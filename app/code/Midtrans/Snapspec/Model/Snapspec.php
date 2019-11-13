@@ -1,4 +1,5 @@
 <?php
+
 namespace Midtrans\Snapspec\Model;
 
 use Magento\Quote\Api\Data\CartInterface;
@@ -35,13 +36,6 @@ class Snapspec extends \Magento\Payment\Model\Method\AbstractMethod
      */
     protected $_formBlockType = 'Midtrans\Snapspec\Block\Form\Snapspec';
 
-    /**
-     * Sidebar payment info block
-     *
-     * @var string
-     */
-//    protected $_infoBlockType = 'Magento\Payment\Block\Info\Instructions';
-
     protected $_isProduction;
 
     protected $orderFactory;
@@ -60,7 +54,8 @@ class Snapspec extends \Magento\Payment\Model\Method\AbstractMethod
         \Magento\Sales\Model\OrderFactory $orderFactory,
         \Magento\Framework\Model\ResourceModel\AbstractResource $resource = null,
         \Magento\Framework\Data\Collection\AbstractDb $resourceCollection = null,
-        array $data = []){
+        array $data = [])
+    {
         $this->orderFactory = $orderFactory;
         parent::__construct($context,
             $registry,
@@ -74,28 +69,18 @@ class Snapspec extends \Magento\Payment\Model\Method\AbstractMethod
             $data);
     }
 
-
-    //@param \Magento\Framework\Object|\Magento\Payment\Model\InfoInterface $payment
     public function getAmount($orderId)//\Magento\Framework\Object $payment)
-    {   //\Magento\Sales\Model\OrderFactory
-        $orderFactory=$this->orderFactory;
-        /** @var \Magento\Sales\Model\Order $order */
-        // $order = $payment->getOrder();
-        // $order->getIncrementId();
+    {   $orderFactory = $this->orderFactory;
+
         /* @var $order \Magento\Sales\Model\Order */
-
-            $order = $orderFactory->create()->loadByIncrementId($orderId);
-            //$payment= $order->getPayment();
-
-        // return $payment->getAmount();
+        $order = $orderFactory->create()->loadByIncrementId($orderId);
         return $order->getGrandTotal();
     }
 
     protected function getOrder($orderId)
     {
-        $orderFactory=$this->orderFactory;
+        $orderFactory = $this->orderFactory;
         return $orderFactory->create()->loadByIncrementId($orderId);
-
     }
 
     /**
@@ -108,7 +93,7 @@ class Snapspec extends \Magento\Payment\Model\Method\AbstractMethod
     public function initialize($paymentAction, $stateObject)
     {
         $state = $this->getConfigData('order_status');
-        $this->_isProduction=$this->getConfigData('is_production');
+        $this->_isProduction = $this->getConfigData('is_production');
         $stateObject->setStatus($state);
         $stateObject->setIsNotified(false);
     }
@@ -124,20 +109,17 @@ class Snapspec extends \Magento\Payment\Model\Method\AbstractMethod
         if ($quote === null) {
             return false;
         }
-//        $isAllowedShipping = $this->isCarrierAllowed($quote->getShippingAddress()->getShippingMethod();
-//        return parent::isAvailable($quote) && $isAllowedShipping;
         return parent::isAvailable($quote);
     }
 
-    public function generateHash($login,$sum,$pass,$id=null)
+    public function generateHash($login, $sum, $pass, $id = null)
     {
-        
+
         $hashData = array(
             "MrchLogin" => $login,
             "OutSum" => $sum,
-            
+
             "InvId" => $id,
-            //"OutSumCurrency" => "RUB",
             "pass" => $pass,
         );
 
@@ -146,15 +128,14 @@ class Snapspec extends \Magento\Payment\Model\Method\AbstractMethod
     }
 
     public function getPostData($orderId)
-    {   //TODO: add curency
-        //OutSumCurrency
-        $PostData=[];
-        $PostData['OutSum']=round($this->getAmount($orderId), 2);
-        $PostData['InvId']=intval($orderId);
-        $PostData['MerchantLogin']=$this->getConfigData('merchant_id');
-        $PostData['Description']="payment for order ".$orderId;
-        $PostData['SignatureValue']=$this->generateHash($PostData['MerchantLogin'],
-            $PostData['OutSum'],$this->getConfigData('pass_word_1'),$PostData['InvId']);
+    {
+        $PostData = [];
+        $PostData['OutSum'] = round($this->getAmount($orderId), 2);
+        $PostData['InvId'] = intval($orderId);
+        $PostData['MerchantLogin'] = $this->getConfigData('merchant_id');
+        $PostData['Description'] = "payment for order " . $orderId;
+        $PostData['SignatureValue'] = $this->generateHash($PostData['MerchantLogin'],
+            $PostData['OutSum'], $this->getConfigData('pass_word_1'), $PostData['InvId']);
         return $PostData;
 
     }
@@ -164,32 +145,22 @@ class Snapspec extends \Magento\Payment\Model\Method\AbstractMethod
         $debugData = ['response' => $responseData];
         $this->_debug($debugData);
 
-        // $this->mapGatewayResponse($responseData, $this->getResponse());
-        if(count($responseData)>2){
-         $order = $this->getOrder(sprintf("%010s",$responseData['InvId']));
-        
+        if (count($responseData) > 2) {
+            $order = $this->getOrder(sprintf("%010s", $responseData['InvId']));
 
-
-        if ($order) {
-            echo $this->_processOrder($order,$responseData);
-        }
-        }else{
+            if ($order) {
+                echo $this->_processOrder($order, $responseData);
+            }
+        } else {
             echo "errors";
         }
     }
 
-    protected function _processOrder(\Magento\Sales\Model\Order $order , $response)
+    protected function _processOrder(\Magento\Sales\Model\Order $order, $response)
     {
-        //$response = $this->getResponse();
         $payment = $order->getPayment();
-        //$payment->setTransactionId($response->getPnref())->setIsTransactionClosed(0);
-        //TODO: add validation for request data
-
-         try {
+        try {
             $errors = array();
-            //$this->readConfig();
-            //$order = Mage::getModel("sales/order")->load($this->getOrderId($answer));
-            //$order = Mage::getModel("sales/order")->loadByIncrementId($this->getOrderId($answer));
             $hashArray = array(
                 $response["OutSum"],
                 $response["InvId"],
@@ -208,41 +179,26 @@ class Snapspec extends \Magento\Payment\Model\Method\AbstractMethod
             /**
              * @var $order Mage_Sales_Model_Order
              */
-            // if ($this->_transferCurrency != $order->getOrderCurrencyCode()) {
-            //     $outSum = round(
-            //         $order->getBaseCurrency()->convert($order->getBaseGrandTotal(), $this->_transferCurrency),
-            //         2
-            //     );
-            // } else {
-                $outSum = round($order->getGrandTotal(), 2);
-            // }
+            $outSum = round($order->getGrandTotal(), 2);
 
             if ($outSum != $response["OutSum"]) {
                 $errors[] = "Incorrect Amount: " . $response["OutSum"] . " (need: " . $outSum . ")";
             }
 
-            // if (count($errors) > 0) {
-            //     return $errors;
-            // }
 
-            //return (bool)$correctHash;
-            //$payment->registerCaptureNotification($payment->getBaseAmountAuthorized());
             if (!$correctHash) {
                 $payment->setTransactionId($response["InvId"])->setIsTransactionClosed(0);
                 $order->setStatus(Order::STATE_PAYMENT_REVIEW);
                 $order->save();
-                return "Ok".$response["InvId"]; 
+                return "Ok" . $response["InvId"];
             }
-            
-            //  
         } catch (Exception $e) {
             return array("Internal error:" . $e->getMessage());
         }
-
-          
     }
 
-    public function getOrderPlaceRedirectUrl(){
+    public function getOrderPlaceRedirectUrl()
+    {
         return 'http://www.google.com/';
     }
 

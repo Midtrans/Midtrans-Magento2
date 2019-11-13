@@ -1,4 +1,5 @@
 <?php
+
 namespace Midtrans\Snapio\Model\Ui;
 
 use Magento\Checkout\Model\ConfigProviderInterface;
@@ -8,11 +9,12 @@ use Magento\Framework\Exception\LocalizedException;
 use Magento\Framework\App\RequestInterface;
 use Magento\Framework\View\Asset\Repository;
 use Psr\Log\LoggerInterface;
-use Magento\Payment\Model\Config as PaymentConfig; 
+use Magento\Payment\Model\Config as PaymentConfig;
 use Magento\Quote\Model\Quote;
 use Magento\Checkout\Model\Session;
 
-final class ConfigProvider  implements ConfigProviderInterface{
+final class ConfigProvider implements ConfigProviderInterface
+{
     const CODE = 'snapio';
     protected $iv;
     protected $config;
@@ -26,19 +28,20 @@ final class ConfigProvider  implements ConfigProviderInterface{
 
 
     public function __construct(
-        PaymentConfig $paymentConfig, 
+        PaymentConfig $paymentConfig,
         Repository $assetRepo,
         RequestInterface $request,
         UrlInterface $urlBuilder,
         \Midtrans\Snapio\Model\Snapio $iv,
         \Magento\Checkout\Model\Session $checkoutSession,
-        LoggerInterface $logger){
+        LoggerInterface $logger)
+    {
 
         $this->urlBuilder = $urlBuilder;
         $this->logger = $logger;
         $this->iv = $iv;
         $this->config = $paymentConfig;
-        $this->assetRepo = $assetRepo; 
+        $this->assetRepo = $assetRepo;
         $this->_checkoutSession = $checkoutSession;
     }
 
@@ -47,6 +50,7 @@ final class ConfigProvider  implements ConfigProviderInterface{
         $production = $this->iv->getConfigData("is_production");
         $clientkey = $this->iv->getConfigData("client_key");
         $merchantid = $this->iv->getConfigData("merchant_id");
+        $enableredirect = $this->iv->getConfigData("enable_redirect");
         $mixpanelkey = $production == 1 ? "17253088ed3a39b1e2bd2cbcfeca939a" : "9dcba9b440c831d517e8ff1beff40bd9";
         $magentoversion = \Magento\Framework\App\ObjectManager::getInstance()->get('Magento\Framework\App\ProductMetadataInterface')->getVersion();
 
@@ -57,9 +61,10 @@ final class ConfigProvider  implements ConfigProviderInterface{
         return [
             'payment' => [
                 self::CODE => [
-                    'production'=> $production,
-                    'clientkey'=> $clientkey,
+                    'production' => $production,
+                    'clientkey' => $clientkey,
                     'merchantid' => $merchantid,
+                    'enableredirect' => $enableredirect,
                     'mixpanelkey' => $mixpanelkey,
                     'magentoversion' => $magentoversion,
                     'pluginversion' => $pluginversion
@@ -67,5 +72,4 @@ final class ConfigProvider  implements ConfigProviderInterface{
             ]
         ];
     }
-
 }

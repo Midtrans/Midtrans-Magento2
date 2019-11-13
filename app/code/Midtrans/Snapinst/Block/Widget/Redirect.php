@@ -1,6 +1,7 @@
 <?php
 
 namespace Midtrans\Snapinst\Block\Widget;
+
 use \Magento\Framework\View\Element\Template;
 
 
@@ -42,7 +43,8 @@ class Redirect extends Template
         \Magento\Framework\App\Http\Context $httpContext,
         \Midtrans\Snapinst\Model\Snapinst $paymentConfig,
         array $data = []
-    ) {
+    )
+    {
         parent::__construct($context, $data);
         $this->_checkoutSession = $checkoutSession;
         $this->_customerSession = $customerSession;
@@ -53,17 +55,19 @@ class Redirect extends Template
         $this->Config = $paymentConfig;
     }
 
-    public function getGateUrl(){
+    public function getGateUrl()
+    {
         $om = \Magento\Framework\App\ObjectManager::getInstance();
         $storeManager = $om->get('Magento\Store\Model\StoreManagerInterface');
         $currentStore = $storeManager->getStore();
         $baseUrl = $currentStore->getBaseUrl(\Magento\Framework\UrlInterface::DEFAULT_URL_TYPE);
-        $redirUrl = $baseUrl.'snapinst/payment/redirect';
+        $redirUrl = $baseUrl . 'snapinst/payment/redirect';
         return $redirUrl;
     }
 
     public function getAmount()
-    {   $orderId = $this->_checkoutSession->getLastOrderId(); 
+    {
+        $orderId = $this->_checkoutSession->getLastOrderId();
         if ($orderId) {
             $incrementId = $this->_checkoutSession->getLastRealOrderId();
             return $this->Config->getAmount($incrementId);
@@ -72,42 +76,20 @@ class Redirect extends Template
 
     public function getPostData()
     {
-        $orderId = $this->_checkoutSession->getLastOrderId(); 
+        $orderId = $this->_checkoutSession->getLastOrderId();
         if ($orderId) {
             $incrementId = $this->_checkoutSession->getLastRealOrderId();
             return $this->Config->getPostData($incrementId);
         }
     }
 
-    public function isVisible() {
+    public function isVisible()
+    {
         $orderId = $this->_checkoutSession->getLastRealOrderId();
         $om = \Magento\Framework\App\ObjectManager::getInstance();
         $order = $om->create('Magento\Sales\Model\Order')->load($orderId);
         $payment = $order->getPayment();
         $code = $payment->getMethodInstance()->getCode();
-        return ($code==\Midtrans\Snapinst\Model\Snapinst::SNAPINST_PAYMENT_CODE);
+        return ($code == \Midtrans\Snapinst\Model\Snapinst::SNAPINST_PAYMENT_CODE);
     }
-
-    // public function getChildHtml($name = '', $useCache = true){
-    //     return "";
-    // }
-    // public function getChildHtml($name = '', $useCache = true)
-    // {
-    //     $payment = $this->getRequest()->getPost('payment');
-    //     $result = "";
-    //     $deviceData = $this->getRequest()->getPost('device_data');
-
-    //     if (isset($payment["cc_token"]) && $payment["cc_token"]) {
-    //         $ccToken = $payment["cc_token"];
-    //         $result .= "<input type='hidden' name='payment[cc_token]' value='$ccToken'>";
-    //     }
-    //     if (isset($payment['store_in_vault']) && $payment['store_in_vault']) {
-    //         $storeInVault = $payment['store_in_vault'];
-    //         $result .= "<input type='hidden' name='payment[store_in_vault]' value='$storeInVault'>";
-    //     }
-    //     if ($deviceData) {
-    //         $result .= "<input type='hidden' name='device_data' value='$deviceData'>";
-    //     }
-    //     return $result;
-    // }
 }
