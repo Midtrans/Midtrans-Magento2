@@ -2,6 +2,7 @@
 
 namespace Midtrans\Snap\Controller\Payment;
 
+use Exception;
 use Magento\Framework\App\Filesystem\DirectoryList;
 use Magento\Framework\Controller\ResultFactory;
 
