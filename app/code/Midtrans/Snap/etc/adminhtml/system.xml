@@ -62,9 +62,22 @@
                     </tooltip>
                     <source_model>Magento\Config\Model\Config\Source\Enabledisable</source_model>
                 </field>
+                <field id="bank" translate="label" type="text" sortOrder="9" showInDefault="1" showInWebsite="1"
+                       showInStore="1">
+                    <label>Acquiring Bank</label>
+                    <comment>
+                        <![CDATA[Input the desired acquiring bank. e.g: bni.<br/>Leave blank if you are not sure!]]></comment>
+                </field>
+                <field id="bin" translate="label" type="text" sortOrder="10" showInDefault="1" showInWebsite="1"
+                       showInStore="0">
+                    <label>Bin Number</label>
+                    <comment>
+                        <![CDATA[Fill with CC BIN numbers (or bank name) that you want to allow to use this payment button.<br\>Separate BIN number with coma Example: 4,5,4811,bni,mandiri.<br\>Leave it blank if you are not sure!]]></comment>
+                </field>
                 <field id="custom_expiry" translate="label" type="text" sortOrder="12" showInDefault="1"
                        showInWebsite="1" showInStore="0">
                     <label>Custom Expiry</label>
+                    <comment><![CDATA[Filled with duration & unit. Unit: minute,hour,day. example: 120 minute]]></comment>
                     <tooltip>This will allow you to set custom duration on how long the transaction available to be
                         paid.
                     </tooltip>

@@ -83,6 +83,7 @@
                 <field id="custom_expiry" translate="label" type="text" sortOrder="12" showInDefault="1"
                        showInWebsite="1" showInStore="0">
                     <label>Custom Expiry</label>
+                    <comment><![CDATA[Filled with duration & unit. Unit: minute,hour,day. example: 120 minute]]></comment>
                     <tooltip>This will allow you to set custom duration on how long the transaction available to be
                         paid.
                     </tooltip>
