@@ -48,6 +48,11 @@ class Redirect extends \Magento\Framework\App\Action\Action
         $oneClick = $config->getValue('payment/snap/one_click', \Magento\Store\Model\ScopeInterface::SCOPE_STORE);
         $customExpiry = $config->getValue('payment/snap/custom_expiry', \Magento\Store\Model\ScopeInterface::SCOPE_STORE);
 
+        $bank = $config->getValue('payment/snap/bank', \Magento\Store\Model\ScopeInterface::SCOPE_STORE);
+        $binNumber = $config->getValue('payment/snap/bin', \Magento\Store\Model\ScopeInterface::SCOPE_STORE);
+
+
+
         $vtConfig = $om->get('Midtrans\Config');
         $vtConfig::$isProduction = $isProduction;
         $vtConfig::$is3ds = $is3ds;
@@ -183,6 +188,14 @@ class Redirect extends \Magento\Framework\App\Action\Action
         $payloads['item_details'] = $item_details;
         $payloads['customer_details'] = $customer_details;
 
+        if (!empty($bank)) {
+            $payloads['credit_card']['bank'] = $bank;
+        }
+
+        if (!empty($binNumber)) {
+            $bin = explode(',', $binNumber);
+            $payloads['credit_card']['whitelist_bins'] = $bin;
+        }
 
         if ($oneClick == 1) {
             $payloads['credit_card']['save_card'] = true;
@@ -199,7 +212,6 @@ class Redirect extends \Magento\Framework\App\Action\Action
                 'unit' => $expiry_unit,
                 'duration' => (int)$expiry_duration
             );
-
         }
 
 
