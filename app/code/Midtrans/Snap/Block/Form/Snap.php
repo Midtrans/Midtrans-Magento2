@@ -10,7 +10,6 @@ class Snap extends \Magento\Payment\Block\Form
      */
     protected $_instructions;
 
-
     protected $_template = 'form/snap.phtml';
 
 }

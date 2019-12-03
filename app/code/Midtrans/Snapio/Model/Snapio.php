@@ -1,4 +1,5 @@
 <?php
+
 namespace Midtrans\Snapio\Model;
 
 use Magento\Quote\Api\Data\CartInterface;
@@ -60,7 +61,8 @@ class Snapio extends \Magento\Payment\Model\Method\AbstractMethod
         \Magento\Sales\Model\OrderFactory $orderFactory,
         \Magento\Framework\Model\ResourceModel\AbstractResource $resource = null,
         \Magento\Framework\Data\Collection\AbstractDb $resourceCollection = null,
-        array $data = []){
+        array $data = [])
+    {
         $this->orderFactory = $orderFactory;
         parent::__construct($context,
             $registry,
@@ -78,14 +80,14 @@ class Snapio extends \Magento\Payment\Model\Method\AbstractMethod
     //@param \Magento\Framework\Object|\Magento\Payment\Model\InfoInterface $payment
     public function getAmount($orderId)//\Magento\Framework\Object $payment)
     {   //\Magento\Sales\Model\OrderFactory
-        $orderFactory=$this->orderFactory;
+        $orderFactory = $this->orderFactory;
         /** @var \Magento\Sales\Model\Order $order */
         // $order = $payment->getOrder();
         // $order->getIncrementId();
         /* @var $order \Magento\Sales\Model\Order */
 
-            $order = $orderFactory->create()->loadByIncrementId($orderId);
-            //$payment= $order->getPayment();
+        $order = $orderFactory->create()->loadByIncrementId($orderId);
+        //$payment= $order->getPayment();
 
         // return $payment->getAmount();
         return $order->getGrandTotal();
@@ -93,7 +95,7 @@ class Snapio extends \Magento\Payment\Model\Method\AbstractMethod
 
     protected function getOrder($orderId)
     {
-        $orderFactory=$this->orderFactory;
+        $orderFactory = $this->orderFactory;
         return $orderFactory->create()->loadByIncrementId($orderId);
 
     }
@@ -108,7 +110,7 @@ class Snapio extends \Magento\Payment\Model\Method\AbstractMethod
     public function initialize($paymentAction, $stateObject)
     {
         $state = $this->getConfigData('order_status');
-        $this->_isProduction=$this->getConfigData('is_production');
+        $this->_isProduction = $this->getConfigData('is_production');
         $stateObject->setStatus($state);
         $stateObject->setIsNotified(false);
     }
@@ -129,13 +131,13 @@ class Snapio extends \Magento\Payment\Model\Method\AbstractMethod
         return parent::isAvailable($quote);
     }
 
-    public function generateHash($login,$sum,$pass,$id=null)
+    public function generateHash($login, $sum, $pass, $id = null)
     {
-        
+
         $hashData = array(
             "MrchLogin" => $login,
             "OutSum" => $sum,
-            
+
             "InvId" => $id,
             //"OutSumCurrency" => "RUB",
             "pass" => $pass,
@@ -146,15 +148,13 @@ class Snapio extends \Magento\Payment\Model\Method\AbstractMethod
     }
 
     public function getPostData($orderId)
-    {   //TODO: add curency
-        //OutSumCurrency
-        $PostData=[];
-        $PostData['OutSum']=round($this->getAmount($orderId), 2);
-        $PostData['InvId']=intval($orderId);
-        $PostData['MerchantLogin']=$this->getConfigData('merchant_id');
-        $PostData['Description']="payment for order ".$orderId;
-        $PostData['SignatureValue']=$this->generateHash($PostData['MerchantLogin'],
-            $PostData['OutSum'],$this->getConfigData('pass_word_1'),$PostData['InvId']);
+    {   $PostData = [];
+        $PostData['OutSum'] = round($this->getAmount($orderId), 2);
+        $PostData['InvId'] = intval($orderId);
+        $PostData['MerchantLogin'] = $this->getConfigData('merchant_id');
+        $PostData['Description'] = "payment for order " . $orderId;
+        $PostData['SignatureValue'] = $this->generateHash($PostData['MerchantLogin'],
+            $PostData['OutSum'], $this->getConfigData('pass_word_1'), $PostData['InvId']);
         return $PostData;
 
     }
@@ -165,27 +165,24 @@ class Snapio extends \Magento\Payment\Model\Method\AbstractMethod
         $this->_debug($debugData);
 
         // $this->mapGatewayResponse($responseData, $this->getResponse());
-        if(count($responseData)>2){
-         $order = $this->getOrder(sprintf("%010s",$responseData['InvId']));
-        
+        if (count($responseData) > 2) {
+            $order = $this->getOrder(sprintf("%010s", $responseData['InvId']));
 
 
-        if ($order) {
-            echo $this->_processOrder($order,$responseData);
-        }
-        }else{
+            if ($order) {
+                echo $this->_processOrder($order, $responseData);
+            }
+        } else {
             echo "errors";
         }
     }
 
-    protected function _processOrder(\Magento\Sales\Model\Order $order , $response)
+    protected function _processOrder(\Magento\Sales\Model\Order $order, $response)
     {
         //$response = $this->getResponse();
         $payment = $order->getPayment();
         //$payment->setTransactionId($response->getPnref())->setIsTransactionClosed(0);
-        //TODO: add validation for request data
-
-         try {
+        try {
             $errors = array();
             //$this->readConfig();
             //$order = Mage::getModel("sales/order")->load($this->getOrderId($answer));
@@ -214,7 +211,7 @@ class Snapio extends \Magento\Payment\Model\Method\AbstractMethod
             //         2
             //     );
             // } else {
-                $outSum = round($order->getGrandTotal(), 2);
+            $outSum = round($order->getGrandTotal(), 2);
             // }
 
             if ($outSum != $response["OutSum"]) {
@@ -231,15 +228,15 @@ class Snapio extends \Magento\Payment\Model\Method\AbstractMethod
                 $payment->setTransactionId($response["InvId"])->setIsTransactionClosed(0);
                 $order->setStatus(Order::STATE_PAYMENT_REVIEW);
                 $order->save();
-                return "Ok".$response["InvId"]; 
+                return "Ok" . $response["InvId"];
             }
-            
+
             //  
         } catch (Exception $e) {
             return array("Internal error:" . $e->getMessage());
         }
 
-          
+
     }
 
 }

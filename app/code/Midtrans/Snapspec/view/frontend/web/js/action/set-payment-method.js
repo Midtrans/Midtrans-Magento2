@@ -1,4 +1,3 @@
-
 define(
     [
         'jquery',
@@ -38,8 +37,8 @@ define(
             fullScreenLoader.startLoader();
 
             return storage.put(
-                    serviceUrl, JSON.stringify(payload)
-                ).done(
+                serviceUrl, JSON.stringify(payload)
+            ).done(
                 function () {
                     $.mage.redirect('/snapspec/payment/redirect');
                 }

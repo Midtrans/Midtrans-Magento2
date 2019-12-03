@@ -1,6 +1,7 @@
 <?php
 
 namespace Midtrans\Snapspec\Block\Widget;
+
 use \Magento\Framework\View\Element\Template;
 
 
@@ -42,7 +43,8 @@ class Redirect extends Template
         \Magento\Framework\App\Http\Context $httpContext,
         \Midtrans\Snapspec\Model\Snapspec $paymentConfig,
         array $data = []
-    ) {
+    )
+    {
         parent::__construct($context, $data);
         $this->_checkoutSession = $checkoutSession;
         $this->_customerSession = $customerSession;
@@ -53,17 +55,19 @@ class Redirect extends Template
         $this->Config = $paymentConfig;
     }
 
-    public function getGateUrl(){
+    public function getGateUrl()
+    {
         $om = \Magento\Framework\App\ObjectManager::getInstance();
         $storeManager = $om->get('Magento\Store\Model\StoreManagerInterface');
         $currentStore = $storeManager->getStore();
         $baseUrl = $currentStore->getBaseUrl(\Magento\Framework\UrlInterface::DEFAULT_URL_TYPE);
-        $redirUrl = $baseUrl.'snapspec/payment/redirect';
+        $redirUrl = $baseUrl . 'snapspec/payment/redirect';
         return $redirUrl;
     }
 
     public function getAmount()
-    {   $orderId = $this->_checkoutSession->getLastOrderId(); 
+    {
+        $orderId = $this->_checkoutSession->getLastOrderId();
         if ($orderId) {
             $incrementId = $this->_checkoutSession->getLastRealOrderId();
             return $this->Config->getAmount($incrementId);
@@ -72,20 +76,21 @@ class Redirect extends Template
 
     public function getPostData()
     {
-        $orderId = $this->_checkoutSession->getLastOrderId(); 
+        $orderId = $this->_checkoutSession->getLastOrderId();
         if ($orderId) {
             $incrementId = $this->_checkoutSession->getLastRealOrderId();
             return $this->Config->getPostData($incrementId);
         }
     }
 
-    public function isVisible() {
+    public function isVisible()
+    {
         $orderId = $this->_checkoutSession->getLastRealOrderId();
         $om = \Magento\Framework\App\ObjectManager::getInstance();
         $order = $om->create('Magento\Sales\Model\Order')->load($orderId);
         $payment = $order->getPayment();
         $code = $payment->getMethodInstance()->getCode();
-        return ($code==\Midtrans\Snapspec\Model\Snapspec::SNAPSPEC_PAYMENT_CODE);
+        return ($code == \Midtrans\Snapspec\Model\Snapspec::SNAPSPEC_PAYMENT_CODE);
     }
 
 }

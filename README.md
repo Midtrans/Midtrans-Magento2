@@ -48,7 +48,18 @@ php bin/magento cache:clean
 ```
 5. Login to your Magento Admin Panel.
 6. In your Magento admin area, enable the Midtrans plug-in and insert your merchant details (Server key and client key) in the Menu "Stores" > "Configuration" > "Sales" > "Payment Method" > Tab "Midtrans Snap".
-7. Login into your Midtrans account and change the Payment Notification URL in Settings to `http://[your shop's homepage]/snap/payment/notification`.
+
+### Midtrans&nbsp;  MAP Configuration
+1. Login to your [Midtrans&nbsp;  Account](https://dashboard.midtrans.com), select your environment (sandbox/production), go to menu `settings > configuration`
+   * Payment Notification URL: 
+    >`http://[your-site-url]/snap/payment/notification`
+   * Finish Redirect URL: 
+    >`http://[your-site-url]/snap/index/finish`
+   * Unfinish Redirect URL: 
+    >`http://[your-site-url]/snap/index/finish`
+   * Error Redirect URL: 
+    >`http://[your-site-url]/snap/index/finish`
+
 
 #### Get help
 

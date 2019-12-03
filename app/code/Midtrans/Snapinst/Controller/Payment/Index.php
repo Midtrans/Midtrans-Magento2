@@ -1,4 +1,5 @@
 <?php
+
 namespace Midtrans\Snapinst\Controller\Payment;
 class Index extends \Magento\Framework\App\Action\Action
 {
@@ -7,4 +8,5 @@ class Index extends \Magento\Framework\App\Action\Action
         echo '<p>You Did It!</pd>';
     }
 }
+
 ?>

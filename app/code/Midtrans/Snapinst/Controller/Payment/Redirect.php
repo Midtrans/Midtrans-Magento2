@@ -1,4 +1,5 @@
 <?php
+
 namespace Midtrans\Snapinst\Controller\Payment;
 
 use Magento\Framework\App\Filesystem\DirectoryList;
@@ -7,12 +8,12 @@ use Magento\Framework\Controller\ResultFactory;
 $object_manager = \Magento\Framework\App\ObjectManager::getInstance();
 $filesystem = $object_manager->get('Magento\Framework\Filesystem');
 $root = $filesystem->getDirectoryRead(DirectoryList::ROOT);
-$lib_file = $root->getAbsolutePath('lib/internal/veritrans-php/Veritrans.php');
+$lib_file = $root->getAbsolutePath('lib/internal/midtrans-php\Midtrans.php');
 require_once($lib_file);
 
 class Redirect extends \Magento\Framework\App\Action\Action
 {
-    /** @var \Magento\Framework\View\Result\PageFactory  */
+    /** @var \Magento\Framework\View\Result\PageFactory */
     protected $_checkoutSession;
     protected $_logger;
     protected $_coreSession;
@@ -20,7 +21,8 @@ class Redirect extends \Magento\Framework\App\Action\Action
     public function __construct(
         \Magento\Framework\App\Action\Context $context,
         \Magento\Framework\Session\SessionManagerInterface $coreSession
-    ){
+    )
+    {
         parent::__construct($context);
         $this->_coreSession = $coreSession;
     }
@@ -39,114 +41,72 @@ class Redirect extends \Magento\Framework\App\Action\Action
         $orderId = $quote2->getId();
         $quote = $om->create('Magento\Sales\Model\Order')->load($orderId);
 
-        $isProduction = $config->getValue('payment/snapinst/is_production', \Magento\Store\Model\ScopeInterface::SCOPE_STORE)=='1'?true:false;
-        // $is3ds = $config->getValue('payment/snapinst/is_3ds', \Magento\Store\Model\ScopeInterface::SCOPE_STORE)=='1'?true:false;
+        $enableRedirect = $config->getValue('payment/snapinst/enable_redirect', \Magento\Store\Model\ScopeInterface::SCOPE_STORE) == '1' ? true : false;
+        $isProduction = $config->getValue('payment/snapinst/is_production', \Magento\Store\Model\ScopeInterface::SCOPE_STORE) == '1' ? true : false;
         $title = $config->getValue('payment/snapinst/title', \Magento\Store\Model\ScopeInterface::SCOPE_STORE);
         $serverKey = $config->getValue('payment/snapinst/server_key', \Magento\Store\Model\ScopeInterface::SCOPE_STORE);
         $oneClick = $config->getValue('payment/snapinst/one_click', \Magento\Store\Model\ScopeInterface::SCOPE_STORE);
-        $bank = $config->getValue('payment/snapinst/bank', \Magento\Store\Model\ScopeInterface::SCOPE_STORE);        
+        $bank = $config->getValue('payment/snapinst/bank', \Magento\Store\Model\ScopeInterface::SCOPE_STORE);
         $minAmount = $config->getValue('payment/snapinst/min_amount', \Magento\Store\Model\ScopeInterface::SCOPE_STORE);
 
-        $vtConfig = $om->get('Veritrans_Config');
+        $vtConfig = $om->get('Midtrans\Config');
         $vtConfig::$isProduction = $isProduction;
-        // $vtConfig::$is3ds = $is3ds;
         $vtConfig::$serverKey = $serverKey;
         $vtConfig::$isSanitized = false;
- 
+
         $transaction_details = array();
         $prefix = $config->getValue('payment/snapinst/prefix', \Magento\Store\Model\ScopeInterface::SCOPE_STORE);
-        $transaction_details['order_id'] = $prefix.$orderIncrementId;
+        $transaction_details['order_id'] = $prefix . $orderIncrementId;
         $this->setValue($orderIncrementId);
 
         $order_billing_address = $quote->getBillingAddress();
         $billing_address = array();
-        $billing_address['first_name']   = $order_billing_address->getFirstname();
-        $billing_address['last_name']    = $order_billing_address->getLastname();
-        $billing_address['address']      = $order_billing_address->getStreet()[0];
-        $billing_address['city']         = $order_billing_address->getCity();
-        $billing_address['postal_code']  = $order_billing_address->getPostcode();
+        $billing_address['first_name'] = $order_billing_address->getFirstname();
+        $billing_address['last_name'] = $order_billing_address->getLastname();
+        $billing_address['address'] = $order_billing_address->getStreet()[0];
+        $billing_address['city'] = $order_billing_address->getCity();
+        $billing_address['postal_code'] = $order_billing_address->getPostcode();
         $billing_address['country_code'] = $this->convert_country_code($order_billing_address->getCountryId());
-        $billing_address['phone']        = $order_billing_address->getTelephone();
+        $billing_address['phone'] = $order_billing_address->getTelephone();
 
         $order_shipping_address = $quote->getShippingAddress();
         $shipping_address = array();
-        $shipping_address['first_name']   = $order_shipping_address->getFirstname();
-        $shipping_address['last_name']    = $order_shipping_address->getLastname();
-        $shipping_address['address']      = $order_shipping_address->getStreet()[0];
-        $shipping_address['city']         = $order_shipping_address->getCity();
-        $shipping_address['postal_code']  = $order_shipping_address->getPostcode();
-        $shipping_address['phone']        = $order_shipping_address->getTelephone();
-        $shipping_address['country_code'] =
-            $this->convert_country_code($order_shipping_address->getCountryId());
+        $shipping_address['first_name'] = $order_shipping_address->getFirstname();
+        $shipping_address['last_name'] = $order_shipping_address->getLastname();
+        $shipping_address['address'] = $order_shipping_address->getStreet()[0];
+        $shipping_address['city'] = $order_shipping_address->getCity();
+        $shipping_address['postal_code'] = $order_shipping_address->getPostcode();
+        $shipping_address['phone'] = $order_shipping_address->getTelephone();
+        $shipping_address['country_code'] = $this->convert_country_code($order_shipping_address->getCountryId());
 
         $customer_details = array();
-        $customer_details['billing_address']  = $billing_address;
+        $customer_details['billing_address'] = $billing_address;
         $customer_details['shipping_address'] = $shipping_address;
-        $customer_details['first_name']       = $order_billing_address
-            ->getFirstname();
-        $customer_details['last_name']        = $order_billing_address
-            ->getLastname();
-        $customer_details['email']            = $order_billing_address->getEmail();
-        $customer_details['phone']            = $order_billing_address
-            ->getTelephone();
+        $customer_details['first_name'] = $order_billing_address->getFirstname();
+        $customer_details['last_name'] = $order_billing_address->getLastname();
+        $customer_details['email'] = $order_billing_address->getEmail();
+        $customer_details['phone'] = $order_billing_address->getTelephone();
 
-        /*dummy data*/
-//        $billing_address['first_name']   = 'testfirst';
-//        $billing_address['last_name']    = 'testlast';
-//        $billing_address['address']      = 'tess address';
-//        $billing_address['city']         = 'test city';
-//        $billing_address['postal_code']  = '12345';
-//        $billing_address['country_code'] = $this->convert_country_code('IN');
-//        $billing_address['phone']        = '08123123123';
 
-//        $shipping_address['first_name']   = 'testfirst';
-//        $shipping_address['last_name']    = 'testlast';
-//        $shipping_address['address']      = 'tess address';
-//        $shipping_address['city']         = 'test city';
-//        $shipping_address['postal_code']  = '12345';
-//        $shipping_address['country_code'] = $this->convert_country_code('IN');
-//        $shipping_address['phone']        = '08123123123';
-
-        $customer_details['billing_address']  = $billing_address;
+        $customer_details['billing_address'] = $billing_address;
         $customer_details['shipping_address'] = $shipping_address;
-//        $customer_details['first_name']       = 'testfirst';
-//        $customer_details['last_name']        = 'testlast';
-//        $customer_details['email']            = 'test@test.com';
-//        $customer_details['phone']            = '08123123123';
-        /*dummy data*/
 
-        $items               = $quote->getAllItems();
-//        var_dump($items);exit();
-        $shipping_amount     = $quote->getShippingAmount();
+        $items = $quote->getAllItems();
+        $shipping_amount = $quote->getShippingAmount();
         $shipping_tax_amount = $quote->getShippingTaxAmount();
         $tax_amount = $quote->getTaxAmount();
 
         $item_details = array();
 
-        /*dummy data*/
-//        $item = array(
-//            'id'       => '123',
-//            'price'    => 100000,
-//            'quantity' => 1,
-//            'name'     => 'dummy product'
-//        );
-//        $item_details[] = $item;
-        /*dummy data*/
-
         foreach ($items as $each) {
-//            echo print_r($each,true);
             $item = array(
-                'id'       => $each->getProductId(),
-                'price'    => (string)round($each->getPrice()),
+                'id' => $each->getProductId(),
+                'price' => (string)round($each->getPrice()),
                 'quantity' => (string)round($each->getQtyOrdered()),
-                'name'     => $this->repString($this->getName($each->getName()))
+                'name' => $this->repString($this->getName($each->getName()))
             );
-
-//            if ($item['quantity'] == 0) continue;
-            // error_log(print_r($each->getProductOptions(), true));
             $item_details[] = $item;
         }
-//        exit();
 
         $num_products = count($item_details);
 
@@ -169,7 +129,7 @@ class Redirect extends \Magento\Framework\App\Action\Action
                 'quantity' => 1,
                 'name' => 'Shipping Cost'
             );
-            $item_details[] =$shipping_item;
+            $item_details[] = $shipping_item;
         }
 
         if ($shipping_tax_amount > 0) {
@@ -195,7 +155,7 @@ class Redirect extends \Magento\Framework\App\Action\Action
         if ($quote->getBaseGiftCardsAmount() != 0) {
             $giftcardAmount = array(
                 'id' => 'GIFTCARD',
-                'price' => round($quote->getBaseGiftCardsAmount()*-1),
+                'price' => round($quote->getBaseGiftCardsAmount() * -1),
                 'quantity' => 1,
                 'name' => 'GIFTCARD'
             );
@@ -205,7 +165,7 @@ class Redirect extends \Magento\Framework\App\Action\Action
         if ($quote->getBaseCustomerBalanceAmount() != 0) {
             $balancAmount = array(
                 'id' => 'STORE CREDIT',
-                'price' => round($quote->getBaseCustomerBalanceAmount()*-1),
+                'price' => round($quote->getBaseCustomerBalanceAmount() * -1),
                 'quantity' => 1,
                 'name' => 'STORE CREDIT'
             );
@@ -219,8 +179,8 @@ class Redirect extends \Magento\Framework\App\Action\Action
 
         $transaction_details['gross_amount'] = $totalPrice;
 
-        if ($minAmount <= $totalPrice){
-            $terms      = array(3,6,9,12,15,18,21,24,27,30,33,36);
+        if ($minAmount <= $totalPrice) {
+            $terms = array(3, 6, 9, 12, 15, 18, 21, 24, 27, 30, 33, 36);
             $installment = array();
             $installment['required'] = true;
             $installment['terms'] = array(
@@ -230,54 +190,52 @@ class Redirect extends \Magento\Framework\App\Action\Action
                 'mega' => $terms,
                 'bni' => $terms,
                 'mandiri' => $terms,
-                'cimb' => $terms 
-                );
-             $credit_card['installment'] = $installment;
+                'cimb' => $terms
+            );
+            $credit_card['installment'] = $installment;
         }
-        
+
         $payloads = array();
         $payloads['transaction_details'] = $transaction_details;
-        $payloads['enabled_payments']    = array('credit_card');
-        $payloads['item_details']        = $item_details;
-        $payloads['customer_details']    = $customer_details;
+        $payloads['enabled_payments'] = array('credit_card');
+        $payloads['item_details'] = $item_details;
+        $payloads['customer_details'] = $customer_details;
 
-         if($oneClick == 1){
+        if ($oneClick == 1) {
             $credit_card['save_card'] = true;
             $payloads['user_id'] = crypt($order_billing_address->getEmail(), $serverKey);
         }
-        
+
         $credit_card['secure'] = true;
         $payloads['credit_card'] = $credit_card;
 
         try {
-//            $this->_logger->addDebug('some text or variable');
             $writer = new \Zend\Log\Writer\Stream(BP . '/var/log/test.log');
             $logger = new \Zend\Log\Logger();
             $logger->addWriter($writer);
             // error_log(print_r($payloads,true));
-            $logger->info('$payloads:'.print_r($payloads,true));
-//            var_dump($payloads);
-//            Mage::log('$payloads:'.print_r($payloads,true),null,'snap_payloads.log',true);
-            $snap = $om->get('Veritrans_Snap');
-            $token = $snap->getSnapToken($payloads);
-            $logger->info('snap token:'.print_r($token,true));
-//            var_dump($redirUrl);exit();
-            // error_log('snap_token:'.$token);
-            echo $token;
-
-
-
-        }
-        catch (Exception $e) {
+            $logger->info('$payloads:' . print_r($payloads, true));
+            $snap = $om->get('Midtrans\Snap');
+            $data = null;
+            if ($enableRedirect == false) {
+                $token = $snap->getSnapToken($payloads);
+                $data = $token;
+                $logger->info('snap token:' . print_r($data, true));
+            } else {
+                $redirect_url = $snap->createTransaction($payloads)->redirect_url;
+                $data = $redirect_url;
+                $logger->info('redirect url:' . print_r($data, true));
+            }
+            $result = $this->resultFactory->create(ResultFactory::TYPE_JSON);
+            $result->setData($data);
+            return $result;
+        } catch (Exception $e) {
             error_log($e->getMessage());
-//            Mage::log('error:'.print_r($e->getMessage(),true),null,'snap.log',true);
         }
-
-//        $page_object = $this->resultFactory->create();;
-//        return $page_object;
     }
-    
-    public function setValue($order_id){
+
+    public function setValue($order_id)
+    {
         $this->_coreSession->start();
         $this->_coreSession->setMessage($order_id);
     }
@@ -293,7 +251,8 @@ class Redirect extends \Magento\Framework\App\Action\Action
     }
 
 
-    public function convert_country_code( $country_code ) {
+    public function convert_country_code($country_code)
+    {
 
         // 3 digits country codes
         $cc_three = array(
@@ -544,14 +503,15 @@ class Redirect extends \Magento\Framework\App\Action\Action
         );
 
         // Check if country code exists
-        if( isset( $cc_three[ $country_code ] ) && $cc_three[ $country_code ] != '' ) {
-            $country_code = $cc_three[ $country_code ];
+        if (isset($cc_three[$country_code]) && $cc_three[$country_code] != '') {
+            $country_code = $cc_three[$country_code];
         }
 
         return $country_code;
     }
 
-    private function repString($str){
+    private function repString($str)
+    {
         return preg_replace("/[^a-zA-Z0-9]+/", " ", $str);
     }
 
@@ -560,7 +520,7 @@ class Redirect extends \Magento\Framework\App\Action\Action
         $max_length = 20;
         if (strlen($s) > $max_length) {
             $offset = ($max_length - 3) - strlen($s);
-            $s      = substr($s, 0, strrpos($s, ' ', $offset));
+            $s = substr($s, 0, strrpos($s, ' ', $offset));
         }
         return $s;
     }
