@@ -189,7 +189,6 @@ define(
                                                                 message: 'customer closed the popup without finishing the payment'
                                                             });
                                                             console.log('customer closed the popup without finishing the payment');
-                                                            window.location.replace(url.build('checkout/onepage/failure'));
                                                         }
                                                     });
                                                 }
