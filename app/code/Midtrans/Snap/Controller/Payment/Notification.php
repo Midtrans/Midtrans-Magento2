@@ -5,9 +5,10 @@ namespace Midtrans\Snap\Controller\Payment;
 use Magento\Framework\App\Filesystem\DirectoryList;
 use Magento\Framework\Controller\ResultFactory;
 
-use Magento\Framework\App\CsrfAwareActionInterface;
+//use Magento\Framework\App\CsrfAwareActionInterface;
 use Magento\Framework\App\RequestInterface;
 use Magento\Framework\App\Request\InvalidRequestException;
+use Midtrans\Snap\Plugin\CsrfValidatorSkip;
 
 $object_manager = \Magento\Framework\App\ObjectManager::getInstance();
 $filesystem = $object_manager->get('Magento\Framework\Filesystem');
@@ -15,7 +16,7 @@ $root = $filesystem->getDirectoryRead(DirectoryList::ROOT);
 $lib_file = $root->getAbsolutePath('lib/internal/midtrans-php/Midtrans.php');
 require_once($lib_file);
 
-class Notification extends \Magento\Framework\App\Action\Action implements CsrfAwareActionInterface
+class Notification extends \Magento\Framework\App\Action\Action
 {
     /**
      * @var \Magento\Framework\Registry
@@ -70,7 +71,7 @@ class Notification extends \Magento\Framework\App\Action\Action implements CsrfA
         $logger->info($_info);
         ##log notif snap
 
-        $order_note = "Midtrans HTTP notification received. ";
+        $order_note = "Midtrans Notification - ";
 
         if ($transaction == 'capture') {
             $order->setInstallmentTenor($notif->installment_term);
@@ -132,15 +133,5 @@ class Notification extends \Magento\Framework\App\Action\Action implements CsrfA
             }
         }
         $order->save();
-    }
-
-    public function createCsrfValidationException(RequestInterface $request): ?InvalidRequestException
-    {
-        return null;
-    }
-
-    public function validateForCsrf(RequestInterface $request): ?bool
-    {
-        return true;
     }
 }

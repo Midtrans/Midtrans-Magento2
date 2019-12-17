@@ -1,5 +1,4 @@
 <?php
-
 namespace Midtrans\Snap\Block;
 
 use \Magento\Framework\View\Element\Template;

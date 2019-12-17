@@ -33,10 +33,20 @@ class Cancel extends \Magento\Framework\App\Action\Action
         $orderId = $this->getValue();
 
         $order = $om->get('Magento\Sales\Model\Order')->loadByIncrementId($orderId);
-        $order->setStatus(\Magento\Sales\Model\Order::STATE_CANCELED);
-        $order->addStatusToHistory(\Magento\Sales\Model\Order::STATE_CANCELED);
-        $order->save();
-        $this->unSetValue();
+        if ($order->getState() == \Magento\Sales\Model\Order::STATE_NEW) {
+
+            $order->setStatus(\Magento\Sales\Model\Order::STATE_CANCELED);
+            $order->addStatusToHistory(\Magento\Sales\Model\Order::STATE_CANCELED);
+            $order->save();
+
+            $order->getPayment()->cancel();
+            $order->registerCancellation();
+
+            $this->unSetValue();
+            return $this->resultRedirectFactory->create()->setPath('snap/index/close');
+        } else {
+            return $this->resultRedirectFactory->create()->setPath('checkout/cart');
+        }
     }
 
     public function getValue()
@@ -50,6 +60,5 @@ class Cancel extends \Magento\Framework\App\Action\Action
         $this->_coreSession->start();
         return $this->_coreSession->unsMessage();
     }
-
 
 }

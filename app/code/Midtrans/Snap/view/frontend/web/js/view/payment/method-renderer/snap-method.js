@@ -176,23 +176,13 @@ define(
                                                     messageList.addErrorMessage({
                                                         message: result.status_message
                                                     });
-                                                    window.location.replace(url.build('checkout/onepage/failure'));
+                                                    window.location.replace(url.build('snap/payment/cancel'));
                                                     console.log(result.status_message);
                                                 },
                                                 onClose: function () {
                                                     console.log("get to onclose")
                                                     trackResult(data, merchant_id, 'Fullpayment Snap PopUp', 'close');
-                                                    $.ajax({
-                                                        url: url.build('snap/payment/cancel'),
-                                                        cache: false,
-                                                        success: function () {
-                                                            messageList.addErrorMessage({
-                                                                message: 'customer closed the popup without finishing the payment'
-                                                            });
-                                                            console.log('customer closed the popup without finishing the payment');
-                                                            window.location.replace(url.build('checkout/onepage/failure'));
-                                                        }
-                                                    });
+                                                    window.location.replace(url.build('snap/payment/cancel'));
                                                 }
                                             });
                                         var snapExecuted = true;
