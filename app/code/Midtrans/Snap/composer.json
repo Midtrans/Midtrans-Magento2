@@ -2,7 +2,7 @@
   "name": "midtrans/snap",
   "description": "Midtrans-Snap Payment Method",
   "type": "magento2-module",
-  "version": "2.1.0",
+  "version": "2.2.0",
   "license": [
     "OSL-3.0",
     "AFL-3.0"
