@@ -1,7 +1,4 @@
 <?php
-/**
- * Created by Zaki Ibrahim (c) 2019. Copyright Midtrans PT
- */
 
 namespace Midtrans\Snap\Block;
 use Magento\Framework\Registry;
