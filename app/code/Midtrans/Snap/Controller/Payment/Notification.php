@@ -125,11 +125,29 @@ class Notification extends \Magento\Framework\App\Action\Action
         } else if ($transaction == 'pending') {
             $order->setStatus(\Magento\Sales\Model\Order::STATE_PENDING_PAYMENT);
             $order->addStatusHistoryComment($order_note . 'Awating Payment - ' . $payment_type);
-        } else if ($transaction == 'cancel' || $transaction == 'deny' || $transaction == 'expire') {
+        } else if ($transaction == 'cancel' ) {
             if ($order->canCancel()) {
                 $order->setStatus(\Magento\Sales\Model\Order::STATE_CANCELED);
                 $order->addStatusHistoryComment($order_note . 'Canceled Payment - ' . $payment_type);
-                $order->addStatusToHistory(\Magento\Sales\Model\Order::STATE_CANCELED);
+
+                $order->getPayment()->cancel();
+                $order->registerCancellation();
+            }
+        } else if ($transaction == 'expire') {
+            if ($order->canCancel()) {
+                $order->setStatus(\Magento\Sales\Model\Order::STATE_CANCELED);
+                $order->addStatusHistoryComment($order_note . 'Expired Payment - ' . $payment_type);
+
+                $order->getPayment()->cancel();
+                $order->registerCancellation();
+            }
+        } else if ($transaction == 'deny') {
+            if ($order->canCancel()) {
+                $order->setStatus(\Magento\Sales\Model\Order::STATE_CANCELED);
+                $order->addStatusHistoryComment($order_note . 'Payment Deny - ' . $payment_type);
+
+//                $order->getPayment()->cancel();
+//                $order->registerCancellation();
             }
         }
         $order->save();

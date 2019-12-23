@@ -37,6 +37,8 @@ class Cancel extends \Magento\Framework\App\Action\Action
 
             $order->setStatus(\Magento\Sales\Model\Order::STATE_CANCELED);
             $order->addStatusToHistory(\Magento\Sales\Model\Order::STATE_CANCELED);
+            $order->addStatusHistoryComment('Midtrans | ' . 'Payment Page close - ' . 'by User');
+
             $order->save();
 
             $order->getPayment()->cancel();
