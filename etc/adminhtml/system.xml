@@ -1,0 +1,18 @@
+<?xml version="1.0"?>
+<config xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="../../../Config/etc/system_file.xsd">
+    <system>
+        <section id="payment">
+            <group id="snap" translate="label" type="text" sortOrder="1" showInDefault="1"  showInWebsite="1" showInStore="1">
+                <label>Midtrans - Accept online payment</label>
+                <comment><![CDATA[Empowering commerce through technology]]></comment>
+                <attribute type="expanded">1</attribute>
+                <include path="Midtrans_Snap::system/midtrans_getting_started.xml"/>
+                <include path="Midtrans_Snap::system/midtrans_settings.xml"/>
+                <include path="Midtrans_Snap::system/midtrans_snap_basic_payment.xml"/>
+                <include path="Midtrans_Snap::system/midtrans_snap_specific_payment.xml"/>
+                <include path="Midtrans_Snap::system/midtrans_snap_installment_payment.xml"/>
+                <include path="Midtrans_Snap::system/midtrans_snap_offline_payment.xml"/>
+            </group>
+        </section>
+    </system>
+</config>
