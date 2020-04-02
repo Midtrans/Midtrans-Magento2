@@ -1,8 +1,9 @@
 <?xml version="1.0"?>
 <include xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="urn:magento:module:Magento_Config:etc/system_include.xsd">
     <group id="installment" translate="label" type="text" sortOrder="50" showInDefault="1" showInWebsite="1" showInStore="1">
-        <label><![CDATA[Snap Installment Payment Integration]]></label>
+        <label><![CDATA[Optional - Snap Online Installment Payment Integration]]></label>
         <frontend_model>Magento\Config\Block\System\Config\Form\Fieldset</frontend_model>
+        <comment><![CDATA[<p>Online Installment payment it’s design as optional for Installment where the Card Issuer and Acquiring Bank is the same entity (e.g: BNI Card and BNI Acquiring bank).</p>]]></comment>
         <field id="active" translate="label" type="select" sortOrder="10" showInDefault="1" showInWebsite="1" showInStore="0">
             <label>Enabled</label>
             <source_model>Magento\Config\Model\Config\Source\Yesno</source_model>
