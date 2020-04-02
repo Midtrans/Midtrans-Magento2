@@ -304,7 +304,6 @@
     </type>
 <!-- END LOGGER -->
 
-
     <!-- Refund Request -->
     <virtualType name="SnapRefundRequest" type="Magento\Payment\Gateway\Request\BuilderComposite">
         <arguments>
@@ -319,13 +318,5 @@
             <argument name="settings" xsi:type="object">Midtrans\Snap\Helper\Data</argument>
         </arguments>
     </type>
-
-<!--    <virtualType name="Magento\Sales\Model\ResourceModel\Order" type="Magento\Sales\Model\Order">-->
-<!--        <arguments>-->
-<!--            <argument name="columns" xsi:type="array">-->
-<!--                <item name="midtrans_trx_id" xsi:type="string">sales_order.midtrans_trx_id</item>-->
-<!--            </argument>-->
-<!--        </arguments>-->
-<!--    </virtualType>-->
 
 </config>
