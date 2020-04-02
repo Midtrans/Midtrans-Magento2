@@ -1,4 +1,3 @@
-# Overview
 Midtrans ❤️ Magento! Midtrans is highly concerned with customer experience (UX). We strive to make payments simple for both the merchant and customers. With this plugin,  you can make your Magento store using Midtrans payment.
 
 ## Requirements:
@@ -26,8 +25,9 @@ Before you begin to install through the composer, you need Magento marketplace a
 With these steps, you can custom/modify our Magento plugins to handle the business model that you want
 
 1. Download and extract the plugin you have previously downloaded from GitHub and rename the folder as Snap.
-2. Make a directory structure like this: \
-    - app
+2. Make a directory structure like this: 
+   ```` 
+   - app
       - code
         - Midtrans
             - Snap (the folder from step 1)
@@ -54,13 +54,13 @@ Configure the Midtrans plugin in your Magento admin panel:
 2. In the left navigation bar, go to **Stores(1)** -> **Configuration(2)**. 
 3. In the menu, go to **Sales(3)** -> **Payment Methods(4)**
 
-![](images/Midtrans-Magento1.png "image_tooltip")
+![](https://user-images.githubusercontent.com/21098575/78235369-c133c000-7502-11ea-99af-d28144d5f2ca.png "image_mag_config")
 
 
 4. In the Midtrans - Accept Online Payment section, click Basic Settings and fill out the following fields:
 
-| Field                   | Description									|
-|-------------------------|:---------------------------------------------------------------------------:|
+| Field                   | Description									                               |
+|-------------------------| ---------------------------------------------------------------------------|
 | Is Production           | Select whether you want to use a sandbox or production mode\.			|
 | Merchant ID             | Unique id of your Midtrans account for which the payments will be processed\.|
 | Sandbox \- ClientKey    | Used as an API key to be used for authorization sandbox environment on frontend API request/configuration\. So it is safe to put in your HTML / client code publicly\.    |
@@ -74,7 +74,8 @@ Configure the Midtrans plugin in your Magento admin panel:
 
 ## Log options
 
-The plugins will store log file in midtrans directory `/var/log/midtrans`. The default value is on for request, notification and error log. Except Throw Exception, is off by default.
+The plugins will store log file in directory `/var/log/midtrans`. The default value is on for request, notification and error log. Except Throw Exception, is off by default.
+![](https://user-images.githubusercontent.com/21098575/78235349-b9741b80-7502-11ea-9139-f5119193bc20.png "image_mag_config")
 
 
 ## Config Plugins Payment Integration
@@ -143,7 +144,7 @@ If you make a refund in the Midtrans Dashboard, a Refund notification is sent to
 3. Click on the order you want to refund.
 4. In the **Order list View** left-hand navigation sidebar, click **Invoices**tab.
 5. In the invoice list page, selected the order. click the view button on invoice you need to request online refund.
-6. Click **Credit Memo** on the top-right corner of the page. ****
+6. Click **Credit Memo** on the top-right corner of the page.
 7. In the **New Memo for Invoice** page, scroll down to the **Refund Totals** section.
 8. In this section, you can request online **Refund** or **Refund Offline**.
     *   **Refund:** This option will request refund Online to Midtrans, Midtrans automatically send refund notification and changes order status to **Closed** from notification.
