@@ -265,14 +265,16 @@ abstract class AbstractAction extends Action
      * do create invoice for order
      *
      * @param $order
+     * @throws \Exception
      */
     public function createInvoice($order) {
         try {
             $newInvoice = $this->_invoiceService->prepareInvoice($order);
         } catch (LocalizedException $e) {
-            //TODO: Handle to logger
+            error_reporting($e);
+            $this->_midtransLogger->midtransError($e->getMessage());
         } catch (\Exception $e) {
-            //TODO: Handle to logger
+            $this->_midtransLogger->midtransError($e->getMessage());
         }
         try {
             $newInvoice->register();
@@ -280,7 +282,7 @@ abstract class AbstractAction extends Action
             $newInvoice->capture();
             $newInvoice->setIsUsedForRefund(1);
         } catch (LocalizedException $e) {
-            //TODO: Handle to logger
+            $this->_midtransLogger->midtransError($e->getMessage());
         }
     }
 
