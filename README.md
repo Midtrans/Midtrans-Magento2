@@ -24,8 +24,10 @@ Before you begin to install through the composer, you need Magento marketplace a
 With these steps, you can custom/modify our Magento plugins to handle the business model that you want
 
 1. Download and extract the plugin you have previously downloaded from GitHub and rename the folder as Snap.
-2. Make a directory structure like this: 
+2. Make a directory structure like this:
+
 ![](https://user-images.githubusercontent.com/21098575/78326383-723e6700-75a4-11ea-97ae-44885443008c.png "image_directory_structure")
+
 3. Locate the root Magento directory of your shop via FTP connection.
 4. Copy the app folders into the Magento root folder.
 5. Run this command on terminal
