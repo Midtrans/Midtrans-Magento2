@@ -1,6 +1,7 @@
 <?xml version="1.0"?>
 <include xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="urn:magento:module:Magento_Config:etc/system_include.xsd">
     <group id="settings" translate="label" type="text" sortOrder="20" showInDefault="1" showInWebsite="1" showInStore="1">
+        <frontend_model>Magento\Config\Block\System\Config\Form\Fieldset</frontend_model>
         <label><![CDATA[Basic Settings]]></label>
         <comment><![CDATA[<script type="text/javascript">//<![CDATA[
                         require(['jquery'], function(){
@@ -8,12 +9,10 @@
                             function conditionalField() {
                                 var isProduction = environment.val() === '1';
                                 var isSandbox = environment.val() === '0';
-
                                 var prodServerKey = jQuery("tr[id*='settings_production_server_key']");
                                 var prodClientKey = jQuery("tr[id*='settings_production_client_key']");
                                 var sandboxServerKey = jQuery("tr[id*='settings_sandbox_server_key']");
                                 var sandboxClientKey = jQuery("tr[id*='settings_sandbox_client_key']");
-
 
                                     if (isProduction) {
                                         prodServerKey.show();
@@ -27,14 +26,14 @@
                                         sandboxServerKey.show();
                                 }
                             }
-                            environment.change(function () {
+                            environment.change(
+                            function () {
                                 conditionalField();
                             });
                             conditionalField();
                         });
                     </script>
                 ]]></comment>
-        <frontend_model>Magento\Config\Block\System\Config\Form\Fieldset</frontend_model>
         <field id="is_production" translate="label" type="select" sortOrder="10" showInDefault="1" showInWebsite="1" showInStore="0">
             <label>Is Production</label>
             <source_model>Magento\Config\Model\Config\Source\Yesno</source_model>

@@ -456,8 +456,9 @@ abstract class AbstractAction extends Action
 
         if ($paymentCode == 'snap') {
             $credit_card = $this->getSnapCardConfig($config);
-            $payloads['credit_card'] = $credit_card;
-
+            if ($credit_card != null) {
+                $payloads['credit_card'] = $credit_card;
+            }
 
         } else if ($paymentCode == 'specific') {
             $credit_card = $this->getSpecificCardConfig($config);
@@ -484,7 +485,7 @@ abstract class AbstractAction extends Action
         }
 
         if ($config['one_click']) {
-            $payloads['user_id'] = crypt($order_billing_address->getEmail(), $this->data->getServerKey());
+            $payloads['user_id'] = crypt($order_billing_address->getEmail(), $this->data->getServerKey($paymentCode));
         }
         if (!empty($customExpiry)) {
             $customExpiry = explode(" ", $customExpiry);
@@ -623,7 +624,6 @@ abstract class AbstractAction extends Action
         return $offline_credit_card;
     }
 
-    //move from redirect
 
     /**
      * @param $country_code
@@ -1025,12 +1025,11 @@ abstract class AbstractAction extends Action
      * @return void
      * @throws \Exception
      */
-    public function setOrderStateAndStatus($orderId, $status, $order_note, $trxId)
+    public function setOrderStateAndStatus($orderId, $status, $order_note)
     {
         $order = $this->getQuoteByOrderId($orderId);
         $order->setState($status);
         $order->setStatus($status);
-        $order->setData(self::midtransTrxId, $trxId);
         $order->addCommentToStatusHistory($order_note, true, false);
         $this->saveOrder($order);
     }

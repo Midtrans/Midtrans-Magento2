@@ -12,35 +12,23 @@ use Midtrans\Snap\Gateway\Config\Config;
 
 class Finish extends AbstractAction
 {
+    const PAYMENT_CODE = 'snap';
 
     public function execute()
     {
-
         try {
             $transactionId = $this->getRequest()->getParam('id');
             $orderId = $this->getRequest()->getParam('order_id');
             if ($transactionId != null) {
                 $param = $transactionId;
-                $order = $this->getOrderByTransactionId($param);
             } else if ($orderId != null) {
                 $param = $orderId;
-                $order = $this->getQuoteByOrderId($param);
             } else {
                 return $this->resultRedirectFactory->create()->setPath('checkout/cart');
             }
 
-            if (isset($order)) {
-                if ($order->getPayment() != null) {
-                    $paymentCode = $order->getPayment()->getMethod();
-                } else {
-                    return $this->resultRedirectFactory->create()->setPath('checkout/cart');
-                }
-            }
-
             Config::$isProduction = $this->data->isProduction();
-            if (isset($paymentCode)) {
-                Config::$serverKey = $this->data->getServerKey($paymentCode);
-            }
+            Config::$serverKey = $this->data->getServerKey(self::PAYMENT_CODE);
 
             $transaction = new Transaction();
             $statusResult = $transaction::status($param);

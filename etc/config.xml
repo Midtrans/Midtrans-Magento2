@@ -57,7 +57,7 @@
             </specific>
             <installment>
                 <active>0</active>
-                <title>Installment Payment via Midtrans</title>
+                <title>Online Installment Payment via Midtrans</title>
                 <custom_expiry>120 minute</custom_expiry>
                 <minimal_amount>500000</minimal_amount>
                 <is3ds>1</is3ds>

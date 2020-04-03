@@ -56,7 +56,7 @@ class Notification extends AbstractAction
                 if ($order->canInvoice() && !$order->hasInvoices()) {
                     $this->generateInvoice($orderId, $payment_type);
                 }
-                $this->setOrderStateAndStatus($orderId,Order::STATE_PROCESSING, $order_note, $trxId);
+                $this->setOrderStateAndStatus($orderId,Order::STATE_PROCESSING, $order_note);
             }
         } else if ($transaction == 'settlement') {
             if ($payment_type != 'credit_card') {
@@ -64,11 +64,7 @@ class Notification extends AbstractAction
                 if ($order->canInvoice() && !$order->hasInvoices()) {
                     $this->generateInvoice($orderId, $payment_type);
                 }
-                //$order->setData('state', 'processing');
-               // $order->setStatus(Order::STATE_PROCESSING);
-               // $order->setState(Order::STATE_PROCESSING);
-                $this->setOrderStateAndStatus($orderId, Order::STATE_PROCESSING, $order_note, $trxId);
-                //$order->addCommentToStatusHistory($note_prefix . 'Payment Completed - ' . $payment_type, false, false);
+                $this->setOrderStateAndStatus($orderId, Order::STATE_PROCESSING, $order_note);
             }
         } else if ($transaction == 'pending') {
             $order_note = $note_prefix . 'Awating Payment - ' . $payment_type;
@@ -84,10 +80,8 @@ class Notification extends AbstractAction
                 $this->cancelOrder($orderId, Order::STATE_CANCELED, $order_note);
             }
         } else if ($transaction == 'deny') {
-            if ($order->canCancel()) {
-                $order->setStatus(Order::STATE_CANCELED);
+                $order->setStatus(Order::STATE_PAYMENT_REVIEW);
                 $order->addCommentToStatusHistory($note_prefix . 'Payment Deny - ' . $payment_type, false, false);
-            }
         } else if ($transaction == 'refund' || $transaction == 'partial_refund') {
             $isFullRefund = ($transaction == 'refund') ? true : false;
 

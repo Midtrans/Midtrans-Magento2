@@ -18,7 +18,6 @@ Before you begin to install through the composer, you need Magento marketplace a
 
 ## Install Midtrans Snap plugins through Magento marketplace 
 
-1. TODO ELABORATE
 
 ## Install Midtrans Snap plugins from GitHub project
 
@@ -26,12 +25,7 @@ With these steps, you can custom/modify our Magento plugins to handle the busine
 
 1. Download and extract the plugin you have previously downloaded from GitHub and rename the folder as Snap.
 2. Make a directory structure like this: 
-   ```` 
-   - app
-      - code
-        - Midtrans
-            - Snap (the folder from step 1)
-
+![](https://user-images.githubusercontent.com/21098575/78326383-723e6700-75a4-11ea-97ae-44885443008c.png "image_directory_structure")
 3. Locate the root Magento directory of your shop via FTP connection.
 4. Copy the app folders into the Magento root folder.
 5. Run this command on terminal
@@ -41,7 +35,6 @@ With these steps, you can custom/modify our Magento plugins to handle the busine
     `bin/magento setup:upgrade`
     
     `bin/magento cache:flush`
-
 
 
 # Plugin Usage Instruction
@@ -66,7 +59,7 @@ Configure the Midtrans plugin in your Magento admin panel:
 | Sandbox \- ClientKey    | Used as an API key to be used for authorization sandbox environment on frontend API request/configuration\. So it is safe to put in your HTML / client code publicly\.    |
 | Sandbox \- ServerKey    | Used as an API key to be used for authorization sandbox environment while calling Midtrans API from the backend\. So keep it stored confidentially\.                      |
 | Production \- ClientKey | Used as an API key to be used for authorization production environment on frontend API request/configuration\. So it is safe to put in your HTML / client code publicly\. |
-| Production \- ServerKey | Used as an API key to be used for authorization production environments while calling Midtrans API from the backend\. So keep it stored confidentially                    					|
+| Production \- ServerKey | Used as an API key to be used for authorization production environments while calling Midtrans API from the backend\. So keep it stored confidentially                    |
 | Enable Snap redirect    | Change to Snap redirect mode, the default value is No\.			 |
 
 
@@ -84,11 +77,13 @@ In the Midtrans Magento plugins we have 4 option to use Snap model payment metho
 
 
 1. **Snap payment integration**
-
+    
     This is the default Snap for Midtrans Magento plugins, Snap payment will auto-enabled when install the Midtrans plugins. Midtrans will show the available payment method on the Snap payment screen.
 
-2. **Specific Payment integration | Optional** \
-Specific payment it’s design as optional for specific payment that specify in Allow payment method field, Midtrans Snap will show directly payment method on the Snap screen.
+2. **Specific Payment integration | Optional** 
+    
+    Specific payment it’s design as optional for specific payment that specify in Allow payment method field, Midtrans Snap will show directly payment method on the Snap screen.
+
 3. **Online Installment payment integration | Optional**
 
     Online Installment payment it’s design as optional for Installment where the Card Issuer and Acquiring Bank is the same entity (e.g: BNI Card and BNI Acquiring bank).
@@ -99,6 +94,8 @@ Specific payment it’s design as optional for specific payment that specify in 
 
 
 >Note: You can use different Midtrans Account for every Snap model payment method, should configure the access-key in Optional section `“Use another Midtrans account”`. If the optional access-key is empty, the plugins will automatically use access key on Basic Settings.
+
+>INFO: BCA Klikpay only can use in Snap payment integration
 
 If you need custom configuration you can feel free to change the default configuration with the following fields 
 
