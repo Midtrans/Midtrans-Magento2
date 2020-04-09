@@ -2,9 +2,10 @@ Midtrans ❤️ Magento! Midtrans is highly concerned with customer experience (
 
 ## Requirements:
 *   An online store with Magento infrastructure. This plugin is tested with Magento v2.3.2
-*   PHP v5.4 or greater.
-*   MySQL v5.0 or greater.
+*   PHP v5.6 or greater.
+*   MySQL v5.7 or greater.
 *   Midtrans plugin for Magento v2.x [ [Github](https://github.com/Midtrans/Midtrans-Magento2) | [Zip](https://github.com/Midtrans/Midtrans-Magento2/archive/master.zip) ]
+*   This plugin supports Magento2 version 2.1.0, 2.2.0, 2.3.4 and higher.
 
 
 # How to install the plugins
