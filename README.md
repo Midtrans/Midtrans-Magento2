@@ -82,20 +82,20 @@ In the Midtrans Magento plugins we have 4 option to use Snap model payment metho
 
 2. **Specific Payment integration | Optional** 
     
-    Specific payment it’s design as optional for specific payment that specify in Allow payment method field, Midtrans Snap will show directly payment method on the Snap screen.
+    Enabling this will display additional payment options to customer, for specific payment that are specified in the "Allowed Payment Method" field, Midtrans Snap will show only the listed payment method on the Snap screen.
 
 3. **Online Installment payment integration | Optional**
 
-    Online Installment payment it’s design as optional for Installment where the Card Issuer and Acquiring Bank is the same entity (e.g: BNI Card and BNI Acquiring bank).
+    Enabling this will display additional payment options to customer, for online installment payment where the Card Issuer and Acquiring Bank is the same entity (e.g: BNI Card and BNI Acquiring bank).
 
 4. **Offline Installment payment integration | Optional**
 
-    Offline payment it’s desing as optional for Installment where the Card Issuer and Acquiring Bank don't have to be same entity (e.g: BNI Card and Mandiri Acquiring Bank)
+    Enabling this will display additional payment options to customer, for offline Installment where the Card Issuer and Acquiring Bank don't have to be same entity (e.g: BNI Card and Mandiri Acquiring Bank)
 
 
 >Note: You can use different Midtrans Account for every Snap model payment method, should configure the access-key in Optional section `“Use another Midtrans account”`. If the optional access-key is empty, the plugins will automatically use access key on Basic Settings.
 
->INFO: BCA Klikpay only can use in Snap payment integration
+>INFO: The built-in BCA Klikpay landing page for now will only use server key from basic settings of Snap payment integration
 
 If you need custom configuration you can feel free to change the default configuration with the following fields 
 
