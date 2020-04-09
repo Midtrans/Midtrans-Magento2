@@ -3,7 +3,7 @@
     <group id="specific" translate="label" type="text" sortOrder="30" showInDefault="1" showInWebsite="1" showInStore="1">
         <label><![CDATA[Optional - Snap Specific Payment Integration]]></label>
         <frontend_model>Magento\Config\Block\System\Config\Form\Fieldset</frontend_model>
-        <comment><![CDATA[<p>Specific payment it’s design as optional for specific payment that specify in Allow payment method field, Midtrans Snap will show directly payment method on the Snap screen.</p>]]></comment>
+        <comment><![CDATA[<p>Optional - Enabling this will display additional payment options to customer, for specific payment that are specified in the "Allowed Payment Method" field, Midtrans Snap will show only the listed payment method on the Snap screen.</p>]]></comment>
         <field id="active" translate="label" type="select" sortOrder="10" showInDefault="1" showInWebsite="1" showInStore="0">
             <label>Enabled</label>
             <source_model>Magento\Config\Model\Config\Source\Yesno</source_model>
@@ -55,7 +55,7 @@
             </field>
         </group>
         <group id="specific_access" translate="label" type="text" sortOrder="101" showInDefault="1" showInWebsite="1" showInStore="1">
-            <label><![CDATA[Optional - Use another Midtrans account for Specific payment]]></label>
+            <label><![CDATA[Optional - Use different Midtrans account for Specific payment]]></label>
             <field id="active" translate="label" type="select" sortOrder="10" showInDefault="1" showInWebsite="1" showInStore="0">
                 <label>Enabled</label>
                 <source_model>Magento\Config\Model\Config\Source\Yesno</source_model>
