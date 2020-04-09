@@ -14,6 +14,7 @@ use Magento\Payment\Model\InfoInterface;
 use Magento\Payment\Model\Method\Adapter;
 
 use Magento\Payment\Model\MethodInterface;
+use Magento\Sales\Model\Order;
 use Midtrans\Snap\Gateway\Config\Config;
 use Midtrans\Snap\Gateway\MidtransApi;
 use Midtrans\Snap\Gateway\Transaction;
@@ -25,12 +26,12 @@ use PHPUnit\Exception;
  * Class AbstractPayment
  * @package Midtrans\Snap\Model\Config\Source\Payment
  */
- abstract class AbstractPayment extends Adapter
+class AbstractPayment extends Adapter
 {
-     /**
-      * @var string
-      */
-     public $code;
+    /**
+     * @var string
+     */
+    public $code;
 
     /**
      * @var bool
@@ -49,35 +50,41 @@ use PHPUnit\Exception;
      */
     protected $canRefundInvoicePartial = true;
 
-     /**
-      * @var string
-      */
-     public $formBlockType;
+    /**
+     * @var string
+     */
+    public $formBlockType;
 
-     /**
-      * @var string
-      */
-     public $infoBlockType;
+    /**
+     * @var string
+     */
+    public $infoBlockType;
 
+    /**
+     * @var Data
+     */
     protected $dataConfig;
 
+    /**
+     * @var MidtransLogger
+     */
     protected $midtransLogger;
 
 
-     /**
-      * AbstractPayment constructor.
-      * @param ManagerInterface $eventManager
-      * @param ValueHandlerPoolInterface $valueHandlerPool
-      * @param PaymentDataObjectFactory $paymentDataObjectFactory
-      * @param Data $dataConfig
-      * @param MidtransLogger $midtransLogger
-      * @param string $code
-      * @param string $formBlockType
-      * @param string $infoBlockType
-      * @param CommandPoolInterface|null $commandPool
-      * @param ValidatorPoolInterface|null $validatorPool
-      * @param CommandManagerInterface|null $commandExecutor
-      */
+    /**
+     * AbstractPayment constructor.
+     * @param ManagerInterface $eventManager
+     * @param ValueHandlerPoolInterface $valueHandlerPool
+     * @param PaymentDataObjectFactory $paymentDataObjectFactory
+     * @param Data $dataConfig
+     * @param MidtransLogger $midtransLogger
+     * @param string $code
+     * @param string $formBlockType
+     * @param string $infoBlockType
+     * @param CommandPoolInterface|null $commandPool
+     * @param ValidatorPoolInterface|null $validatorPool
+     * @param CommandManagerInterface|null $commandExecutor
+     */
     public function __construct
     (
         ManagerInterface $eventManager,
@@ -93,8 +100,6 @@ use PHPUnit\Exception;
         CommandManagerInterface $commandExecutor = null
     )
     {
-        $this->dataConfig = $dataConfig;
-        $this->midtransLogger = $midtransLogger;
         parent::__construct(
             $eventManager,
             $valueHandlerPool,
@@ -106,15 +111,17 @@ use PHPUnit\Exception;
             $validatorPool,
             $commandExecutor
         );
+        $this->dataConfig = $dataConfig;
+        $this->midtransLogger = $midtransLogger;
     }
 
-     /**
-      * @param InfoInterface $payment
-      * @param $amount
-      * @return Adapter|MethodInterface|void
-      * @throws LocalizedException
-      */
-     function refund(InfoInterface $payment, $amount)
+    /**
+     * @param InfoInterface $payment
+     * @param $amount
+     * @return Adapter|MethodInterface|void
+     * @throws LocalizedException
+     */
+    function refund(InfoInterface $payment, $amount)
     {
         if (!$this->canRefund()) {
             throw new LocalizedException(__('The refund action is not available.'));
@@ -127,7 +134,6 @@ use PHPUnit\Exception;
         Config::$serverKey = $this->dataConfig->getServerKey($paymentCode);
         $transaction = new Transaction();
 
-
         // Check is full refund or partial
         $canRefundMore = $payment->getCreditmemo()->getInvoice()->canRefund();
         $isFullRefund = !$canRefundMore && (double)$order->getBaseTotalOnlineRefunded() == (double)$payment->getBaseAmountPaid();
@@ -135,33 +141,30 @@ use PHPUnit\Exception;
         $refundKey = $orderId . '-' . time();
         $reasonRefund = "Refund From Magento Dashboard";
         $refundParams = [
-            'refund_key'    => $refundKey,
-            'amount'        => $amount,
-            'reason'        => $reasonRefund
+            'refund_key' => $refundKey,
+            'amount' => $amount,
+            'reason' => $reasonRefund
         ];
 
-        // Request refund to Gateway
-        try {
-            $order->addCommentToStatusHistory('Request Refund with Refund-Key: '.$refundKey, false, false);
-            $order->save();
 
+        /*
+         * Request refund to midtrans
+         */
+            $order->addStatusToHistory(Order::STATE_PROCESSING, 'Request Refund with Refund-Key: ' . $refundKey, false, false);
+            $order->save();
             $response = $transaction::refund($orderId, $refundParams);
-        } catch (Exception $e) {
-            $error_message = strpos($e->getMessage(), '412') ? $e->getMessage() . ' Note: Refund via Midtrans only for specific payment method, please consult to your midtrans PIC for more information' : $e->getMessage();
-            $this->midtransLogger->midtransError($error_message);
-        }
-
-        if ($response->status_code == 200) {
-            if ($isFullRefund) {
-                $refund_message = sprintf('Full Refunded %1$s | Refund-Key %2$s | %3$s', $response->refund_amount, $response->refund_key, $reasonRefund);
-            } else {
-                $refund_message = sprintf('Partial Refunded %1$s | Refund-Key %2$s | %3$s', $response->refund_amount, $response->refund_key, $reasonRefund);
+            if (isset($response)) {
+                if ($response->status_code == 200) {
+                    if ($isFullRefund) {
+                        $refund_message = sprintf('Full Refunded %1$s | Refund-Key %2$s | %3$s', $response->refund_amount, $response->refund_key, $reasonRefund);
+                        $order->addStatusToHistory(Order::STATE_CLOSED, $refund_message, false);
+                    } else {
+                        $refund_message = sprintf('Partial Refunded %1$s | Refund-Key %2$s | %3$s', $response->refund_amount, $response->refund_key, $reasonRefund);
+                        $order->addStatusToHistory(Order::STATE_PROCESSING, $refund_message, false);
+                    }
+                    $order->save();
+                }
             }
-            $order->addCommentToStatusHistory($refund_message, false, false);
-            $order->save();
-        }
-        else if ($response->status_code == 412) {
-            echo "ssssss";
-        }
     }
+
 }

@@ -20,22 +20,18 @@ class MidtransLogger extends Logger
 
     protected $settings;
 
+
     /**
      * MidtransLogger constructor.
-     *
      * @param string $name
+     * @param Settings $settings
      * @param array $handlers
      * @param array $processors
-     * @param Settings $settings
      */
-    function __construct(
-        $name , array $handlers = array(),
-        array $processors = array(),
-        Settings $settings
-    )
+    function __construct($name, Settings $settings, array $handlers = array(), array $processors = array())
     {
-        parent::__construct($name, $handlers, $processors);
         $this->settings = $settings;
+        parent::__construct($name, $handlers, $processors);
     }
 
 

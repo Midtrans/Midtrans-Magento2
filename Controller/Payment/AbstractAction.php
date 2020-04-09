@@ -19,10 +19,9 @@ use Magento\Sales\Model\Service\CreditmemoService;
 use Magento\Sales\Model\Service\InvoiceService;
 use Midtrans\Snap\Helper\Data;
 use Magento\Framework\View\Result\PageFactory;
+use Magento\Sales\Api\OrderStatusHistoryRepositoryInterface;
 
 use Midtrans\Snap\Logger\MidtransLogger;
-use Zend\Log\Logger;
-use Zend\Log\Writer\Stream;
 
 
 /**
@@ -112,6 +111,7 @@ abstract class AbstractAction extends Action
      * @param Order\CreditmemoRepository $creditmemoRepository
      * @param MidtransLogger $midtransLogger
      * @param Registry $registry
+     * @param OrderStatusHistoryRepositoryInterface $orderStatusHistoryRepository
      * @param PageFactory $pageFactory
      */
     public function __construct(
@@ -1009,9 +1009,11 @@ abstract class AbstractAction extends Action
         $order = $this->getQuoteByOrderId($orderId);
         $order->setState($status);
         $order->setStatus($status);
-        $order->addCommentToStatusHistory($order_note, true, false);
+       // $order->addCommentToStatusHistory($order_note, true, false);
+        $order->addStatusToHistory($status, $order_note, false);
         $order->cancel();
         $this->saveOrder($order);
+
         return $order;
     }
 
@@ -1030,7 +1032,8 @@ abstract class AbstractAction extends Action
         $order = $this->getQuoteByOrderId($orderId);
         $order->setState($status);
         $order->setStatus($status);
-        $order->addCommentToStatusHistory($order_note, true, false);
+    //    $order->addCommentToStatusHistory($order_note, true, false);
+        $order->addStatusToHistory($status, $order_note, false);
         $this->saveOrder($order);
     }
 
@@ -1142,4 +1145,5 @@ abstract class AbstractAction extends Action
             $this->_midtransLogger->midtransError($error_exception);
         }
     }
+
 }

@@ -11,7 +11,6 @@ class Cancel extends AbstractAction
         $orderId = $this->getValue();
         $order = $this->_order->loadByIncrementId($orderId);
         if ($order->getState() == Order::STATE_NEW && !$order->hasInvoices()) {
-
             $order_note = "Midtrans | Payment Page close - by User";
             $this->cancelOrder($orderId, Order::STATE_CANCELED, $order_note);
             $this->unSetValue();
@@ -20,6 +19,4 @@ class Cancel extends AbstractAction
             return $this->resultRedirectFactory->create()->setPath('checkout/cart');
         }
     }
-
-
 }

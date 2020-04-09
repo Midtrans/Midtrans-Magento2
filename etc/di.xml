@@ -32,7 +32,7 @@
 <!-- END - Settings Adapter -->
 
 <!-- START - Snap Method Adapter -->
-    <virtualType name="snapMethodAdapter" type="Magento\Payment\Model\Method\Adapter">
+    <virtualType name="snapMethodAdapter" type="Midtrans\Snap\Model\Config\Source\Payment\AbstractPayment">
         <arguments>
             <argument name="code" xsi:type="const">Midtrans\Snap\Model\Snap::SNAP_PAYMENT_CODE</argument>
             <argument name="valueHandlerPool" xsi:type="object">SnapValueHandlerPool</argument>
@@ -86,7 +86,7 @@
 <!-- END - Snap Method Adapter -->
 
 <!-- START - Specific Method Adapter -->
-    <virtualType name="specificMethodAdapter" type="Magento\Payment\Model\Method\Adapter">
+    <virtualType name="specificMethodAdapter" type="Midtrans\Snap\Model\Config\Source\Payment\AbstractPayment">
         <arguments>
             <argument name="code" xsi:type="const">Midtrans\Snap\Model\Config\Source\Payment\Specific::SPECIFIC_PAYMENT_CODE</argument>
             <argument name="valueHandlerPool" xsi:type="object">SpecificValueHandlerPool</argument>
@@ -140,7 +140,7 @@
 <!-- END - Specific Method Adapter -->
 
 <!-- START - Installment Method Adapter -->
-    <virtualType name="installmentMethodAdapter" type="Magento\Payment\Model\Method\Adapter">
+    <virtualType name="installmentMethodAdapter" type="Midtrans\Snap\Model\Config\Source\Payment\AbstractPayment">
         <arguments>
             <argument name="code" xsi:type="const">Midtrans\Snap\Model\Config\Source\Payment\Installment::INSTALLMENT_PAYMENT_CODE</argument>
             <argument name="valueHandlerPool" xsi:type="object">InstallmentValueHandlerPool</argument>
@@ -195,7 +195,7 @@
 
 
 <!-- START - Offline Method Adapter -->
-    <virtualType name="offlineMethodAdapter" type="Magento\Payment\Model\Method\Adapter">
+    <virtualType name="offlineMethodAdapter" type="Midtrans\Snap\Model\Config\Source\Payment\AbstractPayment">
         <arguments>
             <argument name="code" xsi:type="const">Midtrans\Snap\Model\Config\Source\Payment\Offline::OFFLINE_PAYMENT_CODE</argument>
             <argument name="valueHandlerPool" xsi:type="object">OfflineValueHandlerPool</argument>
@@ -284,15 +284,6 @@
         </arguments>
     </type>
 <!-- END LOGGER -->
-
-    <!-- Refund Request -->
-    <virtualType name="SnapRefundRequest" type="Magento\Payment\Gateway\Request\BuilderComposite">
-        <arguments>
-            <argument name="builders" xsi:type="array">
-                <item name="transaction" xsi:type="string">Midtrans\Snap\Gateway\Transaction</item>
-            </argument>
-        </arguments>
-    </virtualType>
 
     <type name="Midtrans\Snap\Model\Config\Source\Payment\Settings">
         <arguments>

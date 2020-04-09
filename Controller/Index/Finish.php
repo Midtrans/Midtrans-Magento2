@@ -21,14 +21,17 @@ class Finish extends AbstractAction
             $orderId = $this->getRequest()->getParam('order_id');
             if ($transactionId != null) {
                 $param = $transactionId;
+                $paymentCode = self::PAYMENT_CODE;
             } else if ($orderId != null) {
                 $param = $orderId;
+                $code = $this->getQuoteByOrderId($orderId)->getPayment()->getMethod();
+                $paymentCode = $code;
             } else {
                 return $this->resultRedirectFactory->create()->setPath('checkout/cart');
             }
 
             Config::$isProduction = $this->data->isProduction();
-            Config::$serverKey = $this->data->getServerKey(self::PAYMENT_CODE);
+            Config::$serverKey = $this->data->getServerKey($paymentCode);
 
             $transaction = new Transaction();
             $statusResult = $transaction::status($param);
