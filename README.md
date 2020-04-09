@@ -24,10 +24,8 @@ Before you begin to install through the composer, you need Magento marketplace a
 With these steps, you can custom/modify our Magento plugins to handle the business model that you want
 
 1. Download and extract the plugin you have previously downloaded from GitHub and rename the folder as Snap.
-2. Make a directory structure like this:
-
+2. Make a directory structure like this: 
 ![](https://user-images.githubusercontent.com/21098575/78326383-723e6700-75a4-11ea-97ae-44885443008c.png "image_directory_structure")
-
 3. Locate the root Magento directory of your shop via FTP connection.
 4. Copy the app folders into the Magento root folder.
 5. Run this command on terminal
@@ -151,6 +149,7 @@ If you make a refund in the Midtrans Dashboard, a Refund notification is sent to
     
     The order status change does not mean that the refund was carried out successfully on Midtrans side. If the transaction status in Midtrans dashboard changes to **REFUND**, then the refund went through successfully
     
+>Info: When refund process and the Magento dashboard show message `Midtrans Error (412): Transaction status cannot be updated.` The message occurs when do a refund before the transaction_status is settlement 
 
 #### Get help
 
