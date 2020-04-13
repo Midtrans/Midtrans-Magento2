@@ -79,7 +79,7 @@ In the Midtrans Magento plugins we have 4 option to use Snap model payment metho
 
 1. **Snap payment integration**
     
-    This is the default Snap for Midtrans Magento plugins, Snap payment will auto-enabled when install the Midtrans plugins. Midtrans will show the available payment method on the Snap payment screen.
+    This is the default Snap for Midtrans Magento plugins, Snap payment will be auto-enabled when installing the Midtrans plugins. Midtrans will show the available payment method on the Snap payment screen.
 
 2. **Specific Payment integration | Optional** 
     
@@ -98,7 +98,7 @@ In the Midtrans Magento plugins we have 4 option to use Snap model payment metho
 
 >INFO: The built-in BCA Klikpay landing page for now will only use server key from basic settings of Snap payment integration
 
-If you need custom configuration you can feel free to change the default configuration with the following fields 
+In case you need to customize configuration these field are configurable, and described as follows:
 
 | Field                  | Description            
 |------------------------|---------------------------------------------------------------------------|
@@ -130,28 +130,26 @@ If you need custom configuration you can feel free to change the default configu
 
 ## How to online refund transaction
 
-You can request refunds either in the [Midtrans Dashboard](https://dashboard.midtrans.com/transactions) or in the Magento admin. After a refund is issued, it cannot be cancelled or undone. Before you trigger this request, make sure that the refund amount and any other details are correct. The online refund function is available only for payment method gopay and credit card.
+You can request refunds either from the [Midtrans Dashboard](https://dashboard.midtrans.com/transactions) or from the Magento admin. After a refund is issued, it cannot be cancelled or undone. Before you trigger this request, make sure that the refund amount and any other details are correct. The online refund feature is available for payment method gopay and credit card.
 
-If you make a refund in the Midtrans Dashboard, a Refund notification is sent to Magento, set transaction state to CLOSE and for now is not created the credit memo.
+If you make refund from the Midtrans Dashboard, Refund notification is sent to Magento, set transaction state to CLOSED and for now is not created the credit memo.
 
 
 ### Request refund from Magento Admin:
 
 1. Log in to your Magento admin panel. 
 2. In the menu, go to **Sales** > **Orders**. This opens the order overview page. 
-3. Click on the order you want to refund.
-4. In the **Order list View** left-hand navigation sidebar, click **Invoices**tab.
-5. In the invoice list page, selected the order. click the view button on invoice you need to request online refund.
+3. Click on the **order** you want to refund.
+4. In the **Order list View** left-hand navigation sidebar, click **Invoices** tab.
+5. In the **invoice list page**, selected the **order**. click the **view button** on invoice you need to request online refund.
 6. Click **Credit Memo** on the top-right corner of the page.
 7. In the **New Memo for Invoice** page, scroll down to the **Refund Totals** section.
 8. In this section, you can request online **Refund** or **Refund Offline**.
     *   **Refund:** This option will request refund Online to Midtrans, Midtrans automatically send refund notification and changes order status to **Closed** from notification.
     *   **Refund Offline**: An offline refund does not trigger request refund to midtrans it’s only refund in Magento side. You need to take action and carry out the refund manually from Midtrans dashboard.After a refund operation, the order status changes to **Closed**. This order status change is controlled by the Magento system. 
     
-    The order status change does not mean that the refund was carried out successfully on Midtrans side. If the transaction status in Midtrans dashboard changes to **REFUND**, then the refund went through successfully
+    The status change may not mean that the refund has carried out successfully on Midtrans side. When the transaction status in Midtrans dashboard changes to REFUND, then the refund went through successfully
     
->Info: When refund process and the Magento dashboard show message `Midtrans Error (412): Transaction status cannot be updated.` The message occurs when do a refund before the transaction_status is settlement 
-
 #### Get help
 
 * [General Documentation Midtrans](http://docs.midtrans.com)
