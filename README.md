@@ -126,6 +126,8 @@ In case you need to customize configuration these field are configurable, and de
    * Error Redirect URL: 
     >`http://[your-site-url]/snap/index/finish`
 
+2. Go to menu **settings > Snap Preference > System Settings**
+  * Insert `http://[your-site-url]/snap/index/finish` link as Finish/Unfinish/Error Redirect URL.
 
 
 ## How to online refund transaction
