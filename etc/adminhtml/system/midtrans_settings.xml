@@ -1,0 +1,83 @@
+<?xml version="1.0"?>
+<include xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="urn:magento:module:Magento_Config:etc/system_include.xsd">
+    <group id="settings" translate="label" type="text" sortOrder="20" showInDefault="1" showInWebsite="1" showInStore="1">
+        <frontend_model>Magento\Config\Block\System\Config\Form\Fieldset</frontend_model>
+        <label><![CDATA[Basic Settings]]></label>
+        <field id="is_production" translate="label" type="select" sortOrder="10" showInDefault="1" showInWebsite="1" showInStore="0">
+            <label>Is Production</label>
+            <source_model>Magento\Config\Model\Config\Source\Yesno</source_model>
+        </field>
+        <field id="merchant_id" translate="label" type="text" sortOrder="20" showInDefault="1" showInWebsite="1" showInStore="0">
+            <label>Merchant Id</label>
+        </field>
+        <field id="production_client_key" translate="label" type="obscure" sortOrder="30" showInDefault="1" showInWebsite="1" showInStore="0">
+            <label>Production - Client Key</label>
+            <backend_model>Magento\Config\Model\Config\Backend\Encrypted</backend_model>
+            <depends>
+                <field id="is_production">1</field>
+            </depends>
+        </field>
+        <field id="production_server_key" translate="label" type="obscure" sortOrder="40" showInDefault="1" showInWebsite="1" showInStore="0">
+            <label>Production - Server Key</label>
+            <backend_model>Magento\Config\Model\Config\Backend\Encrypted</backend_model>
+            <depends>
+                <field id="is_production">1</field>
+            </depends>
+        </field>
+        <field id="sandbox_client_key" translate="label" type="obscure" sortOrder="50" showInDefault="1" showInWebsite="1" showInStore="0">
+            <label>Sandbox - Client Key</label>
+            <backend_model>Magento\Config\Model\Config\Backend\Encrypted</backend_model>
+            <depends>
+                <field id="is_production">0</field>
+            </depends>
+        </field>
+        <field id="sandbox_server_key" translate="label" type="obscure" sortOrder="60" showInDefault="1" showInWebsite="1" showInStore="0">
+            <label>Sandbox - Server Key</label>
+            <backend_model>Magento\Config\Model\Config\Backend\Encrypted</backend_model>
+            <depends>
+                <field id="is_production">0</field>
+            </depends>
+        </field>
+        <field id="enable_redirect" translate="label" type="select" sortOrder="70" showInDefault="1" showInWebsite="1" showInStore="0">
+            <label>Enable Snap Redirect</label>
+            <source_model>Magento\Config\Model\Config\Source\Yesno</source_model>
+            <tooltip>If you enabling this feature, Snap PopUp change to SNAP Redirect mode. After finish and
+                close payment page, snap automatically redirect to URL specified on Midtrans Dashboard. Choose
+                NO if you want use Snap PopUp.
+            </tooltip>
+        </field>
+        <field id="order_status" translate="label" type="select" sortOrder="80" showInDefault="1" showInWebsite="1" showInStore="0">
+            <label>New Order Status</label>
+            <source_model>Magento\Sales\Model\Config\Source\Order\Status\NewStatus</source_model>
+            <config_path>payment/settings/order_status</config_path>
+        </field>
+        <group id="log" translate="label" type="text" sortOrder="90" showInDefault="1" showInWebsite="1" showInStore="1">
+            <label><![CDATA[Log Option]]></label>
+            <frontend_model>Magento\Config\Block\System\Config\Form\Fieldset</frontend_model>
+            <field id="notification" translate="label" type="select" sortOrder="100" showInDefault="1" showInWebsite="1" showInStore="0">
+                <label>Enable Notification Log</label>
+                <source_model>Magento\Config\Model\Config\Source\Yesno</source_model>
+                <config_path>payment/settings/notification_log</config_path>
+                <tooltip>If enable you can see every Midtrans notification received log on /var/log/midtrans/notification.log</tooltip>
+            </field>
+            <field id="request" translate="label" type="select" sortOrder="110" showInDefault="1" showInWebsite="1" showInStore="0">
+                <label>Enable Request Log</label>
+                <source_model>Magento\Config\Model\Config\Source\Yesno</source_model>
+                <config_path>payment/settings/request_log</config_path>
+                <tooltip>If enable you can see every Midtrans notification received log on /var/log/midtrans/request.log</tooltip>
+            </field>
+            <field id="debug" translate="label" type="select" sortOrder="120" showInDefault="1" showInWebsite="1" showInStore="0">
+                <label>Enable Error Log</label>
+                <source_model>Magento\Config\Model\Config\Source\Yesno</source_model>
+                <config_path>payment/settings/error_log</config_path>
+                <tooltip>If enable you can see every Midtrans notification received log on /var/log/midtrans/error.log</tooltip>
+            </field>
+            <field id="exception" translate="label" type="select" sortOrder="130" showInDefault="1" showInWebsite="1" showInStore="0">
+                <label>Enable Throw Exception</label>
+                <source_model>Magento\Config\Model\Config\Source\Yesno</source_model>
+                <config_path>payment/settings/throw_exception</config_path>
+                <tooltip>Exception feature can show the exception message if Error log is not enabled</tooltip>
+            </field>
+        </group>
+    </group>
+</include>

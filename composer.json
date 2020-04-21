@@ -1,0 +1,21 @@
+{
+    "name": "midtrans/snap",
+    "description": "Midtrans Online Payment Magento 2 module",
+    "type": "magento2-module",
+    "version": "2.3.0",
+    "license": [
+        "MIT"
+    ],
+    "require": {
+        "php": "~5.5.0|~5.6.0",
+        "magento/magento-composer-installer": "*"
+    },
+    "autoload": {
+        "psr-4": {
+            "Midtrans\\Snap\\": ""
+        },
+        "files": [
+            "registration.php"
+        ]
+    }
+}

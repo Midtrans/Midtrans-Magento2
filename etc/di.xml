@@ -1,0 +1,293 @@
+<?xml version="1.0"?>
+<config xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="urn:magento:framework:ObjectManager/etc/config.xsd">
+<!-- START - Settings Adapter-->
+    <virtualType name="midtransSettings" type="Magento\Payment\Model\Method\Adapter">
+        <arguments>
+            <argument name="code" xsi:type="const">Midtrans\Snap\Model\Config\Source\Payment\Settings::SETTINGS_PAYMENT_CODE</argument>
+            <argument name="valueHandlerPool" xsi:type="object">MidtransValueHandlerPool</argument>
+            <argument name="formBlockType" xsi:type="string">Midtrans\Snap\Block\Form\Snap</argument>
+            <argument name="infoBlockType" xsi:type="string">Midtrans\Snap\Block\Info\Snap</argument>
+        </arguments>
+    </virtualType>
+
+    <!-- START - Settings Value Handler Pool -->
+    <virtualType name="MidtransConfig" type="Magento\Payment\Gateway\Config\Config">
+        <arguments>
+            <argument name="methodCode" xsi:type="const">Midtrans\Snap\Model\Config\Source\Payment\Settings::SETTINGS_PAYMENT_CODE</argument>
+        </arguments>
+    </virtualType>
+    <virtualType name="MidtransConfigValueHandler" type="Magento\Payment\Gateway\Config\ConfigValueHandler">
+        <arguments>
+            <argument name="configInterface" xsi:type="object">MidtransConfig</argument>
+        </arguments>
+    </virtualType>
+    <virtualType name="MidtransValueHandlerPool" type="Magento\Payment\Gateway\Config\ValueHandlerPool">
+        <arguments>
+            <argument name="handlers" xsi:type="array">
+                <item name="default" xsi:type="string">MidtransConfigValueHandler</item>
+            </argument>
+        </arguments>
+    </virtualType>
+    <!-- END - Snap Value Handler Pool -->
+<!-- END - Settings Adapter -->
+
+<!-- START - Snap Method Adapter -->
+    <virtualType name="snapMethodAdapter" type="Midtrans\Snap\Model\Config\Source\Payment\AbstractPayment">
+        <arguments>
+            <argument name="code" xsi:type="const">Midtrans\Snap\Model\Snap::SNAP_PAYMENT_CODE</argument>
+            <argument name="valueHandlerPool" xsi:type="object">SnapValueHandlerPool</argument>
+            <argument name="validatorPool" xsi:type="object">SnapValidatorPool</argument>
+            <argument name="formBlockType" xsi:type="string">Midtrans\Snap\Block\Form\Snap</argument>
+            <argument name="infoBlockType" xsi:type="string">Midtrans\Snap\Block\Info\Snap</argument>
+        </arguments>
+    </virtualType>
+
+    <!-- START - Snap Value Handler Pool -->
+    <virtualType name="MidtransSnapConfig" type="Magento\Payment\Gateway\Config\Config">
+        <arguments>
+            <argument name="methodCode" xsi:type="const">Midtrans\Snap\Model\Snap::SNAP_PAYMENT_CODE</argument>
+        </arguments>
+    </virtualType>
+    <virtualType name="MidtransSnapConfigValueHandler" type="Magento\Payment\Gateway\Config\ConfigValueHandler">
+        <arguments>
+            <argument name="configInterface" xsi:type="object">MidtransSnapConfig</argument>
+        </arguments>
+    </virtualType>
+    <virtualType name="SnapValueHandlerPool" type="Magento\Payment\Gateway\Config\ValueHandlerPool">
+        <arguments>
+            <argument name="handlers" xsi:type="array">
+                <item name="default" xsi:type="string">MidtransSnapConfigValueHandler</item>
+            </argument>
+        </arguments>
+    </virtualType>
+    <!-- END - Snap Value Handler Pool -->
+
+    <!-- START - Snap Validator Pool -->
+    <virtualType name="CountryValidator" type="Magento\Payment\Gateway\Validator\CountryValidator">
+        <arguments>
+            <argument name="config" xsi:type="object">MidtransSnapConfig</argument>
+        </arguments>
+    </virtualType>
+    <virtualType name="MidtransGlobalValidator" type="Magento\Payment\Gateway\Validator\ValidatorComposite">
+        <arguments>
+            <argument name="validators" xsi:type="array">
+                <item name="country" xsi:type="string">CountryValidator</item>
+            </argument>
+        </arguments>
+    </virtualType>
+    <virtualType name="SnapValidatorPool" type="Magento\Payment\Gateway\Validator\ValidatorPool">
+        <arguments>
+            <argument name="validators" xsi:type="array">
+                <item name="global" xsi:type="string">MidtransGlobalValidator</item>
+            </argument>
+        </arguments>
+    </virtualType>
+    <!-- END - Snap Validator Pool -->
+<!-- END - Snap Method Adapter -->
+
+<!-- START - Specific Method Adapter -->
+    <virtualType name="specificMethodAdapter" type="Midtrans\Snap\Model\Config\Source\Payment\AbstractPayment">
+        <arguments>
+            <argument name="code" xsi:type="const">Midtrans\Snap\Model\Config\Source\Payment\Specific::SPECIFIC_PAYMENT_CODE</argument>
+            <argument name="valueHandlerPool" xsi:type="object">SpecificValueHandlerPool</argument>
+            <argument name="validatorPool" xsi:type="object">SpecificValidatorPool</argument>
+            <argument name="formBlockType" xsi:type="string">Midtrans\Snap\Block\Form\Snap</argument>
+            <argument name="infoBlockType" xsi:type="string">Midtrans\Snap\Block\Info\Snap</argument>
+        </arguments>
+    </virtualType>
+
+    <!-- START - Specific Config Reader -->
+    <virtualType name="MidtransSpecificConfig" type="Magento\Payment\Gateway\Config\Config">
+        <arguments>
+            <argument name="methodCode" xsi:type="const">Midtrans\Snap\Model\Config\Source\Payment\Specific::SPECIFIC_PAYMENT_CODE</argument>
+        </arguments>
+    </virtualType>
+    <virtualType name="MidtransSpecificConfigValueHandler" type="Magento\Payment\Gateway\Config\ConfigValueHandler">
+        <arguments>
+            <argument name="configInterface" xsi:type="object">MidtransSpecificConfig</argument>
+        </arguments>
+    </virtualType>
+    <virtualType name="SpecificValueHandlerPool" type="Magento\Payment\Gateway\Config\ValueHandlerPool">
+        <arguments>
+            <argument name="handlers" xsi:type="array">
+                <item name="default" xsi:type="string">MidtransSpecificConfigValueHandler</item>
+            </argument>
+        </arguments>
+    </virtualType>
+    <!-- END - Specific Config Reader -->
+
+    <!-- START - Specific Validator Pool -->
+    <virtualType name="SpecificCountryValidator" type="Magento\Payment\Gateway\Validator\CountryValidator">
+        <arguments>
+            <argument name="config" xsi:type="object">MidtransSpecificConfig</argument>
+        </arguments>
+    </virtualType>
+    <virtualType name="MidtransSpecificGlobalValidator" type="Magento\Payment\Gateway\Validator\ValidatorComposite">
+        <arguments>
+            <argument name="validators" xsi:type="array">
+                <item name="country" xsi:type="string">SpecificCountryValidator</item>
+            </argument>
+        </arguments>
+    </virtualType>
+    <virtualType name="SpecificValidatorPool" type="Magento\Payment\Gateway\Validator\ValidatorPool">
+        <arguments>
+            <argument name="validators" xsi:type="array">
+                <item name="global" xsi:type="string">MidtransSpecificGlobalValidator</item>
+            </argument>
+        </arguments>
+    </virtualType>
+    <!-- END - Specific Validator Pool -->
+<!-- END - Specific Method Adapter -->
+
+<!-- START - Installment Method Adapter -->
+    <virtualType name="installmentMethodAdapter" type="Midtrans\Snap\Model\Config\Source\Payment\AbstractPayment">
+        <arguments>
+            <argument name="code" xsi:type="const">Midtrans\Snap\Model\Config\Source\Payment\Installment::INSTALLMENT_PAYMENT_CODE</argument>
+            <argument name="valueHandlerPool" xsi:type="object">InstallmentValueHandlerPool</argument>
+            <argument name="validatorPool" xsi:type="object">InstallmentValidatorPool</argument>
+            <argument name="formBlockType" xsi:type="string">Midtrans\Snap\Block\Form\Snap</argument>
+            <argument name="infoBlockType" xsi:type="string">Midtrans\Snap\Block\Info\Snap</argument>
+        </arguments>
+    </virtualType>
+
+    <!-- START - Installment Config Reader -->
+    <virtualType name="MidtransInstallmentConfig" type="Magento\Payment\Gateway\Config\Config">
+        <arguments>
+            <argument name="methodCode" xsi:type="const">Midtrans\Snap\Model\Config\Source\Payment\Installment::INSTALLMENT_PAYMENT_CODE</argument>
+        </arguments>
+    </virtualType>
+    <virtualType name="MidtransInstallmentConfigValueHandler" type="Magento\Payment\Gateway\Config\ConfigValueHandler">
+        <arguments>
+            <argument name="configInterface" xsi:type="object">MidtransInstallmentConfig</argument>
+        </arguments>
+    </virtualType>
+    <virtualType name="InstallmentValueHandlerPool" type="Magento\Payment\Gateway\Config\ValueHandlerPool">
+        <arguments>
+            <argument name="handlers" xsi:type="array">
+                <item name="default" xsi:type="string">MidtransInstallmentConfigValueHandler</item>
+            </argument>
+        </arguments>
+    </virtualType>
+    <!-- END - Installment Config Reader -->
+
+    <!-- START - Installment Validator Pool -->
+    <virtualType name="InstallmentCountryValidator" type="Magento\Payment\Gateway\Validator\CountryValidator">
+        <arguments>
+            <argument name="config" xsi:type="object">MidtransInstallmentConfig</argument>
+        </arguments>
+    </virtualType>
+    <virtualType name="MidtransInstallmentGlobalValidator" type="Magento\Payment\Gateway\Validator\ValidatorComposite">
+        <arguments>
+            <argument name="validators" xsi:type="array">
+                <item name="country" xsi:type="string">InstallmentCountryValidator</item>
+            </argument>
+        </arguments>
+    </virtualType>
+    <virtualType name="InstallmentValidatorPool" type="Magento\Payment\Gateway\Validator\ValidatorPool">
+        <arguments>
+            <argument name="validators" xsi:type="array">
+                <item name="global" xsi:type="string">MidtransInstallmentGlobalValidator</item>
+            </argument>
+        </arguments>
+    </virtualType>
+    <!-- END - Installment Validator Pool -->
+<!-- END - Installment Method Adapter -->
+
+
+<!-- START - Offline Method Adapter -->
+    <virtualType name="offlineMethodAdapter" type="Midtrans\Snap\Model\Config\Source\Payment\AbstractPayment">
+        <arguments>
+            <argument name="code" xsi:type="const">Midtrans\Snap\Model\Config\Source\Payment\Offline::OFFLINE_PAYMENT_CODE</argument>
+            <argument name="valueHandlerPool" xsi:type="object">OfflineValueHandlerPool</argument>
+            <argument name="validatorPool" xsi:type="object">OfflineValidatorPool</argument>
+            <argument name="formBlockType" xsi:type="string">Midtrans\Snap\Block\Form\Snap</argument>
+            <argument name="infoBlockType" xsi:type="string">Midtrans\Snap\Block\Info\Snap</argument>
+        </arguments>
+    </virtualType>
+
+    <!-- START - Offline Config Reader -->
+    <virtualType name="MidtransOfflineConfig" type="Magento\Payment\Gateway\Config\Config">
+        <arguments>
+            <argument name="methodCode" xsi:type="const">Midtrans\Snap\Model\Config\Source\Payment\Offline::OFFLINE_PAYMENT_CODE</argument>
+        </arguments>
+    </virtualType>
+    <virtualType name="MidtransOfflineConfigValueHandler" type="Magento\Payment\Gateway\Config\ConfigValueHandler">
+        <arguments>
+            <argument name="configInterface" xsi:type="object">MidtransOfflineConfig</argument>
+        </arguments>
+    </virtualType>
+    <virtualType name="OfflineValueHandlerPool" type="Magento\Payment\Gateway\Config\ValueHandlerPool">
+        <arguments>
+            <argument name="handlers" xsi:type="array">
+                <item name="default" xsi:type="string">MidtransOfflineConfigValueHandler</item>
+            </argument>
+        </arguments>
+    </virtualType>
+    <!-- END - Offline Config Reader -->
+
+    <!-- START - Offline Validator Pool -->
+    <virtualType name="OfflineCountryValidator" type="Magento\Payment\Gateway\Validator\CountryValidator">
+        <arguments>
+            <argument name="config" xsi:type="object">MidtransOfflineConfig</argument>
+        </arguments>
+    </virtualType>
+    <virtualType name="MidtransOfflineGlobalValidator" type="Magento\Payment\Gateway\Validator\ValidatorComposite">
+        <arguments>
+            <argument name="validators" xsi:type="array">
+                <item name="country" xsi:type="string">OfflineCountryValidator</item>
+            </argument>
+        </arguments>
+    </virtualType>
+    <virtualType name="OfflineValidatorPool" type="Magento\Payment\Gateway\Validator\ValidatorPool">
+        <arguments>
+            <argument name="validators" xsi:type="array">
+                <item name="global" xsi:type="string">MidtransOfflineGlobalValidator</item>
+            </argument>
+        </arguments>
+    </virtualType>
+    <!-- END - Offline Validator Pool -->
+<!-- END - Offline Method Adapter -->
+
+<!-- START LOGGER -->
+    <type name="Midtrans\Snap\Logger\Handler\RequestLogger">
+        <arguments>
+            <argument name="filesystem" xsi:type="object">Magento\Framework\Filesystem\Driver\File</argument>
+        </arguments>
+    </type>
+
+    <type name="Midtrans\Snap\Logger\Handler\ErrorLogger">
+        <arguments>
+            <argument name="filesystem" xsi:type="object">Magento\Framework\Filesystem\Driver\File</argument>
+        </arguments>
+    </type>
+
+    <type name="Midtrans\Snap\Logger\Handler\NotificationLogger">
+        <arguments>
+            <argument name="filesystem" xsi:type="object">Magento\Framework\Filesystem\Driver\File</argument>
+        </arguments>
+    </type>
+
+    <type name="Midtrans\Snap\Model\Config\Source\Payment\Settings">
+        <arguments>
+            <argument name="_scopeConfig" xsi:type="object">Magento\Framework\App\Config\ScopeConfigInterface</argument>
+        </arguments>
+    </type>
+
+    <type name="Midtrans\Snap\Logger\MidtransLogger">
+        <arguments>
+            <argument name="name" xsi:type="string">MidtransLogger</argument>
+            <argument name="handlers"  xsi:type="array">
+                <item name="request" xsi:type="object">Midtrans\Snap\Logger\Handler\RequestLogger</item>
+                <item name="error" xsi:type="object">Midtrans\Snap\Logger\Handler\ErrorLogger</item>
+                <item name="notification" xsi:type="object">Midtrans\Snap\Logger\Handler\NotificationLogger</item>
+            </argument>
+        </arguments>
+    </type>
+<!-- END LOGGER -->
+
+    <type name="Midtrans\Snap\Model\Config\Source\Payment\Settings">
+        <arguments>
+            <argument name="settings" xsi:type="object">Midtrans\Snap\Helper\Data</argument>
+        </arguments>
+    </type>
+</config>

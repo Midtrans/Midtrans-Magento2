@@ -1,0 +1,55 @@
+<?xml version="1.0"?>
+<include xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="urn:magento:module:Magento_Config:etc/system_include.xsd">
+    <group id="basic" translate="label" type="text" sortOrder="30" showInDefault="1" showInWebsite="1" showInStore="1">
+        <label><![CDATA[Snap Payment Integration]]></label>
+        <frontend_model>Magento\Config\Block\System\Config\Form\Fieldset</frontend_model>
+        <comment><![CDATA[<p>This is the default Snap for Midtrans Magento plugins. Midtrans will show the available payment method on the Snap payment screen.</p>]]></comment>
+        <field id="active" translate="label" type="select" sortOrder="10" showInDefault="1" showInWebsite="1" showInStore="0">
+            <label>Enabled</label>
+            <config_path>payment/snap/active</config_path>
+            <source_model>Magento\Config\Model\Config\Source\Yesno</source_model>
+        </field>
+
+        <field id="title" translate="label" type="text" sortOrder="20" showInDefault="1" showInWebsite="1" showInStore="1">
+            <label>Title</label>
+            <config_path>payment/snap/title</config_path>
+        </field>
+
+        <field id="custom_expiry" translate="label" type="text" sortOrder="30" showInDefault="1" showInWebsite="1" showInStore="0">
+            <label>Custom Expiry</label>
+            <comment><![CDATA[Filled with duration & unit. Unit: minute,hour,day. example: 120 minute]]></comment>
+            <config_path>payment/snap/custom_expiry</config_path>
+            <tooltip>This will allow you to set custom duration on how long the transaction available to be paid.</tooltip>
+        </field>
+        <field id="sort_order" translate="label" type="text" sortOrder="40" showInDefault="1" showInWebsite="1" showInStore="1">
+            <label>Sort Order</label>
+            <frontend_class>validate-number</frontend_class>
+            <config_path>payment/snap/sort_order</config_path>
+        </field>
+        <group id="cc_config" translate="label" type="text" sortOrder="60" showInDefault="1" showInWebsite="1" showInStore="1">
+            <label><![CDATA[Credit Card Option]]></label>
+            <frontend_model>Magento\Config\Block\System\Config\Form\Fieldset</frontend_model>
+            <field id="is3ds" translate="label" type="select" sortOrder="70" showInDefault="1" showInWebsite="1" showInStore="0">
+                <label>3D Secure</label>
+                <comment><![CDATA[You must enable 3D Secure.<br/>Please contact us if you wish to disable this feature in the Production environment.]]></comment>
+                <config_path>payment/snap/is3ds</config_path>
+                <source_model>Magento\Config\Model\Config\Source\Enabledisable</source_model>
+            </field>
+            <field id="one_click" translate="label" type="select" sortOrder="80" showInDefault="1" showInWebsite="1" showInStore="0">
+                <label>Save Card</label>
+                <comment>Leave it disabled if you are not sure!</comment>
+                <tooltip>This will allow your customer to save their card on the payment popup, for faster payment flow on the following purchase.</tooltip>
+                <config_path>payment/snap/one_click</config_path>
+                <source_model>Magento\Config\Model\Config\Source\Enabledisable</source_model>
+            </field>
+            <field id="bank" translate="label" type="text" sortOrder="30" showInDefault="1" showInWebsite="1" showInStore="0">
+                <label>Acquiring Bank</label>
+                <comment><![CDATA[Input the desired acquiring bank. e.g: bni.<br/>Leave blank if you are not sure!]]></comment>
+            </field>
+            <field id="bin" translate="label" type="text" sortOrder="40" showInDefault="1" showInWebsite="1" showInStore="0">
+                <label>Bin Number</label>
+                <comment><![CDATA[Fill with CC BIN numbers (or bank name) that you want to allow to use this payment button.<br\>Separate BIN number with coma Example: 4,5,4811,bni,mandiri.<br\>Leave it blank if you are not sure!]]></comment>
+            </field>
+        </group>
+    </group>
+</include>

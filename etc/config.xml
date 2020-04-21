@@ -1,0 +1,106 @@
+<?xml version="1.0"?>
+<config xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="../../Store/etc/config.xsd">
+    <default>
+        <payment>
+            <settings>
+                <is_production>0</is_production>
+                <production_client_key backend_model="Magento\Config\Model\Config\Backend\Encrypted" />
+                <production_server_key backend_model="Magento\Config\Model\Config\Backend\Encrypted" />
+                <sandbox_client_key backend_model="Magento\Config\Model\Config\Backend\Encrypted" />
+                <sandbox_server_key backend_model="Magento\Config\Model\Config\Backend\Encrypted" />
+                <enable_redirect>0</enable_redirect>
+                <order_status>pending</order_status>
+                <notification_log>1</notification_log>
+                <request_log>1</request_log>
+                <error_log>1</error_log>
+                <allowspecific>0</allowspecific>
+                <throw_exception>0</throw_exception>
+                <model>midtransSettings</model>
+            </settings>
+            <snap>
+                <active>1</active>
+                <title>Online Payment via Midtrans</title>
+                <custom_expiry>120 minute</custom_expiry>
+                <is3ds>1</is3ds>
+                <one_click>0</one_click>
+                <model>snapMethodAdapter</model>
+                <is_gateway>1</is_gateway>
+                <can_refund_partial_per_invoice>1</can_refund_partial_per_invoice>
+                <can_refund>1</can_refund>
+                <can_void>1</can_void>
+                <can_cancel>1</can_cancel>
+                <can_use_checkout>1</can_use_checkout>
+                <can_capture>1</can_capture>
+                <sort_order>1</sort_order>
+            </snap>
+            <specific>
+                <active>0</active>
+                <title>Specific Online Payment via Midtrans</title>
+                <custom_expiry>120 minute</custom_expiry>
+                <is3ds>1</is3ds>
+                <one_click>0</one_click>
+                <model>specificMethodAdapter</model>
+                <is_gateway>1</is_gateway>
+                <can_order>1</can_order>
+                <can_use_checkout>1</can_use_checkout>
+                <can_capture>1</can_capture>
+                <can_refund_partial_per_invoice>1</can_refund_partial_per_invoice>
+                <can_refund>1</can_refund>
+                <can_cancel>1</can_cancel>
+                <can_void>1</can_void>
+                <sort_order>2</sort_order>
+                <use_specific_account>0</use_specific_account>
+                <production_client_key backend_model="Magento\Config\Model\Config\Backend\Encrypted" />
+                <production_server_key backend_model="Magento\Config\Model\Config\Backend\Encrypted" />
+                <sandbox_client_key backend_model="Magento\Config\Model\Config\Backend\Encrypted" />
+                <sandbox_server_key backend_model="Magento\Config\Model\Config\Backend\Encrypted" />
+            </specific>
+            <installment>
+                <active>0</active>
+                <title>Online Installment Payment via Midtrans</title>
+                <custom_expiry>120 minute</custom_expiry>
+                <minimal_amount>500000</minimal_amount>
+                <is3ds>1</is3ds>
+                <one_click>0</one_click>
+                <model>installmentMethodAdapter</model>
+                <is_gateway>1</is_gateway>
+                <can_order>1</can_order>
+                <can_use_checkout>1</can_use_checkout>
+                <can_capture>1</can_capture>
+                <can_refund_partial_per_invoice>1</can_refund_partial_per_invoice>
+                <can_refund>1</can_refund>
+                <can_cancel>1</can_cancel>
+                <can_void>1</can_void>
+                <sort_order>2</sort_order>
+                <use_specific_account>0</use_specific_account>
+                <production_client_key backend_model="Magento\Config\Model\Config\Backend\Encrypted" />
+                <production_server_key backend_model="Magento\Config\Model\Config\Backend\Encrypted" />
+                <sandbox_client_key backend_model="Magento\Config\Model\Config\Backend\Encrypted" />
+                <sandbox_server_key backend_model="Magento\Config\Model\Config\Backend\Encrypted" />
+            </installment>
+            <offline>
+                <active>0</active>
+                <title>Offline Installment Payment via Midtrans</title>
+                <custom_expiry>120 minute</custom_expiry>
+                <minimal_amount>500000</minimal_amount>
+                <is3ds>1</is3ds>
+                <one_click>0</one_click>
+                <model>offlineMethodAdapter</model>
+                <is_gateway>1</is_gateway>
+                <can_order>1</can_order>
+                <can_use_checkout>1</can_use_checkout>
+                <can_capture>1</can_capture>
+                <can_refund_partial_per_invoice>1</can_refund_partial_per_invoice>
+                <can_refund>1</can_refund>
+                <can_cancel>1</can_cancel>
+                <can_void>1</can_void>
+                <sort_order>2</sort_order>
+                <use_specific_account>0</use_specific_account>
+                <production_client_key backend_model="Magento\Config\Model\Config\Backend\Encrypted" />
+                <production_server_key backend_model="Magento\Config\Model\Config\Backend\Encrypted" />
+                <sandbox_client_key backend_model="Magento\Config\Model\Config\Backend\Encrypted" />
+                <sandbox_server_key backend_model="Magento\Config\Model\Config\Backend\Encrypted" />
+            </offline>
+        </payment>
+    </default>
+</config>

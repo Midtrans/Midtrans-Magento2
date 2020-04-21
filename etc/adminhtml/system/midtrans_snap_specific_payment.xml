@@ -1,0 +1,96 @@
+<?xml version="1.0"?>
+<include xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="urn:magento:module:Magento_Config:etc/system_include.xsd">
+    <group id="specific" translate="label" type="text" sortOrder="30" showInDefault="1" showInWebsite="1" showInStore="1">
+        <label><![CDATA[Optional - Snap Specific Payment Integration]]></label>
+        <frontend_model>Magento\Config\Block\System\Config\Form\Fieldset</frontend_model>
+        <comment><![CDATA[<p>Optional - Enabling this will display additional payment options to customer, for specific payment that are specified in the "Allowed Payment Method" field, Midtrans Snap will show only the listed payment method on the Snap screen.</p>]]></comment>
+        <field id="active" translate="label" type="select" sortOrder="10" showInDefault="1" showInWebsite="1" showInStore="0">
+            <label>Enabled</label>
+            <source_model>Magento\Config\Model\Config\Source\Yesno</source_model>
+            <config_path>payment/specific/active</config_path>
+        </field>
+        <field id="title" translate="label" type="text" sortOrder="20" showInDefault="1" showInWebsite="1" showInStore="1">
+            <label>Title</label>
+            <config_path>payment/specific/title</config_path>
+        </field>
+        <field id="custom_expiry" translate="label" type="text" sortOrder="30" showInDefault="1" showInWebsite="1" showInStore="0">
+            <label>Custom Expiry</label>
+            <config_path>payment/specific/custom_expiry</config_path>
+            <comment><![CDATA[Filled with duration & unit. Unit: minute,hour,day. example: 120 minute]]></comment>
+            <tooltip>This will allow you to set custom duration on how long the transaction available to be paid.</tooltip>
+        </field>
+        <field id="enable_payment" translate="label" type="text" sortOrder="40" showInDefault="1" showInWebsite="1" showInStore="0">
+            <label>Allowed Payment Method</label>
+            <comment><![CDATA[Customize allowed payment method, separate payment method code with coma. e.g: bank_transfer,credit_card.<br\>Leave it default if you are not sure.]]></comment>
+        </field>
+        <field id="sort_order" translate="label" type="text" sortOrder="50" showInDefault="1" showInWebsite="1" showInStore="1">
+            <label>Sort Order</label>
+            <frontend_class>validate-number</frontend_class>
+            <config_path>payment/specific/sort_order</config_path>
+        </field>
+        <group id="cc_config" translate="label" type="text" sortOrder="60" showInDefault="1" showInWebsite="1" showInStore="1">
+            <label><![CDATA[Credit Card Option]]></label>
+            <frontend_model>Magento\Config\Block\System\Config\Form\Fieldset</frontend_model>
+            <field id="is3ds" translate="label" type="select" sortOrder="70" showInDefault="1" showInWebsite="1" showInStore="0">
+                <label>3D Secure</label>
+                <comment><![CDATA[You must enable 3D Secure.<br/>Please contact us if you wish to disable this feature in the Production environment.]]></comment>
+                <config_path>payment/specific/is3ds</config_path>
+                <source_model>Magento\Config\Model\Config\Source\Enabledisable</source_model>
+            </field>
+            <field id="one_click" translate="label" type="select" sortOrder="80" showInDefault="1" showInWebsite="1" showInStore="0">
+                <label>Save Card</label>
+                <comment>Leave it disabled if you are not sure!</comment>
+                <tooltip>This will allow your customer to save their card on the payment popup, for faster payment flow on the following purchase.</tooltip>
+                <config_path>payment/specific/one_click</config_path>
+                <source_model>Magento\Config\Model\Config\Source\Enabledisable</source_model>
+            </field>
+            <field id="bank" translate="label" type="text" sortOrder="90" showInDefault="1" showInWebsite="1" showInStore="0">
+                <label>Acquiring Bank</label>
+                <comment><![CDATA[Input the desired acquiring bank. e.g: bni.<br/>Leave blank if you are not sure!]]></comment>
+            </field>
+            <field id="bin" translate="label" type="text" sortOrder="100" showInDefault="1" showInWebsite="1" showInStore="0">
+                <label>Bin Number</label>
+                <comment><![CDATA[Fill with CC BIN numbers (or bank name) that you want to allow to use this payment button.<br\>Separate BIN number with coma Example: 4,5,4811,bni,mandiri.<br\>Leave it blank if you are not sure!]]></comment>
+            </field>
+        </group>
+        <group id="specific_access" translate="label" type="text" sortOrder="101" showInDefault="1" showInWebsite="1" showInStore="1">
+            <label><![CDATA[Optional - Use different Midtrans account for Specific payment]]></label>
+            <field id="active" translate="label" type="select" sortOrder="10" showInDefault="1" showInWebsite="1" showInStore="0">
+                <label>Enabled</label>
+                <source_model>Magento\Config\Model\Config\Source\Yesno</source_model>
+                <config_path>payment/specific/use_specific_account</config_path>
+            </field>
+            <field id="merchant_id" translate="label" type="text" sortOrder="102" showInDefault="1" showInWebsite="1" showInStore="0">
+                <label>Merchant Id</label>
+            </field>
+            <field id="production_client_key" translate="label" type="obscure" sortOrder="103" showInDefault="1" showInWebsite="1" showInStore="0">
+                <label>Production - Client Key</label>
+                <backend_model>Magento\Config\Model\Config\Backend\Encrypted</backend_model>
+                <depends>
+                    <field id="*/*/settings/is_production">1</field>
+                </depends>
+            </field>
+            <field id="production_server_key" translate="label" type="obscure" sortOrder="104" showInDefault="1" showInWebsite="1" showInStore="0">
+                <label>Production - Server Key</label>
+                <backend_model>Magento\Config\Model\Config\Backend\Encrypted</backend_model>
+                <depends>
+                    <field id="*/*/settings/is_production">1</field>
+                </depends>
+            </field>
+            <field id="sandbox_client_key" translate="label" type="obscure" sortOrder="105" showInDefault="1" showInWebsite="1" showInStore="0">
+                <label>Sandbox - Client Key</label>
+                <backend_model>Magento\Config\Model\Config\Backend\Encrypted</backend_model>
+                <depends>
+                    <field id="*/*/settings/is_production">0</field>
+                </depends>
+            </field>
+            <field id="sandbox_server_key" translate="label" type="obscure" sortOrder="106" showInDefault="1" showInWebsite="1" showInStore="0">
+                <label>Sandbox - Server Key</label>
+                <backend_model>Magento\Config\Model\Config\Backend\Encrypted</backend_model>
+                <depends>
+                    <field id="*/*/settings/is_production">0</field>
+                </depends>
+            </field>
+        </group>
+    </group>
+</include>
