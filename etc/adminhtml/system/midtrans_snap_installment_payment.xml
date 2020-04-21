@@ -58,18 +58,30 @@
             <field id="production_client_key" translate="label" type="obscure" sortOrder="103" showInDefault="1" showInWebsite="1" showInStore="0">
                 <label>Production - Client Key</label>
                 <backend_model>Magento\Config\Model\Config\Backend\Encrypted</backend_model>
+                <depends>
+                    <field id="*/*/settings/is_production">1</field>
+                </depends>
             </field>
             <field id="production_server_key" translate="label" type="obscure" sortOrder="104" showInDefault="1" showInWebsite="1" showInStore="0">
                 <label>Production - Server Key</label>
                 <backend_model>Magento\Config\Model\Config\Backend\Encrypted</backend_model>
+                <depends>
+                    <field id="*/*/settings/is_production">1</field>
+                </depends>
             </field>
             <field id="sandbox_client_key" translate="label" type="obscure" sortOrder="105" showInDefault="1" showInWebsite="1" showInStore="0">
                 <label>Sandbox - Client Key</label>
                 <backend_model>Magento\Config\Model\Config\Backend\Encrypted</backend_model>
+                <depends>
+                    <field id="*/*/settings/is_production">0</field>
+                </depends>
             </field>
             <field id="sandbox_server_key" translate="label" type="obscure" sortOrder="106" showInDefault="1" showInWebsite="1" showInStore="0">
                 <label>Sandbox - Server Key</label>
                 <backend_model>Magento\Config\Model\Config\Backend\Encrypted</backend_model>
+                <depends>
+                    <field id="*/*/settings/is_production">0</field>
+                </depends>
             </field>
         </group>
     </group>

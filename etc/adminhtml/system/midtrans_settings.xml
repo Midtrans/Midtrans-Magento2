@@ -3,37 +3,6 @@
     <group id="settings" translate="label" type="text" sortOrder="20" showInDefault="1" showInWebsite="1" showInStore="1">
         <frontend_model>Magento\Config\Block\System\Config\Form\Fieldset</frontend_model>
         <label><![CDATA[Basic Settings]]></label>
-        <comment><![CDATA[<script type="text/javascript">//<![CDATA[
-                        require(['jquery'], function(){
-                            var environment = jQuery("select[id*='settings_is_production']");
-                            function conditionalField() {
-                                var isProduction = environment.val() === '1';
-                                var isSandbox = environment.val() === '0';
-                                var prodServerKey = jQuery("tr[id*='settings_production_server_key']");
-                                var prodClientKey = jQuery("tr[id*='settings_production_client_key']");
-                                var sandboxServerKey = jQuery("tr[id*='settings_sandbox_server_key']");
-                                var sandboxClientKey = jQuery("tr[id*='settings_sandbox_client_key']");
-
-                                    if (isProduction) {
-                                        prodServerKey.show();
-                                        prodClientKey.show();
-                                        sandboxServerKey.hide();
-                                        sandboxClientKey.hide();
-                                    } else if (isSandbox) {
-                                        prodClientKey.hide();
-                                        prodServerKey.hide();
-                                        sandboxClientKey.show();
-                                        sandboxServerKey.show();
-                                }
-                            }
-                            environment.change(
-                            function () {
-                                conditionalField();
-                            });
-                            conditionalField();
-                        });
-                    </script>
-                ]]></comment>
         <field id="is_production" translate="label" type="select" sortOrder="10" showInDefault="1" showInWebsite="1" showInStore="0">
             <label>Is Production</label>
             <source_model>Magento\Config\Model\Config\Source\Yesno</source_model>
@@ -44,18 +13,30 @@
         <field id="production_client_key" translate="label" type="obscure" sortOrder="30" showInDefault="1" showInWebsite="1" showInStore="0">
             <label>Production - Client Key</label>
             <backend_model>Magento\Config\Model\Config\Backend\Encrypted</backend_model>
+            <depends>
+                <field id="is_production">1</field>
+            </depends>
         </field>
         <field id="production_server_key" translate="label" type="obscure" sortOrder="40" showInDefault="1" showInWebsite="1" showInStore="0">
             <label>Production - Server Key</label>
             <backend_model>Magento\Config\Model\Config\Backend\Encrypted</backend_model>
+            <depends>
+                <field id="is_production">1</field>
+            </depends>
         </field>
         <field id="sandbox_client_key" translate="label" type="obscure" sortOrder="50" showInDefault="1" showInWebsite="1" showInStore="0">
             <label>Sandbox - Client Key</label>
             <backend_model>Magento\Config\Model\Config\Backend\Encrypted</backend_model>
+            <depends>
+                <field id="is_production">0</field>
+            </depends>
         </field>
         <field id="sandbox_server_key" translate="label" type="obscure" sortOrder="60" showInDefault="1" showInWebsite="1" showInStore="0">
             <label>Sandbox - Server Key</label>
             <backend_model>Magento\Config\Model\Config\Backend\Encrypted</backend_model>
+            <depends>
+                <field id="is_production">0</field>
+            </depends>
         </field>
         <field id="enable_redirect" translate="label" type="select" sortOrder="70" showInDefault="1" showInWebsite="1" showInStore="0">
             <label>Enable Snap Redirect</label>
