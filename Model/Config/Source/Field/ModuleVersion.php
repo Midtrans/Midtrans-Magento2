@@ -2,7 +2,6 @@
 
 namespace Midtrans\Snap\Model\Config\Source\Field;
 
-
 use Magento\Framework\App\Cache\TypeListInterface;
 use Magento\Framework\App\Config\ScopeConfigInterface;
 use Magento\Framework\App\Config\Value;
@@ -54,7 +53,6 @@ class ModuleVersion extends Value
 
     /**
      * Inject current installed module version as the config value.
-     *
      * @return void
      */
     public function afterLoad()

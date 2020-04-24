@@ -94,7 +94,7 @@ In the Midtrans Magento plugins we have 4 option to use Snap model payment metho
     Enabling this will display additional payment options to customer, for offline Installment where the Card Issuer and Acquiring Bank don't have to be same entity (e.g: BNI Card and Mandiri Acquiring Bank)
 
 
->Note: You can use different Midtrans Account for every Snap model payment method, should configure the access-key in Optional section `“Use another Midtrans account”`. If the optional access-key is empty, the plugins will automatically use access key on Basic Settings.
+>Note: You can use different Midtrans Account for every Snap model payment method, should configure the access-key in Optional section `“Use different Midtrans account”`. If the optional access-key is empty, the plugins will automatically use access key on Basic Settings.
 
 >INFO: The built-in BCA Klikpay landing page for now will only use server key from basic settings of Snap payment integration
 

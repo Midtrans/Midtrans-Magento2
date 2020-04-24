@@ -1,21 +1,31 @@
 {
     "name": "midtrans/snap",
-    "description": "Midtrans Online Payment Magento 2 module",
+    "description": "Midtrans Accept Online Payment Magento 2 module",
     "type": "magento2-module",
     "version": "2.3.0",
-    "license": [
-        "MIT"
-    ],
+	"authors" : [
+		{
+			"name": "Zaki Ibrahim",
+			"email": "zaki.ibrahim@midtrans.com",
+			"homepage": "https://midtrans.com",
+			"role": "Developer"
+		}
+	],
+    "license": ["MIT"],
     "require": {
-        "php": "~5.5.0|~5.6.0",
-        "magento/magento-composer-installer": "*"
+        "php" : "^5.5 || ^7.0"
     },
     "autoload": {
+        "files": ["registration.php"],
         "psr-4": {
             "Midtrans\\Snap\\": ""
-        },
-        "files": [
-            "registration.php"
-        ]
-    }
+        }
+    },
+	"keywords": [
+		"magento2",
+		"magento 2",
+		"midtrans",
+		"midtrans snap",
+		"snap"
+	]
 }

@@ -2,7 +2,6 @@
 
 namespace Midtrans\Snap\Model\Config\Source\Payment;
 
-
 use Magento\Framework\Event\ManagerInterface;
 use Magento\Framework\Exception\LocalizedException;
 use Magento\Payment\Gateway\Command\CommandManagerInterface;
@@ -12,7 +11,6 @@ use Magento\Payment\Gateway\Data\PaymentDataObjectFactory;
 use Magento\Payment\Gateway\Validator\ValidatorPoolInterface;
 use Magento\Payment\Model\InfoInterface;
 use Magento\Payment\Model\Method\Adapter;
-
 use Magento\Payment\Model\MethodInterface;
 use Magento\Sales\Model\Order;
 use Midtrans\Snap\Gateway\Config\Config;
@@ -20,11 +18,9 @@ use Midtrans\Snap\Gateway\MidtransApi;
 use Midtrans\Snap\Gateway\Transaction;
 use Midtrans\Snap\Helper\Data;
 use Midtrans\Snap\Logger\MidtransLogger;
-use PHPUnit\Exception;
 
 /**
  * Class AbstractPayment
- * @package Midtrans\Snap\Model\Config\Source\Payment
  */
 class AbstractPayment extends Adapter
 {
@@ -69,7 +65,6 @@ class AbstractPayment extends Adapter
      * @var MidtransLogger
      */
     protected $midtransLogger;
-
 
     /**
      * AbstractPayment constructor.
@@ -146,7 +141,6 @@ class AbstractPayment extends Adapter
             'reason' => $reasonRefund
         ];
 
-
         /*
          * Request refund to midtrans
          */
@@ -166,5 +160,4 @@ class AbstractPayment extends Adapter
                 }
             }
     }
-
 }
