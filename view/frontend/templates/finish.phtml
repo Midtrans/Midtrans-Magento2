@@ -10,7 +10,7 @@
     <h2>Payment Success!</h2>
     <p>We have received your payment, your order is being processed. Thank you!</p>
     <?php
-} else if ($transaction['status'] == 'pending') {
+} elseif ($transaction['status'] == 'pending') {
     ?>
     <?php
     if ($transaction['payment_type'] == 'bca_klikpay') {

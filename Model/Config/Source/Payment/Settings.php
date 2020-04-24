@@ -1,6 +1,7 @@
 <?php
 
 namespace Midtrans\Snap\Model\Config\Source\Payment;
+
 use Magento\Framework\App\Config\ScopeConfigInterface;
 use Magento\Store\Model\ScopeInterface;
 use Magento\Framework\Encryption\EncryptorInterface;
@@ -13,35 +14,31 @@ class Settings extends AbstractPayment
      */
 
     public $code = self::SETTINGS_PAYMENT_CODE ;
-
     protected $_scopeConfig;
-
 
     /**
      * Settings constructor.
      * @param ScopeConfigInterface $scopeConfig
      */
-    public function __construct
-    (
-        ScopeConfigInterface $scopeConfig
-    )
+    public function __construct(ScopeConfigInterface $scopeConfig)
     {
         $this->_scopeConfig = $scopeConfig;
     }
 
     public $formBlockType = 'Midtrans\Snap\Block\Form\Snap';
 
-    protected function getDataConfig($pathXML) {
+    protected function getDataConfig($pathXML)
+    {
         return $this->_scopeConfig->getValue($pathXML, ScopeInterface::SCOPE_STORE);
     }
-
 
     public function isProduction()
     {
         return $this->getDataConfig('payment/snap/settings/is_production') == '1' ? true : false;
     }
 
-    public function isRedirect() {
+    public function isRedirect()
+    {
         return $this->getDataConfig('payment/snap/settings/enable_redirect') == '1' ? true : false;
     }
 
@@ -138,11 +135,6 @@ class Settings extends AbstractPayment
     {
         return $this->getDataConfig('payment/settings/throw_exception') == 1 ? true : false;
     }
-
-//    public function isUsedSpecificMidtransAccount()
-//    {
-//        return $this->getDataConfig('payment/specific/use_specific_account') == 1 ? true : false;
-//    }
 
     public function getSpecificMerchantId()
     {
@@ -260,6 +252,4 @@ class Settings extends AbstractPayment
             }
         }
     }
-
-
 }

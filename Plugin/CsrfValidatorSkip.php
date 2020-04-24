@@ -1,6 +1,7 @@
 <?php
 
 namespace Midtrans\Snap\Plugin;
+
 class CsrfValidatorSkip
 {
     /**

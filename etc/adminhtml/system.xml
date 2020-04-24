@@ -1,11 +1,13 @@
 <?xml version="1.0"?>
-<config xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="../../../Config/etc/system_file.xsd">
+<config xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="urn:magento:module:Magento_Config:etc/system_file.xsd">
     <system>
         <section id="payment">
-            <group id="snap" translate="label" type="text" sortOrder="1" showInDefault="1"  showInWebsite="1" showInStore="1">
+            <group id="snap" translate="label" type="text" sortOrder="10" showInDefault="1"  showInWebsite="1" showInStore="1">
                 <label>Midtrans - Accept online payment</label>
-                <comment><![CDATA[Empowering commerce through technology]]></comment>
-                <attribute type="expanded">1</attribute>
+                <fieldset_css>complex midtrans-admin-section</fieldset_css>
+                <comment>Easy-to-setup secure online payment on your Magento store via Midtrans, various payment channels available (credit/debit card, bank transfer, Gopay, etc). Fluid mobile-friendly payment page within your own store. Highly configurable.</comment>
+                <frontend_model>Midtrans\Snap\Block\Adminhtml\Config\Fieldset</frontend_model>
+                <attribute type="displayIn">recommended_solutions</attribute>
                 <include path="Midtrans_Snap::system/midtrans_getting_started.xml"/>
                 <include path="Midtrans_Snap::system/midtrans_settings.xml"/>
                 <include path="Midtrans_Snap::system/midtrans_snap_basic_payment.xml"/>

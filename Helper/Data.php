@@ -4,7 +4,6 @@ namespace Midtrans\Snap\Helper;
 
 use Magento\Framework\Encryption\EncryptorInterface;
 use Midtrans\Snap\Model\Config\Source\Payment\Settings;
-use Midtrans\Snap\Model\Config\Source\Payment\Specific;
 
 class Data
 {
@@ -19,7 +18,6 @@ class Data
         $this->settings = $settings;
         $this->_encryptor = $encryptor;
     }
-
 
     public function getMixPanelKey() {
         return $this->isProduction() == true ? '17253088ed3a39b1e2bd2cbcfeca939a' : '9dcba9b440c831d517e8ff1beff40bd9';

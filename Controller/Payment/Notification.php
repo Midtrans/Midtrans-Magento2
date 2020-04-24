@@ -9,8 +9,6 @@ use \Midtrans\Snap\Gateway\Notification as MidtransNotification;
 /**
  * Class Notification
  * Handle notifications from midtrans http notifications
- *
- * @package Midtrans\Snap\Controller\Payment
  */
 class Notification extends AbstractAction
 {
@@ -28,9 +26,10 @@ class Notification extends AbstractAction
         if ($bodyOrder->isEmpty()) {
             $_info = "404 NOT FOUND - Order with orderId: " . $orderIdRequest . " not found on Magento 2";
             $this->_midtransLogger->midtransNotification($_info);
-            echo "404 Order Not found";
-            exit();
+            return $this->getResponse()->setBody('404 Order not found');
         }
+
+        $this->getResponse()->setBody('OK');
 
         $paymentCode = $bodyOrder->getPayment()->getMethod();
 
@@ -51,14 +50,14 @@ class Notification extends AbstractAction
             if ($fraud == 'challenge') {
                 $order_note = $note_prefix . 'Payment status challenged. Please take action on your Merchant Administration Portal - ' . $payment_type;
                 $this->setOrderStateAndStatus($orderId, Order::STATE_PAYMENT_REVIEW, $order_note, $trxId);
-            } else if ($fraud == 'accept') {
+            } elseif ($fraud == 'accept') {
                 $order_note = $note_prefix . 'Payment Completed - ' . $payment_type;
                 if ($order->canInvoice() && !$order->hasInvoices()) {
                     $this->generateInvoice($orderId, $payment_type);
                 }
                 $this->setOrderStateAndStatus($orderId,Order::STATE_PROCESSING, $order_note);
             }
-        } else if ($transaction == 'settlement') {
+        } elseif ($transaction == 'settlement') {
             if ($payment_type != 'credit_card') {
                 $order_note = $note_prefix . 'Payment Completed - ' . $payment_type;
                 if ($order->canInvoice() && !$order->hasInvoices()) {
@@ -66,23 +65,23 @@ class Notification extends AbstractAction
                 }
                 $this->setOrderStateAndStatus($orderId, Order::STATE_PROCESSING, $order_note);
             }
-        } else if ($transaction == 'pending') {
+        } elseif ($transaction == 'pending') {
             $order_note = $note_prefix . 'Awating Payment - ' . $payment_type;
             $this->setOrderStateAndStatus($orderId, Order::STATE_PENDING_PAYMENT, $order_note, $trxId);
-        } else if ($transaction == 'cancel' ) {
+        } elseif ($transaction == 'cancel' ) {
             if ($order->canCancel()) {
                 $order_note = $note_prefix . 'Canceled Payment - ' . $payment_type;
                 $this->cancelOrder($orderId, Order::STATE_CANCELED, $order_note);
             }
-        } else if ($transaction == 'expire') {
+        } elseif ($transaction == 'expire') {
             if ($order->canCancel()) {
                 $order_note = $note_prefix . 'Expired Payment - ' . $payment_type;
                 $this->cancelOrder($orderId, Order::STATE_CANCELED, $order_note);
             }
-        } else if ($transaction == 'deny') {
+        } elseif ($transaction == 'deny') {
                 $order_note = $note_prefix . 'Payment Deny - ' . $payment_type;
                 $order->addStatusToHistory(Order::STATE_PAYMENT_REVIEW, $order_note, false);
-        } else if ($transaction == 'refund' || $transaction == 'partial_refund') {
+        } elseif ($transaction == 'refund' || $transaction == 'partial_refund') {
             $isFullRefund = ($transaction == 'refund') ? true : false;
 
             /**
@@ -99,8 +98,7 @@ class Notification extends AbstractAction
              */
             $refundRaw[] = end($body['refunds']);
             if (isset($refundRaw[0]['bank_confirmed_at'])) {
-                echo 'OK';
-                exit;
+                return $this->getResponse()->setBody('OK');
             }
 
             /**
@@ -131,6 +129,5 @@ class Notification extends AbstractAction
          */
         $_info = "status : " . $transaction . " , order : " . $orderId . ", payment type : " . $payment_type;
         $this->_midtransLogger->midtransNotification($_info);
-        echo 'OK';
     }
 }

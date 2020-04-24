@@ -1,5 +1,7 @@
 <?php
+
 namespace Midtrans\Snap\Controller\Index;
+
 use Magento\Checkout\Model\Session\SuccessValidator;
 use Midtrans\Snap\Controller\Payment\AbstractAction;
 

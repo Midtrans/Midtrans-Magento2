@@ -2,33 +2,26 @@
 
 namespace Midtrans\Snap\Model\Ui;
 
-
 use Magento\Checkout\Model\ConfigProviderInterface;
 use Magento\Framework\App\ObjectManager;
 use Midtrans\Snap\Helper\Data;
 
-final class SpecificConfigProvider implements ConfigProviderInterface
+class SpecificConfigProvider implements ConfigProviderInterface
 {
     const CODE = 'specific';
-
     protected $data;
 
     /**
      * SpecificConfigProvider constructor.
      * @param $data
      */
-    public function __construct
-    (
-        Data $data
-    )
+    public function __construct(Data $data)
     {
         $this->data = $data;
     }
 
-
     /**
      * Retrieve assoc array of checkout configuration
-     *
      * @return array
      */
     public function getConfig()

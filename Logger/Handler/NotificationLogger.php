@@ -1,12 +1,11 @@
 <?php
 
 namespace Midtrans\Snap\Logger\Handler;
+
 use Midtrans\Snap\Logger\MidtransLogger;
 
 /**
  * Class NotificationLogger for specify the file name, logger type and level
- *
- * @package Midtrans\Snap\Logger\Handler
  */
 class NotificationLogger extends BaseLogger
 {
@@ -27,5 +26,4 @@ class NotificationLogger extends BaseLogger
      * @var int
      */
     protected $level = MidtransLogger::NOTIFICATION;
-
 }

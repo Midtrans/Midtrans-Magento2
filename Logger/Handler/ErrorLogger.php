@@ -6,7 +6,6 @@ use Midtrans\Snap\Logger\MidtransLogger;
 
 /**
  * Class ErrorLogger for specify the file name, logger type and level
- * @package Midtrans\Snap\Logger\Handler
  */
 class ErrorLogger extends BaseLogger
 {
@@ -27,5 +26,4 @@ class ErrorLogger extends BaseLogger
      * @var int
      */
     protected $level = MidtransLogger::ERROR;
-
 }

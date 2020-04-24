@@ -2,7 +2,6 @@
 
 namespace Midtrans\Snap\Logger;
 
-
 use Midtrans\Snap\Model\Config\Source\Payment\Settings;
 use Monolog\Logger;
 
@@ -10,16 +9,13 @@ use Monolog\Logger;
  * Class MidtransLogger handle logging request, notification and error,
  * all log file located at var/log/midtrans folder
  *
- * @package Midtrans\Snap\Logger
  */
 class MidtransLogger extends Logger
 {
     const REQUEST = 100;
     const ERROR = 400;
     const NOTIFICATION = 200;
-
     protected $settings;
-
 
     /**
      * MidtransLogger constructor.
@@ -33,7 +29,6 @@ class MidtransLogger extends Logger
         $this->settings = $settings;
         parent::__construct($name, $handlers, $processors);
     }
-
 
     /**
      * Do record the notification log
@@ -63,13 +58,11 @@ class MidtransLogger extends Logger
             return $this->addRecord(static::REQUEST, $message, $context);
         }
         return null;
-;
     }
 
     /**
      * Do record a Midtrans Error log exception. If logging is disabled,
      * return throw new exception if exception is enabled.
-     *
      * @param $message
      * @param array $context
      * @return bool

@@ -6,8 +6,6 @@ use Midtrans\Snap\Logger\MidtransLogger;
 
 /**
  * Class RequestLogger for specify the file name, logger type and level
- *
- * @package Midtrans\Snap\Logger\Handler
  */
 class RequestLogger extends BaseLogger
 {

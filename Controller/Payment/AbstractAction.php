@@ -19,15 +19,10 @@ use Magento\Sales\Model\Service\CreditmemoService;
 use Magento\Sales\Model\Service\InvoiceService;
 use Midtrans\Snap\Helper\Data;
 use Magento\Framework\View\Result\PageFactory;
-use Magento\Sales\Api\OrderStatusHistoryRepositoryInterface;
-
 use Midtrans\Snap\Logger\MidtransLogger;
-
 
 /**
  * Class AbstractAction to handle basic action order
- *
- * @package Midtrans\Snap\Controller\Payment
  */
 abstract class AbstractAction extends Action
 {
@@ -90,9 +85,6 @@ abstract class AbstractAction extends Action
 
     protected $registry;
 
-    const midtransTrxId = 'midtrans_trx_id';
-
-
     /**
      * AbstractAction constructor.
      * @param Context $context
@@ -111,7 +103,6 @@ abstract class AbstractAction extends Action
      * @param Order\CreditmemoRepository $creditmemoRepository
      * @param MidtransLogger $midtransLogger
      * @param Registry $registry
-     * @param OrderStatusHistoryRepositoryInterface $orderStatusHistoryRepository
      * @param PageFactory $pageFactory
      */
     public function __construct(
@@ -184,11 +175,6 @@ abstract class AbstractAction extends Action
 
     public function getQuoteByTransactionId($trxId) {
         $order = $this->_order->getData('ext_order_id', $trxId);
-        return $order;
-    }
-
-    public function getOrderByTransactionId($trxId) {
-        $order = $this->_order->loadByAttribute(self::midtransTrxId, $trxId);
         return $order;
     }
 
@@ -434,7 +420,6 @@ abstract class AbstractAction extends Action
         $customer_details['phone'] = $order_billing_address->getTelephone();
         $customer_details['billing_address'] = $billing_address;
 
-
         $totalPrice = 0;
         foreach ($item_details as $item) {
             $totalPrice += $item['price'] * $item['quantity'];
@@ -469,13 +454,11 @@ abstract class AbstractAction extends Action
                 $payloads['enabled_payments'] = $enabled_payments;
             }
 
-
         } else if ($paymentCode == 'installment') {
             $minimalAmount = $config['minimal_amount'];
             $credit_card = $this->getInstallmentCardConfig($config, $minimalAmount, $totalPrice);
             $payloads['enabled_payments'] = array('credit_card');
             $payloads['credit_card'] = $credit_card;
-
 
         } else if ($paymentCode == 'offline') {
             $minimalAmount = $config['minimal_amount'];
@@ -878,12 +861,10 @@ abstract class AbstractAction extends Action
             'ZM' => 'ZMB',
             'ZW' => 'ZWE'
         );
-
         // Check if country code exists
         if (isset($cc_three[$country_code]) && $cc_three[$country_code] != '') {
             $country_code = $cc_three[$country_code];
         }
-
         return $country_code;
     }
 
@@ -991,7 +972,6 @@ abstract class AbstractAction extends Action
         } catch (\Exception $e) {
             $this->messageManager->addErrorMessage($e->getMessage());
         }
-
         return $invoice;
     }
 
@@ -1009,11 +989,9 @@ abstract class AbstractAction extends Action
         $order = $this->getQuoteByOrderId($orderId);
         $order->setState($status);
         $order->setStatus($status);
-       // $order->addCommentToStatusHistory($order_note, true, false);
         $order->addStatusToHistory($status, $order_note, false);
         $order->cancel();
         $this->saveOrder($order);
-
         return $order;
     }
 
@@ -1032,7 +1010,6 @@ abstract class AbstractAction extends Action
         $order = $this->getQuoteByOrderId($orderId);
         $order->setState($status);
         $order->setStatus($status);
-    //    $order->addCommentToStatusHistory($order_note, true, false);
         $order->addStatusToHistory($status, $order_note, false);
         $this->saveOrder($order);
     }
@@ -1121,8 +1098,6 @@ abstract class AbstractAction extends Action
             } else {
                 $this->_midtransLogger->midtransError("AbstractAction.class CreateCreditMemo:: Failed create Credit Memo with order-id ".$orderId." Invoice not found");
             }
-
-
         if ($isFullRefund) {
             $creditMemo = $this->_creditmemoFactory->createByOrder($order);
             if (isset($orderInvoice)) {
@@ -1133,7 +1108,6 @@ abstract class AbstractAction extends Action
             $creditMemo->setState(Order\Creditmemo::STATE_REFUNDED);
             $this->cancelOrder($orderId, Order::STATE_CLOSED, $refund_note);
         }
-
         try {
             if (isset($creditMemo)) {
                 $this->_creditmemoRepository->save($creditMemo);
@@ -1145,5 +1119,4 @@ abstract class AbstractAction extends Action
             $this->_midtransLogger->midtransError($error_exception);
         }
     }
-
 }

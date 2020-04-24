@@ -4,11 +4,9 @@ namespace Midtrans\Snap\Controller\Index;
 
 use Exception;
 use Magento\Framework\View\Result\Page;
-
 use Midtrans\Snap\Controller\Payment\AbstractAction;
 use Midtrans\Snap\Gateway\Transaction;
 use Midtrans\Snap\Gateway\Config\Config;
-
 
 class Finish extends AbstractAction
 {
@@ -22,7 +20,7 @@ class Finish extends AbstractAction
             if ($transactionId != null) {
                 $param = $transactionId;
                 $paymentCode = self::PAYMENT_CODE;
-            } else if ($orderId != null) {
+            } elseif ($orderId != null) {
                 $param = $orderId;
                 $code = $this->getQuoteByOrderId($orderId)->getPayment()->getMethod();
                 $paymentCode = $code;
@@ -45,12 +43,10 @@ class Finish extends AbstractAction
             $this->registry->register('transaction_status', $transaction, false);
             $this->registry->register('payment_type', $payment_type, false);
             $this->registry->register('order_id', $orderId, false);
-
         } catch (Exception $e) {
             error_log($e->getMessage());
             $this->_midtransLogger->midtransError($e->getMessage());
         }
-
         /** @var Page $resultPage */
         $resultPage = $this->_pageFactory->create();
         return $resultPage;

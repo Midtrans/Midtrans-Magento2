@@ -48,5 +48,4 @@ class Redirect extends AbstractAction
             $this->_midtransLogger->midtransError($e->getMessage());
         }
     }
-
 }

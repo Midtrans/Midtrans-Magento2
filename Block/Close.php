@@ -1,9 +1,9 @@
 <?php
 
 namespace Midtrans\Snap\Block;
+
 use \Magento\Framework\View\Element\Template;
 use Magento\Framework\View\Element\Template\Context;
-
 
 class Close extends Template
 {
@@ -18,5 +18,4 @@ class Close extends Template
     {
         return __('Your order has been canceled, because you close payment page. Thank you');
     }
-
 }
