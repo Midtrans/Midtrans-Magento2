@@ -18,7 +18,7 @@ Before you begin to install through the composer, you need Magento marketplace a
 
 
 ## Install Midtrans Snap plugins through Magento marketplace 
-
+You can install Midtrans Snap plugins through Magento Marketplace. Please, visit Midtrans on [Magento Marketplace](https://marketplace.magento.com/midtrans-snap.html) and follow step-by-step installation instructions from the [Official Magento extension docs](https://docs.magento.com/user-guide/system/web-setup-extension-manager.html)
 
 ## Install Midtrans Snap plugins from GitHub project
 
