@@ -34,12 +34,12 @@ class Settings extends AbstractPayment
 
     public function isProduction()
     {
-        return $this->getDataConfig('payment/snap/settings/is_production') == '1';
+        return $this->getDataConfig('payment/snap/settings/is_production') == 1;
     }
 
     public function isRedirect()
     {
-        return $this->getDataConfig('payment/snap/settings/enable_redirect') == '1';
+        return $this->getDataConfig('payment/snap/settings/enable_redirect') == 1;
     }
 
     public function getMerchantId()
