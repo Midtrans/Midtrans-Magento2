@@ -138,7 +138,11 @@ class Settings extends AbstractPayment
 
     public function getSpecificMerchantId()
     {
-        return $this->getDataConfig('payment/snap/specific/specific_access/merchant_id');
+        if ($this->getDataConfig('payment/specific/use_specific_account') == 1) {
+            return $this->getDataConfig('payment/snap/specific/specific_access/merchant_id');
+        } else {
+            return $this->getMerchantId();
+        }
     }
 
     public function getSpecificClientKey()
@@ -177,7 +181,11 @@ class Settings extends AbstractPayment
 
     public function getInstallmentMerchantId()
     {
-        return $this->getDataConfig('payment/snap/installment/installment_access/merchant_id');
+        if ($this->getDataConfig('payment/installment/use_specific_account') == 1) {
+            return $this->getDataConfig('payment/snap/installment/installment_access/merchant_id');
+        } else {
+            return $this->getMerchantId();
+        }
     }
 
     public function getInstallmentClientKey()
@@ -216,7 +224,11 @@ class Settings extends AbstractPayment
 
     public function getOfflineMerchantId()
     {
-        return $this->getDataConfig('payment/snap/offline/offline_access/merchant_id');
+        if ($this->getDataConfig('payment/offline/use_specific_account') == 1) {
+            return $this->getDataConfig('payment/snap/offline/offline_access/merchant_id');
+        } else {
+            return $this->getMerchantId();
+        }
     }
 
     public function getOfflineClientKey()
