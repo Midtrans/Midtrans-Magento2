@@ -11,6 +11,7 @@ use Magento\Framework\Exception\CouldNotSaveException;
 use Magento\Framework\Exception\LocalizedException;
 use Magento\Framework\Registry;
 use Magento\Framework\Session\SessionManagerInterface;
+use Magento\Framework\View\Result\PageFactory;
 use Magento\Sales\Api\Data\InvoiceInterface;
 use Magento\Sales\Api\Data\OrderInterface;
 use Magento\Sales\Model\Order;
@@ -18,7 +19,6 @@ use Magento\Sales\Model\OrderRepository;
 use Magento\Sales\Model\Service\CreditmemoService;
 use Magento\Sales\Model\Service\InvoiceService;
 use Midtrans\Snap\Helper\Data;
-use Magento\Framework\View\Result\PageFactory;
 use Midtrans\Snap\Logger\MidtransLogger;
 
 /**
@@ -123,8 +123,7 @@ abstract class AbstractAction extends Action
         MidtransLogger $midtransLogger,
         Registry $registry,
         PageFactory $pageFactory
-    )
-    {
+    ) {
         parent::__construct($context);
         $this->_coreSession = $coreSession;
         $this->_checkoutSession = $checkoutSession;
@@ -147,21 +146,24 @@ abstract class AbstractAction extends Action
     /**
      * @return string
      */
-    public function getOrderIncrementId() {
+    public function getOrderIncrementId()
+    {
         return $this->_checkoutSession->getLastRealOrder()->getIncrementId();
     }
 
     /**
      * @return mixed
      */
-    public function getOrderId() {
+    public function getOrderId()
+    {
         return $this->_checkoutSession->getLastRealOrder()->getId();
     }
 
     /**
      * @return Order
      */
-    public function getQuote() {
+    public function getQuote()
+    {
         return $this->_order->loadByIncrementId($this->getOrderIncrementId());
     }
 
@@ -169,11 +171,13 @@ abstract class AbstractAction extends Action
      * @param $orderId
      * @return Order
      */
-    public function getQuoteByOrderId($orderId) {
+    public function getQuoteByOrderId($orderId)
+    {
         return $this->_order->loadByIncrementId($orderId);
     }
 
-    public function getQuoteByTransactionId($trxId) {
+    public function getQuoteByTransactionId($trxId)
+    {
         $order = $this->_order->getData('ext_order_id', $trxId);
         return $order;
     }
@@ -181,14 +185,16 @@ abstract class AbstractAction extends Action
     /**
      * @return Data
      */
-    public function getData() {
+    public function getData()
+    {
         return $this->data;
     }
 
     /**
      * @return string
      */
-    public function getCode() {
+    public function getCode()
+    {
         $payment = $this->getQuote()->getPayment();
         return $payment->getMethod();
     }
@@ -198,7 +204,8 @@ abstract class AbstractAction extends Action
      *
      * @return \Magento\Sales\Api\Data\OrderAddressInterface|null
      */
-    public function getBillingAddress() {
+    public function getBillingAddress()
+    {
         return $this->getQuote()->getBillingAddress();
     }
 
@@ -207,7 +214,8 @@ abstract class AbstractAction extends Action
      *
      * @return Order\Address|null
      */
-    public function getShippingAddress() {
+    public function getShippingAddress()
+    {
         return $this->getQuote()->getShippingAddress();
     }
 
@@ -216,7 +224,8 @@ abstract class AbstractAction extends Action
      *
      * @return Order\Item[]
      */
-    public function getAllItems() {
+    public function getAllItems()
+    {
         return $this->getQuote()->getAllItems();
     }
 
@@ -225,7 +234,8 @@ abstract class AbstractAction extends Action
      *
      * @return float|null
      */
-    public function getShippingAmount() {
+    public function getShippingAmount()
+    {
         return $this->getQuote()->getShippingAmount();
     }
 
@@ -235,7 +245,8 @@ abstract class AbstractAction extends Action
      * @param $order
      * @throws \Exception
      */
-    public function createInvoice($order) {
+    public function createInvoice($order)
+    {
         try {
             $newInvoice = $this->_invoiceService->prepareInvoice($order);
         } catch (LocalizedException $e) {
@@ -260,8 +271,9 @@ abstract class AbstractAction extends Action
      * @param $order_billing_address
      * @return array
      */
-    public function payloadBillingAddress($order_billing_address) {
-        $payload_billing_address = array();
+    public function payloadBillingAddress($order_billing_address)
+    {
+        $payload_billing_address = [];
         $payload_billing_address['first_name'] = $order_billing_address->getFirstname();
         $payload_billing_address['last_name'] = $order_billing_address->getLastname();
         $payload_billing_address['address'] = $order_billing_address->getStreet()[0];
@@ -278,8 +290,9 @@ abstract class AbstractAction extends Action
      * @param $order_shipping_address
      * @return array
      */
-    public function payloadShippingAddress($order_shipping_address) {
-        $shipping_address = array();
+    public function payloadShippingAddress($order_shipping_address)
+    {
+        $shipping_address = [];
         $shipping_address['first_name'] = $order_shipping_address->getFirstname();
         $shipping_address['last_name'] = $order_shipping_address->getLastname();
         $shipping_address['address'] = $order_shipping_address->getStreet()[0];
@@ -296,80 +309,80 @@ abstract class AbstractAction extends Action
      * @param $items
      * @return array
      */
-    public function payloadItemDetail($items) {
-        $item_details = array();
+    public function payloadItemDetail($items)
+    {
+        $item_details = [];
         foreach ($items as $each) {
-            $item = array(
+            $item = [
                 'id' => $each->getProductId(),
                 'price' => (string)round($each->getPrice()),
                 'quantity' => (string)round($each->getQtyOrdered()),
                 'name' => $this->repString($this->getName($each->getName()))
-            );
+            ];
             $item_details[] = $item;
         }
 
         if ($this->getQuote()->getDiscountAmount() != 0) {
-            $couponItem = array(
+            $couponItem = [
                 'id' => 'DISCOUNT',
                 'price' => round($this->getQuote()->getDiscountAmount()),
                 'quantity' => 1,
                 'name' => 'DISCOUNT'
-            );
+            ];
             $item_details[] = $couponItem;
         }
 
         if ($this->getShippingAmount() > 0) {
-            $shipping_item = array(
+            $shipping_item = [
                 'id' => 'SHIPPING',
                 'price' => round($this->getShippingAmount()),
                 'quantity' => 1,
                 'name' => 'Shipping Cost'
-            );
+            ];
             $item_details[] = $shipping_item;
         }
 
-        if ( $this->getQuote()->getShippingTaxAmount() > 0) {
-            $shipping_tax_item = array(
+        if ($this->getQuote()->getShippingTaxAmount() > 0) {
+            $shipping_tax_item = [
                 'id' => 'SHIPPING_TAX',
-                'price' => round( $this->getQuote()->getShippingTaxAmount()),
+                'price' => round($this->getQuote()->getShippingTaxAmount()),
                 'quantity' => 1,
                 'name' => 'Shipping Tax'
-            );
+            ];
             $item_details[] = $shipping_tax_item;
         }
 
         if ($this->getQuote()->getTaxAmount() > 0) {
-            $tax_item = array(
+            $tax_item = [
                 'id' => 'TAX',
                 'price' => round($this->getQuote()->getTaxAmount()),
                 'quantity' => 1,
                 'name' => 'Tax'
-            );
+            ];
             $item_details[] = $tax_item;
         }
 
         if ($this->getQuote()->getBaseGiftCardsAmount() != 0) {
-            $giftcardAmount = array(
+            $giftcardAmount = [
                 'id' => 'GIFTCARD',
                 'price' => round($this->getQuote()->getBaseGiftCardsAmount() * -1),
                 'quantity' => 1,
                 'name' => 'GIFTCARD'
-            );
+            ];
             $item_details[] = $giftcardAmount;
         }
 
         if ($this->getQuote()->getBaseCustomerBalanceAmount() != 0) {
-            $balancAmount = array(
+            $balancAmount = [
                 'id' => 'STORE CREDIT',
                 'price' => round($this->getQuote()->getBaseCustomerBalanceAmount() * -1),
                 'quantity' => 1,
                 'name' => 'STORE CREDIT'
-            );
+            ];
             $item_details[] = $balancAmount;
         }
         return $item_details;
     }
-
 
     /**
      * do create payload body request for Midtrans get token
@@ -377,7 +390,8 @@ abstract class AbstractAction extends Action
      * @param $config
      * @return array payload
      */
-    public function getPayload($config) {
+    public function getPayload($config)
+    {
         $this->setValue($this->getOrderIncrementId());
 
         // Get Billing address from order
@@ -409,7 +423,7 @@ abstract class AbstractAction extends Action
         /**
          * Set Customer details object for payload
          */
-        $customer_details = array();
+        $customer_details = [];
         $customer_details['billing_address'] = $billing_address;
         if (isset($shipping_address)) {
             $customer_details['shipping_address'] = $shipping_address;
@@ -428,11 +442,11 @@ abstract class AbstractAction extends Action
         /**
          * Initial Payload for request to Midtrans Payment
          */
-        $transaction_details = array();
+        $transaction_details = [];
         $transaction_details['order_id'] = $this->getOrderIncrementId();
         $transaction_details['gross_amount'] = $totalPrice;
 
-        $payloads = array();
+        $payloads = [];
         $payloads['transaction_details'] = $transaction_details;
         $payloads['item_details'] = $item_details;
         $payloads['customer_details'] = $customer_details;
@@ -444,8 +458,7 @@ abstract class AbstractAction extends Action
             if ($credit_card != null) {
                 $payloads['credit_card'] = $credit_card;
             }
-
-        } else if ($paymentCode == 'specific') {
+        } elseif ($paymentCode == 'specific') {
             $credit_card = $this->getSpecificCardConfig($config);
             $payloads['credit_card'] = $credit_card;
             $enablePayment = $config['enabled_payments'];
@@ -453,17 +466,15 @@ abstract class AbstractAction extends Action
                 $enabled_payments = explode(',', $enablePayment);
                 $payloads['enabled_payments'] = $enabled_payments;
             }
-
-        } else if ($paymentCode == 'installment') {
+        } elseif ($paymentCode == 'installment') {
             $minimalAmount = $config['minimal_amount'];
             $credit_card = $this->getInstallmentCardConfig($config, $minimalAmount, $totalPrice);
-            $payloads['enabled_payments'] = array('credit_card');
+            $payloads['enabled_payments'] = ['credit_card'];
             $payloads['credit_card'] = $credit_card;
-
-        } else if ($paymentCode == 'offline') {
+        } elseif ($paymentCode == 'offline') {
             $minimalAmount = $config['minimal_amount'];
             $credit_card = $this->getOfflineCardConfig($config, $minimalAmount, $totalPrice);
-            $payloads['enabled_payments'] = array('credit_card');
+            $payloads['enabled_payments'] = ['credit_card'];
             $payloads['credit_card'] = $credit_card;
         }
 
@@ -475,10 +486,10 @@ abstract class AbstractAction extends Action
             $expiry_unit = $customExpiry[1];
             $expiry_duration = (int)$customExpiry[0];
 
-            $payloads['expiry'] = array(
+            $payloads['expiry'] = [
                 'unit' => $expiry_unit,
                 'duration' => (int)$expiry_duration
-            );
+            ];
         }
         return $payloads;
     }
@@ -487,8 +498,9 @@ abstract class AbstractAction extends Action
      * @param $config
      * @return array config for snap credit card
      */
-    protected function getSnapCardConfig($config) {
-        $snap_credit_card = array();
+    protected function getSnapCardConfig($config)
+    {
+        $snap_credit_card = [];
         $bank = $config['bank'];
         if (!empty($bank)) {
             $snap_credit_card['bank'] = $bank;
@@ -509,8 +521,9 @@ abstract class AbstractAction extends Action
      * @param $config
      * @return array
      */
-    protected function getSpecificCardConfig($config) {
-        $specific_credit_card = array();
+    protected function getSpecificCardConfig($config)
+    {
+        $specific_credit_card = [];
         $bank = $config['bank'];
         if (!empty($bank)) {
             $specific_credit_card['bank'] = $bank;
@@ -527,7 +540,6 @@ abstract class AbstractAction extends Action
         return $specific_credit_card;
     }
 
-
     /**
      * Get credit card config for payment code installment online
      *
@@ -536,17 +548,18 @@ abstract class AbstractAction extends Action
      * @param $totalPrice
      * @return array
      */
-    protected function getInstallmentCardConfig($config, $minAmount, $totalPrice) {
-        $installment_credit_card = array();
+    protected function getInstallmentCardConfig($config, $minAmount, $totalPrice)
+    {
+        $installment_credit_card = [];
         $oneClick = $config['one_click'];
         if ($oneClick) {
             $installment_credit_card['save_card'] = true;
         }
         if ($totalPrice >= $minAmount) {
-            $terms = array(3, 6, 9, 12, 15, 18, 21, 24, 27, 30, 33, 36);
-            $installment = array();
+            $terms = [3, 6, 9, 12, 15, 18, 21, 24, 27, 30, 33, 36];
+            $installment = [];
             $installment['required'] = true;
-            $installment['terms'] = array(
+            $installment['terms'] = [
                 'bca' => $terms,
                 'bri' => $terms,
                 'maybank' => $terms,
@@ -554,12 +567,11 @@ abstract class AbstractAction extends Action
                 'bni' => $terms,
                 'mandiri' => $terms,
                 'cimb' => $terms
-            );
+            ];
             $installment_credit_card['installment'] = $installment;
         }
         return $installment_credit_card;
     }
-
 
     /**
      * Get Credit Card option for offline installment payment
@@ -569,8 +581,9 @@ abstract class AbstractAction extends Action
      * @param $totalPrice
      * @return array
      */
-    protected function getOfflineCardConfig($config, $minAmount, $totalPrice) {
-        $offline_credit_card = array();
+    protected function getOfflineCardConfig($config, $minAmount, $totalPrice)
+    {
+        $offline_credit_card = [];
         $bank = $config['bank'];
         if (!empty($bank)) {
             $offline_credit_card['bank'] = $bank;
@@ -584,16 +597,16 @@ abstract class AbstractAction extends Action
         if ($totalPrice >= $minAmount) {
             $installTerms = $config['terms'];
             $termsStr = explode(',', $installTerms);
-            $terms = array();
+            $terms = [];
             foreach ($termsStr as $termStr) {
                 $terms[] = (int)$termStr;
-            };
+            }
 
-            $installment = array();
+            $installment = [];
             $installment['required'] = true;
-            $installment['terms'] = array(
+            $installment['terms'] = [
                 'offline' => $terms
-            );
+            ];
 
             $offline_credit_card['installment'] = $installment;
 
@@ -607,7 +620,6 @@ abstract class AbstractAction extends Action
         return $offline_credit_card;
     }
 
-
     /**
      * @param $country_code
      * @return mixed
@@ -615,7 +627,7 @@ abstract class AbstractAction extends Action
     public function convert_country_code($country_code)
     {
         // 3 digits country codes
-        $cc_three = array(
+        $cc_three = [
             'AF' => 'AFG',
             'AX' => 'ALA',
             'AL' => 'ALB',
@@ -860,7 +872,7 @@ abstract class AbstractAction extends Action
             'YE' => 'YEM',
             'ZM' => 'ZMB',
             'ZW' => 'ZWE'
-        );
+        ];
         // Check if country code exists
         if (isset($cc_three[$country_code]) && $cc_three[$country_code] != '') {
             $country_code = $cc_three[$country_code];
@@ -918,7 +930,6 @@ abstract class AbstractAction extends Action
         return $this->_coreSession->unsMessage();
     }
 
-
     /**
      * Do generate Invoice
      *
@@ -928,13 +939,14 @@ abstract class AbstractAction extends Action
      * @param $order_note
      * @return InvoiceInterface|Order\Invoice
      */
-    public function generateInvoice($orderId, $payment_type){
+    public function generateInvoice($orderId, $payment_type)
+    {
         try {
             $order = $this->getQuoteByOrderId($orderId);
             if (!$order->getId()) {
                 throw new \Magento\Framework\Exception\LocalizedException(__('MIDTRANS-INFO: The order no longer exists.'));
             }
-            if(!$order->canInvoice()) {
+            if (!$order->canInvoice()) {
                 throw new \Magento\Framework\Exception\LocalizedException(
                     __('MIDTRANS-INFO: The order does not allow an invoice to be created.')
                 );
@@ -955,7 +967,6 @@ abstract class AbstractAction extends Action
             }
             $invoice->register();
             $invoice->getOrder()->setCustomerNoteNotify(false);
-
 
             //Save Invoice
             $transactionSave = $this->_transaction
@@ -1018,11 +1029,12 @@ abstract class AbstractAction extends Action
      * Check is order contain downloadable product
      * @return bool
      */
-    public function isContainDownloadableProduct() {
+    public function isContainDownloadableProduct()
+    {
         $items = $this->getQuote()->getAllItems();
-        foreach($items as $item){
+        foreach ($items as $item) {
             //look for downloadable products
-            if($item->getProductType() === 'downloadable'){
+            if ($item->getProductType() === 'downloadable') {
                 return true;
                 break;
             } else {
@@ -1041,9 +1053,9 @@ abstract class AbstractAction extends Action
     public function saveOrder(\Magento\Sales\Api\Data\OrderInterface $order)
     {
         try {
-           $this->_orderRepository->save($order);
+            $this->_orderRepository->save($order);
         } catch (\Exception $e) {
-            $error_exception = "AbstractAction.class SaveOrder : ". $e;
+            $error_exception = "AbstractAction.class SaveOrder : " . $e;
             $this->_midtransLogger->midtransError($error_exception);
         }
     }
@@ -1056,14 +1068,15 @@ abstract class AbstractAction extends Action
      * @param $refund_amount
      * @return bool
      */
-    public function canFullRefund($refund_key, $order, $refund_amount) {
+    public function canFullRefund($refund_key, $order, $refund_amount)
+    {
         $foundedRefundKey = null;
 
         $commentStatusHistory = $order->getStatusHistories();
         $creditMemo = $order->getCreditmemosCollection();
-        foreach($commentStatusHistory as $value) {
-            $valueComment = "Refunded ". $refund_amount ." | Refund-Key ". $value->getComment();
-            if (strpos($valueComment, $refund_key ) !== false ) {
+        foreach ($commentStatusHistory as $value) {
+            $valueComment = "Refunded " . $refund_amount . " | Refund-Key " . $value->getComment();
+            if (strpos($valueComment, $refund_key) !== false) {
                 $foundedRefundKey = true;
                 break;
             } else {
@@ -1071,7 +1084,7 @@ abstract class AbstractAction extends Action
             }
         }
 
-        if ( $creditMemo != null && $foundedRefundKey) {
+        if ($creditMemo != null && $foundedRefundKey) {
             return false;
         } else {
             return true;
@@ -1087,23 +1100,24 @@ abstract class AbstractAction extends Action
      * @param $refund_note
      * @throws \Exception
      */
-    public function createCreditMemo($orderId, $isFullRefund, $refund_note) {
+    public function createCreditMemo($orderId, $isFullRefund, $refund_note)
+    {
         $order = $this->getQuoteByOrderId($orderId);
         $invoices = $order->getInvoiceCollection();
         foreach ($invoices as $invoice) {
             $invoiceIncrementId = $invoice->getIncrementId();
         }
-            if (isset($invoiceIncrementId)) {
-                $orderInvoice = $this->_invoice->loadByIncrementId($invoiceIncrementId);
-            } else {
-                $this->_midtransLogger->midtransError("AbstractAction.class CreateCreditMemo:: Failed create Credit Memo with order-id ".$orderId." Invoice not found");
-            }
+        if (isset($invoiceIncrementId)) {
+            $orderInvoice = $this->_invoice->loadByIncrementId($invoiceIncrementId);
+        } else {
+            $this->_midtransLogger->midtransError("AbstractAction.class CreateCreditMemo:: Failed create Credit Memo with order-id " . $orderId . " Invoice not found");
+        }
         if ($isFullRefund) {
             $creditMemo = $this->_creditmemoFactory->createByOrder($order);
             if (isset($orderInvoice)) {
                 $creditMemo->setInvoice($orderInvoice);
             } else {
-                $this->_midtransLogger->midtransError("AbstractAction.class CreateCreditMemo:: Failed create Credit Memo with order-id ".$orderId." Invoice not found");
+                $this->_midtransLogger->midtransError("AbstractAction.class CreateCreditMemo:: Failed create Credit Memo with order-id " . $orderId . " Invoice not found");
             }
             $creditMemo->setState(Order\Creditmemo::STATE_REFUNDED);
             $this->cancelOrder($orderId, Order::STATE_CLOSED, $refund_note);
@@ -1112,10 +1126,10 @@ abstract class AbstractAction extends Action
             if (isset($creditMemo)) {
                 $this->_creditmemoRepository->save($creditMemo);
             } else {
-                $this->_midtransLogger->midtransError("AbstractAction.class CreateCreditMemo:: Failed create Credit Memo with order-id ".$orderId." Invoice not found");
+                $this->_midtransLogger->midtransError("AbstractAction.class CreateCreditMemo:: Failed create Credit Memo with order-id " . $orderId . " Invoice not found");
             }
         } catch (CouldNotSaveException $e) {
-            $error_exception = "AbstractAction.class saveCreditMemo :". $e;
+            $error_exception = "AbstractAction.class saveCreditMemo :" . $e;
             $this->_midtransLogger->midtransError($error_exception);
         }
     }

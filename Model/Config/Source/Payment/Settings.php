@@ -3,8 +3,8 @@
 namespace Midtrans\Snap\Model\Config\Source\Payment;
 
 use Magento\Framework\App\Config\ScopeConfigInterface;
-use Magento\Store\Model\ScopeInterface;
 use Magento\Framework\Encryption\EncryptorInterface;
+use Magento\Store\Model\ScopeInterface;
 
 class Settings extends AbstractPayment
 {
@@ -13,7 +13,7 @@ class Settings extends AbstractPayment
      * @var EncryptorInterface
      */
 
-    public $code = self::SETTINGS_PAYMENT_CODE ;
+    public $code = self::SETTINGS_PAYMENT_CODE;
     protected $_scopeConfig;
 
     /**
@@ -47,7 +47,6 @@ class Settings extends AbstractPayment
         return $this->getDataConfig('payment/snap/settings/merchant_id');
     }
 
-
     public function getDefaultClientKey()
     {
         if ($this->isProduction()) {
@@ -66,16 +65,19 @@ class Settings extends AbstractPayment
         }
     }
 
-    public function enableLog() {
+    public function enableLog()
+    {
         return $this->getDataConfig('payment/settings/enable_log') == 1;
     }
 
-    public function getOrderStatus() {
+    public function getOrderStatus()
+    {
         return $this->getDataConfig('payment/settings/order_status');
     }
 
-    public function getConfigSnap() {
-        $config = array();
+    public function getConfigSnap()
+    {
+        $config = [];
         $config['bank'] = $this->getDataConfig('payment/snap/basic/cc_config/bank');
         $config['custom_expiry'] = $this->getDataConfig('payment/snap/custom_expiry');
         $config['is3ds'] = $this->getDataConfig('payment/snap/is3ds') == 1;
@@ -84,8 +86,9 @@ class Settings extends AbstractPayment
         return $config;
     }
 
-    public function getConfigSpecific() {
-        $configSpecific = array();
+    public function getConfigSpecific()
+    {
+        $configSpecific = [];
         $configSpecific['bank'] = $this->getDataConfig('payment/snap/specific/cc_config/bank');
         $configSpecific['custom_expiry'] = $this->getDataConfig('payment/specific/custom_expiry');
         $configSpecific['is3ds'] = $this->getDataConfig('payment/specific/is3ds') == 1;
@@ -95,8 +98,9 @@ class Settings extends AbstractPayment
         return $configSpecific;
     }
 
-    public function getConfigInstallment() {
-        $configInstallment = array();
+    public function getConfigInstallment()
+    {
+        $configInstallment = [];
         $configInstallment['custom_expiry'] = $this->getDataConfig('payment/installment/custom_expiry');
         $configInstallment['is3ds'] = $this->getDataConfig('payment/installment/is3ds') == 1;
         $configInstallment['one_click'] = $this->getDataConfig('payment/installment/one_click') == 1;
@@ -104,8 +108,9 @@ class Settings extends AbstractPayment
         return $configInstallment;
     }
 
-    public function getConfigOffline() {
-        $configOffline = array();
+    public function getConfigOffline()
+    {
+        $configOffline = [];
         $configOffline['bank'] = $this->getDataConfig('payment/snap/offline/cc_config/bank');
         $configOffline['custom_expiry'] = $this->getDataConfig('payment/offline/custom_expiry');
         $configOffline['is3ds'] = $this->getDataConfig('payment/offline/is3ds') == 1;

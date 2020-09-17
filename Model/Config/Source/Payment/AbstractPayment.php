@@ -14,7 +14,6 @@ use Magento\Payment\Model\Method\Adapter;
 use Magento\Payment\Model\MethodInterface;
 use Magento\Sales\Model\Order;
 use Midtrans\Snap\Gateway\Config\Config;
-use Midtrans\Snap\Gateway\MidtransApi;
 use Midtrans\Snap\Gateway\Transaction;
 use Midtrans\Snap\Helper\Data;
 use Midtrans\Snap\Logger\MidtransLogger;
@@ -80,8 +79,7 @@ class AbstractPayment extends Adapter
      * @param ValidatorPoolInterface|null $validatorPool
      * @param CommandManagerInterface|null $commandExecutor
      */
-    public function __construct
-    (
+    public function __construct(
         ManagerInterface $eventManager,
         ValueHandlerPoolInterface $valueHandlerPool,
         PaymentDataObjectFactory $paymentDataObjectFactory,
@@ -93,8 +91,7 @@ class AbstractPayment extends Adapter
         CommandPoolInterface $commandPool = null,
         ValidatorPoolInterface $validatorPool = null,
         CommandManagerInterface $commandExecutor = null
-    )
-    {
+    ) {
         parent::__construct(
             $eventManager,
             $valueHandlerPool,
@@ -116,7 +113,7 @@ class AbstractPayment extends Adapter
      * @return Adapter|MethodInterface|void
      * @throws LocalizedException
      */
-    function refund(InfoInterface $payment, $amount)
+    public function refund(InfoInterface $payment, $amount)
     {
         if (!$this->canRefund()) {
             throw new LocalizedException(__('The refund action is not available.'));
@@ -144,20 +141,20 @@ class AbstractPayment extends Adapter
         /*
          * Request refund to midtrans
          */
-            $order->addStatusToHistory(Order::STATE_PROCESSING, 'Request Refund with Refund-Key: ' . $refundKey, false, false);
-            $order->save();
-            $response = $transaction::refund($orderId, $refundParams);
-            if (isset($response)) {
-                if ($response->status_code == 200) {
-                    if ($isFullRefund) {
-                        $refund_message = sprintf('Full Refunded %1$s | Refund-Key %2$s | %3$s', $response->refund_amount, $response->refund_key, $reasonRefund);
-                        $order->addStatusToHistory(Order::STATE_CLOSED, $refund_message, false);
-                    } else {
-                        $refund_message = sprintf('Partial Refunded %1$s | Refund-Key %2$s | %3$s', $response->refund_amount, $response->refund_key, $reasonRefund);
-                        $order->addStatusToHistory(Order::STATE_PROCESSING, $refund_message, false);
-                    }
-                    $order->save();
+        $order->addStatusToHistory(Order::STATE_PROCESSING, 'Request Refund with Refund-Key: ' . $refundKey, false, false);
+        $order->save();
+        $response = $transaction::refund($orderId, $refundParams);
+        if (isset($response)) {
+            if ($response->status_code == 200) {
+                if ($isFullRefund) {
+                    $refund_message = sprintf('Full Refunded %1$s | Refund-Key %2$s | %3$s', $response->refund_amount, $response->refund_key, $reasonRefund);
+                    $order->addStatusToHistory(Order::STATE_CLOSED, $refund_message, false);
+                } else {
+                    $refund_message = sprintf('Partial Refunded %1$s | Refund-Key %2$s | %3$s', $response->refund_amount, $response->refund_key, $reasonRefund);
+                    $order->addStatusToHistory(Order::STATE_PROCESSING, $refund_message, false);
                 }
+                $order->save();
             }
+        }
     }
 }

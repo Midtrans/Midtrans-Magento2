@@ -11,7 +11,7 @@
     <p>We have received your payment, your order is being processed. Thank you!</p>
     <?php
 } elseif ($transaction['status'] == 'pending') {
-    ?>
+        ?>
     <?php
     if ($transaction['payment_type'] == 'bca_klikpay') {
         // BCA Klikpay specific, all non-settlement are considered failure
@@ -27,14 +27,13 @@
         <h2>Your Order #<?php echo $transaction['order_id']?> is Awaiting Your Payment</h2>
         <p>Please complete the payment as instructed earlier. Thank you!</p>
         <?php
-    }
-    ?>
+    } ?>
     <?php
-} else {
-    ?>
+    } else {
+        ?>
     <hr>
     <h2>Payment Is Not Received</h2>
     <p>Your payment is not yet completed. Please complete your payment or do another checkout. Thank you!</p>
     <?php
-}
+    }
 ?>

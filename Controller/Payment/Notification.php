@@ -4,7 +4,7 @@ namespace Midtrans\Snap\Controller\Payment;
 
 use Magento\Sales\Model\Order;
 use Midtrans\Snap\Gateway\Config\Config;
-use \Midtrans\Snap\Gateway\Notification as MidtransNotification;
+use Midtrans\Snap\Gateway\Notification as MidtransNotification;
 
 /**
  * Class Notification
@@ -12,7 +12,6 @@ use \Midtrans\Snap\Gateway\Notification as MidtransNotification;
  */
 class Notification extends AbstractAction
 {
-
     public function execute()
     {
         $input_source = "php://input";
@@ -55,7 +54,7 @@ class Notification extends AbstractAction
                 if ($order->canInvoice() && !$order->hasInvoices()) {
                     $this->generateInvoice($orderId, $payment_type);
                 }
-                $this->setOrderStateAndStatus($orderId,Order::STATE_PROCESSING, $order_note);
+                $this->setOrderStateAndStatus($orderId, Order::STATE_PROCESSING, $order_note);
             }
         } elseif ($transaction == 'settlement') {
             if ($payment_type != 'credit_card') {
@@ -68,7 +67,7 @@ class Notification extends AbstractAction
         } elseif ($transaction == 'pending') {
             $order_note = $note_prefix . 'Awating Payment - ' . $payment_type;
             $this->setOrderStateAndStatus($orderId, Order::STATE_PENDING_PAYMENT, $order_note, $trxId);
-        } elseif ($transaction == 'cancel' ) {
+        } elseif ($transaction == 'cancel') {
             if ($order->canCancel()) {
                 $order_note = $note_prefix . 'Canceled Payment - ' . $payment_type;
                 $this->cancelOrder($orderId, Order::STATE_CANCELED, $order_note);
@@ -79,8 +78,8 @@ class Notification extends AbstractAction
                 $this->cancelOrder($orderId, Order::STATE_CANCELED, $order_note);
             }
         } elseif ($transaction == 'deny') {
-                $order_note = $note_prefix . 'Payment Deny - ' . $payment_type;
-                $order->addStatusToHistory(Order::STATE_PAYMENT_REVIEW, $order_note, false);
+            $order_note = $note_prefix . 'Payment Deny - ' . $payment_type;
+            $order->addStatusToHistory(Order::STATE_PAYMENT_REVIEW, $order_note, false);
         } elseif ($transaction == 'refund' || $transaction == 'partial_refund') {
             $isFullRefund = ($transaction == 'refund') ? true : false;
 
@@ -106,7 +105,7 @@ class Notification extends AbstractAction
              * If refund from magento dashboard add only comment history.
              */
             if ($isFullRefund) {
-                $refund_note = $note_prefix . 'Full Refunded: ' . $refund_amount . '  |  Refund-Key: '.$refund_key.'  |  Reason: ' . $refund_reason;
+                $refund_note = $note_prefix . 'Full Refunded: ' . $refund_amount . '  |  Refund-Key: ' . $refund_key . '  |  Reason: ' . $refund_reason;
                 if ($order->getStatus() != Order::STATE_CLOSED || $order->getState() != Order::STATE_CLOSED && $this->canFullRefund($refund_key, $order, $refund_amount) == true) {
                     $this->cancelOrder($orderId, Order::STATE_CLOSED, $refund_note);
                 } else {
@@ -118,7 +117,7 @@ class Notification extends AbstractAction
              * Handle partial refund from midtrans dashboard to add comment history
              */
             if (!$isFullRefund && $order->getStatus() === Order::STATE_PROCESSING) {
-                $partialRefundNote = $note_prefix . 'Partial Refunded: ' . $refund_amount . '  |  Refund-Key: '.$refund_key.'  |  Reason: ' . $refund_reason;
+                $partialRefundNote = $note_prefix . 'Partial Refunded: ' . $refund_amount . '  |  Refund-Key: ' . $refund_key . '  |  Reason: ' . $refund_reason;
                 $order->addStatusToHistory(Order::STATE_PROCESSING, $partialRefundNote, false);
             }
         }
