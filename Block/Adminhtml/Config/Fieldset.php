@@ -2,25 +2,31 @@
 
 namespace Midtrans\Snap\Block\Adminhtml\Config;
 
+use Magento\Backend\Block\Context;
+use Magento\Backend\Model\Auth\Session;
+use Magento\Config\Model\Config;
+use Magento\Framework\Data\Form\Element\AbstractElement;
+use Magento\Framework\View\Helper\Js;
+
 class Fieldset extends \Magento\Config\Block\System\Config\Form\Fieldset
 {
     /**
-     * @var \Magento\Config\Model\Config
+     * @var Config
      */
     protected $_backendConfig;
 
     /**
-     * @param \Magento\Backend\Block\Context $context
-     * @param \Magento\Backend\Model\Auth\Session $authSession
-     * @param \Magento\Framework\View\Helper\Js $jsHelper
-     * @param \Magento\Config\Model\Config $backendConfig
+     * @param Context $context
+     * @param Session $authSession
+     * @param Js $jsHelper
+     * @param Config $backendConfig
      * @param array $data
      */
     public function __construct(
-        \Magento\Backend\Block\Context $context,
-        \Magento\Backend\Model\Auth\Session $authSession,
-        \Magento\Framework\View\Helper\Js $jsHelper,
-        \Magento\Config\Model\Config $backendConfig,
+        Context $context,
+        Session $authSession,
+        Js $jsHelper,
+        Config $backendConfig,
         array $data = []
     ) {
         $this->_backendConfig = $backendConfig;
@@ -30,7 +36,7 @@ class Fieldset extends \Magento\Config\Block\System\Config\Form\Fieldset
     /**
      * Add custom css class
      *
-     * @param \Magento\Framework\Data\Form\Element\AbstractElement $element
+     * @param AbstractElement $element
      * @return string
      */
     protected function _getFrontendClass($element)
@@ -41,7 +47,7 @@ class Fieldset extends \Magento\Config\Block\System\Config\Form\Fieldset
     /**
      * Return header title part of html for payment solution
      *
-     * @param \Magento\Framework\Data\Form\Element\AbstractElement $element
+     * @param AbstractElement $element
      * @return string
      * @SuppressWarnings(PHPMD.NPathComplexity)
      */
@@ -79,7 +85,7 @@ class Fieldset extends \Magento\Config\Block\System\Config\Form\Fieldset
     /**
      * Return header comment part of html for payment solution
      *
-     * @param \Magento\Framework\Data\Form\Element\AbstractElement $element
+     * @param AbstractElement $element
      * @return string
      * @SuppressWarnings(PHPMD.UnusedFormalParameter)
      */
@@ -91,7 +97,7 @@ class Fieldset extends \Magento\Config\Block\System\Config\Form\Fieldset
     /**
      * Get collapsed state on-load
      *
-     * @param \Magento\Framework\Data\Form\Element\AbstractElement $element
+     * @param AbstractElement $element
      * @return false
      * @SuppressWarnings(PHPMD.UnusedFormalParameter)
      */
@@ -101,7 +107,7 @@ class Fieldset extends \Magento\Config\Block\System\Config\Form\Fieldset
     }
 
     /**
-     * @param \Magento\Framework\Data\Form\Element\AbstractElement $element
+     * @param AbstractElement $element
      * @return string
      * @SuppressWarnings(PHPMD.UnusedFormalParameter)
      */

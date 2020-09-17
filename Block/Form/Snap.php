@@ -2,7 +2,9 @@
 
 namespace Midtrans\Snap\Block\Form;
 
-class Snap extends \Magento\Payment\Block\Form
+use Magento\Payment\Block\Form;
+
+class Snap extends Form
 {
     /**
      * Instructions text

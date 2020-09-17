@@ -2,17 +2,22 @@
 
 namespace Midtrans\Snap\Plugin;
 
+use Closure;
+use Magento\Framework\App\ActionInterface;
+use Magento\Framework\App\Request\CsrfValidator;
+use Magento\Framework\App\RequestInterface;
+
 class CsrfValidatorSkip
 {
     /**
-     * @param \Magento\Framework\App\Request\CsrfValidator $subject
-     * @param \Closure $proceed
-     * @param \Magento\Framework\App\RequestInterface $request
-     * @param \Magento\Framework\App\ActionInterface $action
+     * @param CsrfValidator $subject
+     * @param Closure $proceed
+     * @param RequestInterface $request
+     * @param ActionInterface $action
      */
     public function aroundValidate(
         $subject,
-        \Closure $proceed,
+        Closure $proceed,
         $request,
         $action
     ) {
