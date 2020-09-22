@@ -1,7 +1,7 @@
 Midtrans ❤️ Magento! Midtrans is highly concerned with customer experience (UX). We strive to make payments simple for both the merchant and customers. With this plugin,  you can make your Magento store using Midtrans payment.
 
 ## Requirements:
-*   An online store with Magento infrastructure. This plugin is tested with Magento v2.3.4
+*   An online store with Magento infrastructure. This plugin is tested with Magento v2.4
 *   PHP v5.6 or greater.
 *   MySQL v5.7 or greater.
 *   Midtrans plugin for Magento v2.x [ [Github](https://github.com/Midtrans/Midtrans-Magento2) | [Zip](https://github.com/Midtrans/Midtrans-Magento2/archive/master.zip) ]
