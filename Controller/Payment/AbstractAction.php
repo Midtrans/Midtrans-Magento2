@@ -481,8 +481,8 @@ abstract class AbstractAction extends Action
         if ($config['one_click']) {
             $payloads['user_id'] = crypt($order_billing_address->getEmail(), $this->data->getServerKey($paymentCode));
         }
-        if (!empty($customExpiry)) {
-            $customExpiry = explode(" ", $customExpiry);
+        if (isset($config['custom_expiry'])) {
+            $customExpiry = explode(" ", $config['custom_expiry']);
             $expiry_unit = $customExpiry[1];
             $expiry_duration = (int)$customExpiry[0];
 
@@ -1036,10 +1036,8 @@ abstract class AbstractAction extends Action
             //look for downloadable products
             if ($item->getProductType() === 'downloadable') {
                 return true;
-                break;
             } else {
                 return false;
-                break;
             }
         }
     }
