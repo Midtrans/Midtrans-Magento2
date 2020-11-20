@@ -48,7 +48,7 @@ class Notification extends AbstractAction
         if ($transaction == 'capture') {
             if ($fraud == 'challenge') {
                 $order_note = $note_prefix . 'Payment status challenged. Please take action on your Merchant Administration Portal - ' . $payment_type;
-                $this->setOrderStateAndStatus($orderId, Order::STATE_PAYMENT_REVIEW, $order_note, $trxId);
+                $this->setOrderStateAndStatus($orderId, Order::STATE_PAYMENT_REVIEW, $order_note);
             } elseif ($fraud == 'accept') {
                 $order_note = $note_prefix . 'Payment Completed - ' . $payment_type;
                 if ($order->canInvoice() && !$order->hasInvoices()) {
@@ -66,7 +66,7 @@ class Notification extends AbstractAction
             }
         } elseif ($transaction == 'pending') {
             $order_note = $note_prefix . 'Awating Payment - ' . $payment_type;
-            $this->setOrderStateAndStatus($orderId, Order::STATE_PENDING_PAYMENT, $order_note, $trxId);
+            $this->setOrderStateAndStatus($orderId, Order::STATE_PENDING_PAYMENT, $order_note);
         } elseif ($transaction == 'cancel') {
             if ($order->canCancel()) {
                 $order_note = $note_prefix . 'Canceled Payment - ' . $payment_type;
@@ -81,7 +81,7 @@ class Notification extends AbstractAction
             $order_note = $note_prefix . 'Payment Deny - ' . $payment_type;
             $order->addStatusToHistory(Order::STATE_PAYMENT_REVIEW, $order_note, false);
         } elseif ($transaction == 'refund' || $transaction == 'partial_refund') {
-            $isFullRefund = ($transaction == 'refund') ? true : false;
+            $isFullRefund = $transaction == 'refund';
 
             /**
              * Get last array object from refunds array and get the value from last refund object
