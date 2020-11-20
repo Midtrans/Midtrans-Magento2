@@ -15,7 +15,7 @@ class Sanitizer
 
     public function __construct()
     {
-        $this->filters = array();
+        $this->filters = [];
     }
 
     /**
@@ -25,9 +25,9 @@ class Sanitizer
      */
     public static function jsonRequest(&$json)
     {
-        $keys = array('item_details', 'customer_details');
+        $keys = ['item_details', 'customer_details'];
         foreach ($keys as $key) {
-            if (!array_key_exists($key, $json)) continue;
+            if (!isset($json[$key])) continue;
 
             $camel = static::upperCamelize($key);
             $function = "field$camel";
@@ -38,11 +38,11 @@ class Sanitizer
     private static function fieldItemDetails(&$items)
     {
         foreach ($items as &$item) {
-            $id = new self;
+            $id = new self();
             $item['id'] = $id
                 ->maxLength(50)
                 ->apply($item['id']);
-            $name = new self;
+            $name = new self();
             $item['name'] = $name
                 ->maxLength(50)
                 ->apply($item['name']);
@@ -51,17 +51,17 @@ class Sanitizer
 
     private static function fieldCustomerDetails(&$field)
     {
-        $first_name = new self;
+        $first_name = new self();
         $field['first_name'] = $first_name
             ->maxLength(20)
             ->apply($field['first_name']);
-        if (array_key_exists('last_name', $field)) {
-            $last_name = new self;
+        if (isset($field['last_name'])) {
+            $last_name = new self();
             $field['last_name'] = $last_name
                 ->maxLength(20)
                 ->apply($field['last_name']);
         }
-        $email = new self;
+        $email = new self();
         $field['email'] = $email
             ->maxLength(45)
             ->apply($field['email']);
@@ -69,45 +69,44 @@ class Sanitizer
         static::fieldPhone($field['phone']);
 
         if (!empty($field['billing_address']) || !empty($field['shipping_address'])) {
-            $keys = array('billing_address', 'shipping_address');
+            $keys = ['billing_address', 'shipping_address'];
             foreach ($keys as $key) {
-                if (!array_key_exists($key, $field)) continue;
+                if (!isset($field[$key])) continue;
 
                 $camel = static::upperCamelize($key);
                 $function = "field$camel";
                 static::$function($field[$key]);
             }
         }
-
     }
 
     private static function fieldBillingAddress(&$field)
     {
-        $fields = array(
+        $fields = [
             'first_name'   => 20,
             'last_name'    => 20,
             'address'      => 200,
             'city'         => 20,
             'country_code' => 10
-        );
+        ];
 
         foreach ($fields as $key => $value) {
-            if (array_key_exists($key, $field)) {
-                $self = new self;
+            if (isset($field[$key])) {
+                $self = new self();
                 $field[$key] = $self
                     ->maxLength($value)
                     ->apply($field[$key]);
             }
         }
 
-        if (array_key_exists('postal_code', $field)) {
-            $postal_code = new self;
+        if (isset($field['postal_code'])) {
+            $postal_code = new self();
             $field['postal_code'] = $postal_code
                 ->whitelist('A-Za-z0-9\\- ')
                 ->maxLength(10)
                 ->apply($field['postal_code']);
         }
-        if (array_key_exists('phone', $field)) {
+        if (isset($field['phone'])) {
             static::fieldPhone($field['phone']);
         }
     }
@@ -119,15 +118,17 @@ class Sanitizer
 
     private static function fieldPhone(&$field)
     {
-        $plus = substr($field, 0, 1) === '+' ? true : false;
-        $self = new self;
+        $plus = substr($field, 0, 1) === '+';
+        $self = new self();
         $field = $self
             ->whitelist('\\d\\-\\(\\) ')
             ->maxLength(19)
             ->apply($field);
 
-        if ($plus) $field = '+' . $field;
-        $self = new self;
+        if ($plus) {
+            $field = '+' . $field;
+        }
+        $self = new self();
         $field = $self
             ->maxLength(19)
             ->apply($field);
