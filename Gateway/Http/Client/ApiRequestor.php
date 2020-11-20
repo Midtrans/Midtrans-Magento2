@@ -59,7 +59,7 @@ class ApiRequestor
                 'Content-Type: application/json',
                 'Accept: application/json',
                 'user-agent : Magento 2 Module',
-                'x-plugin-name : midtrans-magento2',
+                'x-plugin-name : midtrans-magento-2.4.3',
                 'Authorization: Basic ' . base64_encode($server_key . ':')
             ),
             CURLOPT_RETURNTRANSFER => 1
