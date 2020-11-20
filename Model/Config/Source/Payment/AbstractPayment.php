@@ -4,6 +4,7 @@ namespace Midtrans\Snap\Model\Config\Source\Payment;
 
 use Magento\Framework\Event\ManagerInterface;
 use Magento\Framework\Exception\LocalizedException;
+use Magento\Framework\UrlInterface;
 use Magento\Payment\Gateway\Command\CommandManagerInterface;
 use Magento\Payment\Gateway\Command\CommandPoolInterface;
 use Magento\Payment\Gateway\Config\ValueHandlerPoolInterface;
@@ -13,6 +14,7 @@ use Magento\Payment\Model\InfoInterface;
 use Magento\Payment\Model\Method\Adapter;
 use Magento\Payment\Model\MethodInterface;
 use Magento\Sales\Model\Order;
+use Magento\Store\Model\StoreManagerInterface;
 use Midtrans\Snap\Gateway\Config\Config;
 use Midtrans\Snap\Gateway\Transaction;
 use Midtrans\Snap\Helper\Data;
@@ -66,11 +68,23 @@ class AbstractPayment extends Adapter
     protected $midtransLogger;
 
     /**
+     * @var UrlInterface
+     */
+    public $urlInterface;
+
+    /**
+     * @var StoreManagerInterface
+     */
+    public $storeManager;
+
+    /**
      * AbstractPayment constructor.
      * @param ManagerInterface $eventManager
      * @param ValueHandlerPoolInterface $valueHandlerPool
      * @param PaymentDataObjectFactory $paymentDataObjectFactory
      * @param Data $dataConfig
+     * @param UrlInterface $urlInterface
+     * @param StoreManagerInterface $storeManager
      * @param MidtransLogger $midtransLogger
      * @param string $code
      * @param string $formBlockType
@@ -84,6 +98,8 @@ class AbstractPayment extends Adapter
         ValueHandlerPoolInterface $valueHandlerPool,
         PaymentDataObjectFactory $paymentDataObjectFactory,
         Data $dataConfig,
+        UrlInterface $urlInterface,
+        StoreManagerInterface $storeManager,
         MidtransLogger $midtransLogger,
         $code,
         $formBlockType,
@@ -104,6 +120,8 @@ class AbstractPayment extends Adapter
             $commandExecutor
         );
         $this->dataConfig = $dataConfig;
+        $this->urlInterface = $urlInterface;
+        $this->storeManager = $storeManager;
         $this->midtransLogger = $midtransLogger;
     }
 
