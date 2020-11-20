@@ -4,26 +4,32 @@ namespace Midtrans\Snap\Controller\Payment;
 
 use Exception;
 use Magento\Framework\Controller\ResultFactory;
-use Midtrans\Snap\Gateway\SnapApi;
 use Midtrans\Snap\Gateway\Config\Config;
+use Midtrans\Snap\Gateway\SnapApi;
 
 class Redirect extends AbstractAction
 {
     public function execute()
     {
-        $paymentCode = $this->getCode();
-        $requestConfig = $this->getData()->getRequestConfig($paymentCode);
-        $enableRedirect = $this->getData()->isRedirect();
-
-        $payloads = $this->getPayload($requestConfig);
-        $is3ds = $requestConfig['is3ds'];
-
-        Config::$is3ds = $is3ds;
-        Config::$isProduction = $this->getData()->isProduction();
-        Config::$serverKey = $this->getData()->getServerKey($paymentCode);
-        Config::$isSanitized = false;
-
         try {
+            $paymentCode = $this->getCode();
+            $requestConfig = $this->getData()->getRequestConfig($paymentCode);
+            $enableRedirect = $this->getData()->isRedirect();
+
+            $payloads = $this->getPayload($requestConfig);
+            $is3ds = $requestConfig['is3ds'];
+            $isProduction = $this->getData()->isProduction();
+
+            Config::$isProduction = $isProduction;
+            Config::$serverKey = $this->getData()->getServerKey($paymentCode);
+            Config::$isSanitized = true;
+            Config::$is3ds = $is3ds;
+
+            /*Override notification, if override notification from admin setting is active (default is active) */
+            if ($this->getData()->isOverrideNotification()) {
+                Config::$overrideNotifUrl = $this->getData()->getNotificationEndpoint();
+            }
+
             $_info = 'Info - Payloads: ' . print_r($payloads, true);
             $this->_midtransLogger->midtransRequest($_info);
 
