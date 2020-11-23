@@ -142,6 +142,11 @@ class AbstractPayment extends Adapter
         $orderId = $order->getRealOrderId();
 
         Config::$serverKey = $this->dataConfig->getServerKey($paymentCode);
+
+        /*Override notification, if override notification from admin setting is active (default is active) */
+        if ($this->dataConfig->isOverrideNotification()) {
+            Config::$overrideNotifUrl = $this->dataConfig->getNotificationEndpoint();
+        }
         $transaction = new Transaction();
 
         // Check is full refund or partial
