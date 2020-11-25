@@ -3,8 +3,9 @@
 namespace Midtrans\Snap\Gateway;
 
 use Midtrans\Snap\Gateway\Config\Config;
-use Midtrans\Snap\Gateway\Utility\Sanitizer;
 use Midtrans\Snap\Gateway\Http\Client\ApiRequestor;
+use Midtrans\Snap\Gateway\Utility\Sanitizer;
+
 /**
  * Provide charge and capture functions for Core API
  */
@@ -19,11 +20,11 @@ class CoreApi
      */
     public static function charge($params)
     {
-        $payloads = array(
+        $payloads = [
             'payment_type' => 'credit_card'
-        );
+        ];
 
-        if (array_key_exists('item_details', $params)) {
+        if (isset($params['item_details'])) {
             $gross_amount = 0;
             foreach ($params['item_details'] as $item) {
                 $gross_amount += $item['quantity'] * $item['price'];
@@ -37,13 +38,19 @@ class CoreApi
             Sanitizer::jsonRequest($payloads);
         }
 
-        $result = ApiRequestor::post(
+        if (Config::$appendNotifUrl) {
+            Config::$curlOptions[CURLOPT_HTTPHEADER][] = 'X-Append-Notification: ' . Config::$appendNotifUrl;
+        }
+
+        if (Config::$overrideNotifUrl) {
+            Config::$curlOptions[CURLOPT_HTTPHEADER][] = 'X-Override-Notification: ' . Config::$overrideNotifUrl;
+        }
+
+        return ApiRequestor::post(
             Config::getBaseUrl() . '/charge',
             Config::$serverKey,
             $payloads
         );
-
-        return $result;
     }
 
     /**
@@ -55,16 +62,14 @@ class CoreApi
      */
     public static function capture($param)
     {
-        $payloads = array(
+        $payloads = [
         'transaction_id' => $param,
-        );
+        ];
 
-        $result = ApiRequestor::post(
+        return ApiRequestor::post(
             Config::getBaseUrl() . '/capture',
             Config::$serverKey,
             $payloads
         );
-
-        return $result;
     }
 }

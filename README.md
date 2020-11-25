@@ -1,24 +1,27 @@
 Midtrans ❤️ Magento! Midtrans is highly concerned with customer experience (UX). We strive to make payments simple for both the merchant and customers. With this plugin,  you can make your Magento store using Midtrans payment.
 
 ## Requirements:
-*   An online store with Magento infrastructure. This plugin is tested with Magento v2.4
+*   An online store with Magento infrastructure. This plugin is tested with Magento v2.4.1
 *   PHP v5.6 or greater.
 *   MySQL v5.7 or greater.
 *   Midtrans plugin for Magento v2.x [ [Github](https://github.com/Midtrans/Midtrans-Magento2) | [Zip](https://github.com/Midtrans/Midtrans-Magento2/archive/master.zip) ]
-*   This plugin supports Magento2 version 2.1.0, 2.2.0, 2.3.4 and higher.
+*   This plugin supports Magento2 version 2.1.0 - 2.4.1 and higher.
 
 
 # How to install the plugins
 ## Install Midtrans Snap plugins through Composer
 Before you begin to install through the composer, you need Magento marketplace account and make sure that you have installed Composer. In your terminal, go to the Magento folder and run the following commands:
 1. Install the plugins: `composer require midtrans/snap`
-2. Enable the plugin:  `bin/magento module:enable Midtrans_Snap`
+2. Enable the plugin:  `bin/magento module:enable Midtrans_Snap --clear-static-content`
 3. Execute upgrade script : `bin/magento setup:upgrade`
-4. Flush cache storage :  `bin/magento cache:flush`
+4. Flush cache storage :  `bin/magento cache:clean`
+5. Check the module status:  `bin/magento module:status Midtrans_Snap`
+
+>Note: If you do have a previous version installed and upgrade the plugins to the latest version. After upgrade our plugins, You need to run `bin/magento setup:upgrade` and flush cache `bin/magento cachce:clean`.
 
 
 ## Install Midtrans Snap plugins through Magento marketplace 
-You can install Midtrans Snap plugins through Magento Marketplace. Please, visit Midtrans on [Magento Marketplace](https://marketplace.magento.com/midtrans-snap.html) and follow step-by-step installation instructions from the [Official Magento extension docs](https://docs.magento.com/user-guide/system/web-setup-extension-manager.html)
+You can install Midtrans Snap plugins through Magento Marketplace. Please, visit Midtrans on [Magento Marketplace](https://marketplace.magento.com/midtrans-snap.html) and follow step-by-step installation instructions from the [Official Magento extension docs](https://devdocs.magento.com/extensions/install)
 
 ## Install Midtrans Snap plugins from GitHub project
 
@@ -31,11 +34,13 @@ With these steps, you can custom/modify our Magento plugins to handle the busine
 4. Copy the app folders into the Magento root folder.
 5. Run this command on terminal
 
-    `bin/magento module:enable Midtrans_Snap`
+    `bin/magento module:enable Midtrans_Snap --clear-static-content`
     
     `bin/magento setup:upgrade`
     
-    `bin/magento cache:flush`
+    `bin/magento cache:clean`
+    
+    `bin/magento module:status Midtrans_Snap`
 
 
 # Plugin Usage Instruction
@@ -96,7 +101,7 @@ In the Midtrans Magento plugins we have 4 option to use Snap model payment metho
 
 >Note: You can use different Midtrans Account for every Snap model payment method, should configure the access-key in Optional section `“Use different Midtrans account”`. If the optional access-key is empty, the plugins will automatically use access key on Basic Settings.
 
->INFO: The built-in BCA Klikpay landing page for now will only use server key from basic settings of Snap payment integration
+>INFO: The built-in BCA Klikpay landing page for now will only use server key from basic settings of Snap payment integration, and our plugins still not support for multishipping order
 
 In case you need to customize configuration these field are configurable, and described as follows:
 

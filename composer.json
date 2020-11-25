@@ -2,7 +2,7 @@
     "name": "midtrans/snap",
     "description": "Midtrans Accept Online Payment Magento 2 module",
     "type": "magento2-module",
-    "version": "2.3.3",
+    "version": "2.4.3",
 	"authors" : [
 		{
 			"name": "Zaki Ibrahim",
