@@ -85,6 +85,8 @@ class Settings extends AbstractPayment
         try {
             return $this->_storeManager->getStore()->getBaseUrl() . 'snap/payment/notification';
         } catch (NoSuchEntityException $e) {
+            $this->midtransLogger->midtransError('GetNotificationEndpointFunction: ' . $e);
+            return null;
         }
     }
 

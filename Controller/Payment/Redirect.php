@@ -26,7 +26,7 @@ class Redirect extends AbstractAction
             Config::$is3ds = $is3ds;
 
             /*Override notification, if override notification from admin setting is active (default is active) */
-            if ($this->getData()->isOverrideNotification()) {
+            if ($this->getData()->isOverrideNotification() && $this->getData()->getNotificationEndpoint() != null) {
                 Config::$overrideNotifUrl = $this->getData()->getNotificationEndpoint();
             }
 

@@ -144,7 +144,7 @@ class AbstractPayment extends Adapter
         Config::$serverKey = $this->dataConfig->getServerKey($paymentCode);
 
         /*Override notification, if override notification from admin setting is active (default is active) */
-        if ($this->dataConfig->isOverrideNotification()) {
+        if ($this->dataConfig->isOverrideNotification() && $this->dataConfig->getNotificationEndpoint() != null) {
             Config::$overrideNotifUrl = $this->dataConfig->getNotificationEndpoint();
         }
         $transaction = new Transaction();
