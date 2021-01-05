@@ -1,3 +1,8 @@
+[![Latest Stable Version](https://poser.pugx.org/midtrans/snap/v)](//packagist.org/packages/midtrans/snap) 
+[![Monthly Downloads](https://poser.pugx.org/midtrans/snap/d/monthly)](//packagist.org/packages/midtrans/snap)
+[![Total Downloads](https://poser.pugx.org/midtrans/snap/downloads)](//packagist.org/packages/midtrans/snap) 
+[![License](https://poser.pugx.org/midtrans/snap/license)](//packagist.org/packages/midtrans/snap)
+
 Midtrans ❤️ Magento! Midtrans is highly concerned with customer experience (UX). We strive to make payments simple for both the merchant and customers. With this plugin,  you can make your Magento store using Midtrans payment.
 
 ## Requirements:
