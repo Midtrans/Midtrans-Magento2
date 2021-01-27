@@ -2,16 +2,16 @@
 <page xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" layout="1column"
       xsi:noNamespaceSchemaLocation="urn:magento:framework:View/Layout/etc/page_configuration.xsd">
     <head>
-        <title>Payment Close</title>
+        <title>Payment Close Page</title>
     </head>
     <body>
         <referenceBlock name="page.main.title">
             <action method="setPageTitle">
-                <argument translate="true" name="title" xsi:type="string">Your order has been canceled!</argument>
+                <argument translate="true" name="text" xsi:type="string">Oops, You close payment page...!</argument>
             </action>
         </referenceBlock>
         <referenceContainer name="content">
-            <block class="Midtrans\Snap\Block\Close" name="snap_close" template="Midtrans_Snap::close.phtml"/>
+            <block class="Midtrans\Snap\Block\Close" name="snap_close" template="Midtrans_Snap::close.phtml" cacheable="false"/>
         </referenceContainer>
     </body>
 </page>
