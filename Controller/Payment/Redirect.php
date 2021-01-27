@@ -12,22 +12,24 @@ class Redirect extends AbstractAction
     public function execute()
     {
         try {
-            $paymentCode = $this->getCode();
-            $requestConfig = $this->getData()->getRequestConfig($paymentCode);
-            $enableRedirect = $this->getData()->isRedirect();
+            $incrementId = $this->_checkoutSession->getLastRealOrder()->getIncrementId();
+            $paymentCode = $this->getPaymentCode($incrementId);
 
-            $payloads = $this->getPayload($requestConfig);
+            $requestConfig = $this->getMidtransDataConfig()->getRequestConfig($paymentCode);
+            $enableRedirect = $this->getMidtransDataConfig()->isRedirect();
+
+            $payloads = $this->getPayload($requestConfig, $paymentCode);
             $is3ds = $requestConfig['is3ds'];
-            $isProduction = $this->getData()->isProduction();
+            $isProduction = $this->getMidtransDataConfig()->isProduction();
 
             Config::$isProduction = $isProduction;
-            Config::$serverKey = $this->getData()->getServerKey($paymentCode);
+            Config::$serverKey = $this->getMidtransDataConfig()->getServerKey($paymentCode);
             Config::$isSanitized = true;
             Config::$is3ds = $is3ds;
 
             /*Override notification, if override notification from admin setting is active (default is active) */
-            if ($this->getData()->isOverrideNotification() && $this->getData()->getNotificationEndpoint() != null) {
-                Config::$overrideNotifUrl = $this->getData()->getNotificationEndpoint();
+            if ($this->getMidtransDataConfig()->isOverrideNotification() && $this->getMidtransDataConfig()->getNotificationEndpoint() != null) {
+                Config::$overrideNotifUrl = $this->getMidtransDataConfig()->getNotificationEndpoint();
             }
 
             $_info = 'Info - Payloads: ' . print_r($payloads, true);

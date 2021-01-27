@@ -8,7 +8,6 @@ use Magento\Framework\App\Action\Action;
 use Magento\Framework\App\Action\Context;
 use Magento\Framework\DB\Transaction;
 use Magento\Framework\Exception\CouldNotSaveException;
-use Magento\Framework\Exception\LocalizedException;
 use Magento\Framework\Registry;
 use Magento\Framework\Session\SessionManagerInterface;
 use Magento\Framework\View\Result\PageFactory;
@@ -18,6 +17,8 @@ use Magento\Sales\Model\Order;
 use Magento\Sales\Model\OrderRepository;
 use Magento\Sales\Model\Service\CreditmemoService;
 use Magento\Sales\Model\Service\InvoiceService;
+use Midtrans\Snap\Gateway\Config\Config;
+use Midtrans\Snap\Gateway\Transaction as MidtransTransaction;
 use Midtrans\Snap\Helper\Data;
 use Midtrans\Snap\Logger\MidtransLogger;
 
@@ -85,6 +86,14 @@ abstract class AbstractAction extends Action
 
     protected $registry;
 
+    protected $_customerSession;
+
+    protected $_contextHttp;
+    /**
+     * @var Context
+     */
+    private $context;
+
     /**
      * AbstractAction constructor.
      * @param Context $context
@@ -103,6 +112,8 @@ abstract class AbstractAction extends Action
      * @param Order\CreditmemoRepository $creditmemoRepository
      * @param MidtransLogger $midtransLogger
      * @param Registry $registry
+     * @param \Magento\Customer\Model\Session $customerSession
+     * @param \Magento\Framework\App\Http\Context $contextHttp
      * @param PageFactory $pageFactory
      */
     public function __construct(
@@ -122,6 +133,8 @@ abstract class AbstractAction extends Action
         Order\CreditmemoRepository $creditmemoRepository,
         MidtransLogger $midtransLogger,
         Registry $registry,
+        \Magento\Customer\Model\Session $customerSession,
+        \Magento\Framework\App\Http\Context $contextHttp,
         PageFactory $pageFactory
     ) {
         parent::__construct($context);
@@ -141,128 +154,62 @@ abstract class AbstractAction extends Action
         $this->_creditmemoRepository = $creditmemoRepository;
         $this->_midtransLogger = $midtransLogger;
         $this->registry = $registry;
+        $this->_customerSession = $customerSession;
+        $this->_contextHttp = $contextHttp;
+        $this->context = $context;
     }
 
     /**
+     * Get increment id from last order checkout session
+     *
      * @return string
      */
-    public function getOrderIncrementId()
+    public function getOrderIdSession()
     {
         return $this->_checkoutSession->getLastRealOrder()->getIncrementId();
     }
 
     /**
-     * @return mixed
-     */
-    public function getOrderId()
-    {
-        return $this->_checkoutSession->getLastRealOrder()->getId();
-    }
-
-    /**
+     * Get order by incrementId from session checkout
+     *
      * @return Order
      */
-    public function getQuote()
+    public function getOrderFromSession()
     {
-        return $this->_order->loadByIncrementId($this->getOrderIncrementId());
+        return $this->_order->loadByIncrementId($this->getOrderIdSession());
     }
 
     /**
-     * @param $orderId
+     * Get order by incrementId
+     *
+     * @param $realOrderId
      * @return Order
      */
-    public function getQuoteByOrderId($orderId)
+    public function getOrderByIncrementId($realOrderId)
     {
-        return $this->_order->loadByIncrementId($orderId);
-    }
-
-    public function getQuoteByTransactionId($trxId)
-    {
-        $order = $this->_order->getData('ext_order_id', $trxId);
-        return $order;
+        return $this->_order->loadByIncrementId($realOrderId);
     }
 
     /**
+     * Get Midtrans data config
+     *
      * @return Data
      */
-    public function getData()
+    public function getMidtransDataConfig()
     {
         return $this->data;
     }
 
     /**
+     * Get order payment code by incrementId
+     *
+     * @param $incrementId
      * @return string
      */
-    public function getCode()
+    public function getPaymentCode($incrementId)
     {
-        $payment = $this->getQuote()->getPayment();
+        $payment = $this->getOrderByIncrementId($incrementId)->getPayment();
         return $payment->getMethod();
-    }
-
-    /**
-     * get billing address from quote order
-     *
-     * @return \Magento\Sales\Api\Data\OrderAddressInterface|null
-     */
-    public function getBillingAddress()
-    {
-        return $this->getQuote()->getBillingAddress();
-    }
-
-    /**
-     * get shipping address from quote order
-     *
-     * @return Order\Address|null
-     */
-    public function getShippingAddress()
-    {
-        return $this->getQuote()->getShippingAddress();
-    }
-
-    /**
-     * get all items from quote order
-     *
-     * @return Order\Item[]
-     */
-    public function getAllItems()
-    {
-        return $this->getQuote()->getAllItems();
-    }
-
-    /**
-     * get shipping amount from quote order
-     *
-     * @return float|null
-     */
-    public function getShippingAmount()
-    {
-        return $this->getQuote()->getShippingAmount();
-    }
-
-    /**
-     * do create invoice for order
-     *
-     * @param $order
-     * @throws \Exception
-     */
-    public function createInvoice($order)
-    {
-        try {
-            $newInvoice = $this->_invoiceService->prepareInvoice($order);
-        } catch (LocalizedException $e) {
-            error_reporting($e);
-            $this->_midtransLogger->midtransError($e->getMessage());
-        } catch (\Exception $e) {
-            $this->_midtransLogger->midtransError($e->getMessage());
-        }
-        try {
-            $newInvoice->register();
-            $newInvoice->canCapture();
-            $newInvoice->capture();
-            $newInvoice->setIsUsedForRefund(1);
-        } catch (LocalizedException $e) {
-            $this->_midtransLogger->midtransError($e->getMessage());
-        }
     }
 
     /**
@@ -306,76 +253,83 @@ abstract class AbstractAction extends Action
     /**
      * do create item details for payload request to Midtrans
      *
-     * @param $items
+     * @param Order $order
+     * @param $isMultishipping
      * @return array
      */
-    public function payloadItemDetail($items)
+    public function payloadItemDetail(Order $order, $isMultishipping)
     {
         $item_details = [];
-        foreach ($items as $each) {
-            $item = [
-                'id' => $each->getProductId(),
-                'price' => (string)round($each->getPrice()),
-                'quantity' => (string)round($each->getQtyOrdered()),
-                'name' => $this->repString($this->getName($each->getName()))
+        $items = $order->getAllItems();
+
+        $itemPrefix = '';
+        if ($isMultishipping) {
+            $itemPrefix = ' For Order :' . $order->getIncrementId();
+        }
+        foreach ($items as $newItem) {
+            $newItem = [
+                'id' => 'ITEM-ID ' . $newItem->getProductId() . $itemPrefix,
+                'price' => (string)round($newItem->getPrice()),
+                'quantity' => (string)round($newItem->getQtyOrdered()),
+                'name' => $this->repString($this->getName($newItem->getName()))
             ];
-            $item_details[] = $item;
+            $item_details[] = $newItem;
         }
 
-        if ($this->getQuote()->getDiscountAmount() != 0) {
+        if ($order->getDiscountAmount() != 0) {
             $couponItem = [
-                'id' => 'DISCOUNT',
-                'price' => round($this->getQuote()->getDiscountAmount()),
+                'id' => 'DISCOUNT' . $itemPrefix,
+                'price' => round($order->getDiscountAmount()),
                 'quantity' => 1,
                 'name' => 'DISCOUNT'
             ];
             $item_details[] = $couponItem;
         }
 
-        if ($this->getShippingAmount() > 0) {
+        if ($order->getShippingAmount() > 0) {
             $shipping_item = [
-                'id' => 'SHIPPING',
-                'price' => round($this->getShippingAmount()),
+                'id' => 'SHIPPING' . $itemPrefix,
+                'price' => round($order->getShippingAmount()),
                 'quantity' => 1,
                 'name' => 'Shipping Cost'
             ];
             $item_details[] = $shipping_item;
         }
 
-        if ($this->getQuote()->getShippingTaxAmount() > 0) {
+        if ($order->getShippingTaxAmount() > 0) {
             $shipping_tax_item = [
-                'id' => 'SHIPPING_TAX',
-                'price' => round($this->getQuote()->getShippingTaxAmount()),
+                'id' => 'SHIPPING_TAX' . $itemPrefix,
+                'price' => round($order->getShippingTaxAmount()),
                 'quantity' => 1,
                 'name' => 'Shipping Tax'
             ];
             $item_details[] = $shipping_tax_item;
         }
 
-        if ($this->getQuote()->getTaxAmount() > 0) {
+        if ($order->getTaxAmount() > 0) {
             $tax_item = [
-                'id' => 'TAX',
-                'price' => round($this->getQuote()->getTaxAmount()),
+                'id' => 'TAX' . $itemPrefix,
+                'price' => round($order->getTaxAmount()),
                 'quantity' => 1,
                 'name' => 'Tax'
             ];
             $item_details[] = $tax_item;
         }
 
-        if ($this->getQuote()->getBaseGiftCardsAmount() != 0) {
+        if ($order->getBaseGiftCardsAmount() != 0) {
             $giftcardAmount = [
-                'id' => 'GIFTCARD',
-                'price' => round($this->getQuote()->getBaseGiftCardsAmount() * -1),
+                'id' => 'GIFTCARD' . $itemPrefix,
+                'price' => round($order->getBaseGiftCardsAmount() * -1),
                 'quantity' => 1,
                 'name' => 'GIFTCARD'
             ];
             $item_details[] = $giftcardAmount;
         }
 
-        if ($this->getQuote()->getBaseCustomerBalanceAmount() != 0) {
+        if ($order->getBaseCustomerBalanceAmount() != 0) {
             $balancAmount = [
-                'id' => 'STORE CREDIT',
-                'price' => round($this->getQuote()->getBaseCustomerBalanceAmount() * -1),
+                'id' => 'STORE CREDIT' . $itemPrefix,
+                'price' => round($order->getBaseCustomerBalanceAmount() * -1),
                 'quantity' => 1,
                 'name' => 'STORE CREDIT'
             ];
@@ -385,73 +339,144 @@ abstract class AbstractAction extends Action
     }
 
     /**
-     * do create payload body request for Midtrans get token
+     * do create payload body request for get Midtrans Snap token
      *
      * @param $config
+     * @param $paymentCode
+     * @param null $multishipping
      * @return array payload
+     * @throws \Exception
      */
-    public function getPayload($config)
+    public function getPayload($config, $paymentCode, $multishipping = null)
     {
-        $this->setValue($this->getOrderIncrementId());
+        $payloads = [];
+        $customer_details = [];
+        $totalPrice = 0;
+        $order = null;
 
-        // Get Billing address from order
-        $order_billing_address = $this->getBillingAddress();
-
+        $merchantId = $this->getMidtransDataConfig()->getMerchantId($paymentCode);
         /**
-         * Set billing address order to billing address object for payload
+         * Check if request for multishipping
          */
-        $billing_address = $this->payloadBillingAddress($order_billing_address);
+        if (isset($multishipping)) {
+            /**
+             * 1. find incrementIds by quote id from request
+             */
+            $quoteId = $multishipping['quote_id'];
+            $incrementIds = $this->getIncrementIdsByQuoteId($quoteId);
+            $midtransOrderId = "multishipping-" . $quoteId;
 
-        if (!$this->isContainDownloadableProduct()) {
-            //Get Shipping Address from order
-            $order_shipping_address = $this->getShippingAddress();
+            $this->setValue($midtransOrderId);
+
+            $item_details = [];
+            foreach ($incrementIds as $key => $orderId) {
+                $order  = $this->getOrderByIncrementId($orderId);
+                $payment = $order->getPayment();
+                $payment->setAdditionalInformation('payment_gateway', 'Midtrans');
+                $payment->setAdditionalInformation('merchant_id', $merchantId);
+                $payment->setAdditionalInformation('midtrans_order_id', $midtransOrderId);
+                $this->saveOrder($order);
+                foreach ($this->payloadItemDetail($order, true) as $item) {
+                    $item_details[] = $item;
+                }
+            }
 
             /**
-             * Set shipping address order to shipping address object for payload
+             * Set items cart to item details object for payload
              */
-            $shipping_address = $this->payloadShippingAddress($order_shipping_address);
+            foreach ($item_details as $item) {
+                $totalPrice += $item['price'] * $item['quantity'];
+            }
+
+            /**
+             * Set billing address order to billing address object for payload
+             */
+            $order_billing_address = $order->getBillingAddress();
+            $billing_address = $this->payloadBillingAddress($order_billing_address);
+
+            $customer_details['first_name'] = $order_billing_address->getFirstname();
+            $customer_details['last_name'] = $order_billing_address->getLastname();
+            $customer_details['email'] = $order_billing_address->getEmail();
+            $customer_details['phone'] = $order_billing_address->getTelephone();
+            $customer_details['billing_address'] = $billing_address;
+
+            /**
+             * Initial Payload for request to Midtrans Payment
+             */
+            $transaction_details['order_id'] = $midtransOrderId;
+            $transaction_details['gross_amount'] = $totalPrice;
+
+            $payloads['transaction_details'] = $transaction_details;
+            $payloads['item_details'] = $item_details;
+        } else {
+            /**
+             * For regular order
+             */
+            $order = $this->getOrderFromSession();
+            $incrementId = $order->getIncrementId();
+
+            $this->setValue($incrementId);
+
+            // Get Billing address from order
+            $order_billing_address = $order->getBillingAddress();
+
+            // Set additional payment info
+            $payment = $order->getPayment();
+            $payment->setAdditionalInformation('payment_gateway', 'Midtrans');
+            $payment->setAdditionalInformation('merchant_id', $merchantId);
+            $payment->setAdditionalInformation('midtrans_order_id', $incrementId);
+            $this->saveOrder($order);
+
+            /**
+             * Set billing address order to billing address object for payload
+             */
+            $billing_address = $this->payloadBillingAddress($order_billing_address);
+
+            if (!$this->isContainVirtualProduct($incrementId)) {
+                //Get Shipping Address from order
+                $order_shipping_address = $order->getShippingAddress();
+
+                /**
+                 * Set shipping address order to shipping address object for payload
+                 */
+                $shipping_address = $this->payloadShippingAddress($order_shipping_address);
+            }
+
+            /**
+             * Set items cart to item details object for payload
+             */
+            $item_details = $this->payloadItemDetail($order, false);
+
+            /**
+             * Set Customer details object for payload
+             */
+
+            $customer_details['billing_address'] = $billing_address;
+            if (isset($shipping_address)) {
+                $customer_details['shipping_address'] = $shipping_address;
+            }
+            $customer_details['first_name'] = $order_billing_address->getFirstname();
+            $customer_details['last_name'] = $order_billing_address->getLastname();
+            $customer_details['email'] = $order_billing_address->getEmail();
+            $customer_details['phone'] = $order_billing_address->getTelephone();
+            $customer_details['billing_address'] = $billing_address;
+
+            foreach ($item_details as $item) {
+                $totalPrice += $item['price'] * $item['quantity'];
+            }
+
+            /**
+             * Initial Payload for request to Midtrans Payment
+             */
+            $transaction_details = [];
+            $transaction_details['order_id'] = $order->getIncrementId();
+            $transaction_details['gross_amount'] = $totalPrice;
+
+            $payloads['transaction_details'] = $transaction_details;
+            $payloads['item_details'] = $item_details;
         }
 
-        //Get Item Cart from order
-        $items = $this->getAllItems();
-
-        /**
-         * Set items cart to item details object for payload
-         */
-        $item_details = $this->payloadItemDetail($items);
-
-        /**
-         * Set Customer details object for payload
-         */
-        $customer_details = [];
-        $customer_details['billing_address'] = $billing_address;
-        if (isset($shipping_address)) {
-            $customer_details['shipping_address'] = $shipping_address;
-        }
-        $customer_details['first_name'] = $order_billing_address->getFirstname();
-        $customer_details['last_name'] = $order_billing_address->getLastname();
-        $customer_details['email'] = $order_billing_address->getEmail();
-        $customer_details['phone'] = $order_billing_address->getTelephone();
-        $customer_details['billing_address'] = $billing_address;
-
-        $totalPrice = 0;
-        foreach ($item_details as $item) {
-            $totalPrice += $item['price'] * $item['quantity'];
-        }
-
-        /**
-         * Initial Payload for request to Midtrans Payment
-         */
-        $transaction_details = [];
-        $transaction_details['order_id'] = $this->getOrderIncrementId();
-        $transaction_details['gross_amount'] = $totalPrice;
-
-        $payloads = [];
-        $payloads['transaction_details'] = $transaction_details;
-        $payloads['item_details'] = $item_details;
         $payloads['customer_details'] = $customer_details;
-
-        $paymentCode = $this->getCode();
 
         if ($paymentCode == 'snap') {
             $credit_card = $this->getSnapCardConfig($config);
@@ -495,6 +520,8 @@ abstract class AbstractAction extends Action
     }
 
     /**
+     * Get credit card config for payment code snap
+     *
      * @param $config
      * @return array config for snap credit card
      */
@@ -518,6 +545,8 @@ abstract class AbstractAction extends Action
     }
 
     /**
+     * Get credit card config for payment code specific
+     *
      * @param $config
      * @return array
      */
@@ -541,7 +570,7 @@ abstract class AbstractAction extends Action
     }
 
     /**
-     * Get credit card config for payment code installment online
+     * Get credit card config for payment code installment
      *
      * @param $config
      * @param $minAmount
@@ -574,7 +603,7 @@ abstract class AbstractAction extends Action
     }
 
     /**
-     * Get Credit Card option for offline installment payment
+     * Get credit card config for payment code offline
      *
      * @param $config
      * @param $minAmount
@@ -621,6 +650,8 @@ abstract class AbstractAction extends Action
     }
 
     /**
+     * function convert country code
+     *
      * @param $country_code
      * @return mixed
      */
@@ -881,6 +912,8 @@ abstract class AbstractAction extends Action
     }
 
     /**
+     * Set value to core session
+     *
      * @param $order_id
      */
     public function setValue($order_id)
@@ -890,6 +923,8 @@ abstract class AbstractAction extends Action
     }
 
     /**
+     * Replace string for items name
+     *
      * @param $str
      * @return string|string[]|null
      */
@@ -899,6 +934,8 @@ abstract class AbstractAction extends Action
     }
 
     /**
+     * Sanitize for item name
+     *
      * @param $s
      * @return false|string
      */
@@ -913,6 +950,8 @@ abstract class AbstractAction extends Action
     }
 
     /**
+     * get value from core session
+     *
      * @return mixed
      */
     public function getValue()
@@ -922,6 +961,8 @@ abstract class AbstractAction extends Action
     }
 
     /**
+     * unset value from core sessions
+     *
      * @return mixed
      */
     public function unSetValue()
@@ -933,17 +974,13 @@ abstract class AbstractAction extends Action
     /**
      * Do generate Invoice
      *
-     * @param $orderId
-     * @param $order_state
-     * @param $payment_type
-     * @param $order_note
+     * @param Order $order
      * @return InvoiceInterface|Order\Invoice
      */
-    public function generateInvoice($orderId, $payment_type)
+    public function generateInvoice(Order $order)
     {
         try {
-            $order = $this->getQuoteByOrderId($orderId);
-            if (!$order->getId()) {
+            if ($order->isEmpty()) {
                 throw new \Magento\Framework\Exception\LocalizedException(__('MIDTRANS-INFO: The order no longer exists.'));
             }
             if (!$order->canInvoice()) {
@@ -959,12 +996,11 @@ abstract class AbstractAction extends Action
             if (!$invoice->getTotalQty()) {
                 throw new \Magento\Framework\Exception\LocalizedException(__('MIDTRANS-INFO: You can\'t create an invoice without products.'));
             }
-            if ($payment_type == 'gopay' || $payment_type == 'credit_card') {
-                $invoice->setTransactionId($orderId);
-                $invoice->setRequestedCaptureCase(\Magento\Sales\Model\Order\Invoice::CAPTURE_OFFLINE);
-            } else {
-                $invoice->pay();
-            }
+
+            $invoice->setTransactionId($order->getIncrementId());
+            $invoice->setRequestedCaptureCase(\Magento\Sales\Model\Order\Invoice::CAPTURE_OFFLINE);
+            //  $invoice->pay();
+
             $invoice->register();
             $invoice->getOrder()->setCustomerNoteNotify(false);
 
@@ -973,13 +1009,6 @@ abstract class AbstractAction extends Action
                 ->addObject($invoice)
                 ->addObject($invoice->getOrder());
             $transactionSave->save();
-
-            // send invoice emails, If you want to stop mail disable below try/catch code
-//            try {
-//                $this->invoiceSender->send($invoice);
-//            } catch (\Exception $e) {
-//                $this->messageManager->addError(__('MIDTRANS-INFO: We can\'t send the invoice email right now.'));
-//            }
         } catch (\Exception $e) {
             $this->messageManager->addErrorMessage($e->getMessage());
         }
@@ -989,15 +1018,14 @@ abstract class AbstractAction extends Action
     /**
      * Do cancel order, and set status, state, also comment status history
      *
-     * @param $orderId
+     * @param Order $order
      * @param $status
      * @param $order_note
      * @return Order
      * @throws \Exception
      */
-    public function cancelOrder($orderId, $status, $order_note)
+    public function cancelOrder(Order $order, $status, $order_note)
     {
-        $order = $this->getQuoteByOrderId($orderId);
         $order->setState($status);
         $order->setStatus($status);
         $order->addStatusToHistory($status, $order_note, false);
@@ -1009,16 +1037,14 @@ abstract class AbstractAction extends Action
     /**
      * Set order status, state and comment status history
      *
-     * @param $orderId
+     * @param Order $order
      * @param $status
      * @param $order_note
-     * @param $trxId
      * @return void
      * @throws \Exception
      */
-    public function setOrderStateAndStatus($orderId, $status, $order_note)
+    public function setOrderStateAndStatus(Order $order, $status, $order_note)
     {
-        $order = $this->getQuoteByOrderId($orderId);
         $order->setState($status);
         $order->setStatus($status);
         $order->addStatusToHistory($status, $order_note, false);
@@ -1026,15 +1052,17 @@ abstract class AbstractAction extends Action
     }
 
     /**
-     * Check is order contain downloadable product
+     * Check is order contain virtual product
+     *
+     * @param $incrementId
      * @return bool
      */
-    public function isContainDownloadableProduct()
+    public function isContainVirtualProduct($incrementId)
     {
-        $items = $this->getQuote()->getAllItems();
+        $items = $this->getOrderByIncrementId($incrementId)->getAllItems();
         foreach ($items as $item) {
-            //look for downloadable products
-            if ($item->getProductType() === 'downloadable') {
+            //look for virtual products
+            if ($item->getProduct()->getIsVirtual()) {
                 return true;
             } else {
                 return false;
@@ -1059,49 +1087,18 @@ abstract class AbstractAction extends Action
     }
 
     /**
-     * Validate the full refund doesn't create credit memo twice
-     *
-     * @param $refund_key
-     * @param $order
-     * @param $refund_amount
-     * @return bool
-     */
-    public function canFullRefund($refund_key, $order, $refund_amount)
-    {
-        $foundedRefundKey = null;
-
-        $commentStatusHistory = $order->getStatusHistories();
-        $creditMemo = $order->getCreditmemosCollection();
-        foreach ($commentStatusHistory as $value) {
-            $valueComment = "Refunded " . $refund_amount . " | Refund-Key " . $value->getComment();
-            if (strpos($valueComment, $refund_key) !== false) {
-                $foundedRefundKey = true;
-                break;
-            } else {
-                $foundedRefundKey = false;
-            }
-        }
-
-        if ($creditMemo != null && $foundedRefundKey) {
-            return false;
-        } else {
-            return true;
-        }
-    }
-
-    /**
      * Create credit memo for refund from midtrans dashboard,
      * if refund from midtrans dashboard is fullRefund. create credit memo and cancel order.
      *
-     * @param $orderId
+     * @param Order $order
      * @param $isFullRefund
      * @param $refund_note
      * @throws \Exception
      */
-    public function createCreditMemo($orderId, $isFullRefund, $refund_note)
+    public function createCreditMemo(Order $order, $isFullRefund, $refund_note)
     {
-        $order = $this->getQuoteByOrderId($orderId);
         $invoices = $order->getInvoiceCollection();
+        $orderId = $order->getIncrementId();
         foreach ($invoices as $invoice) {
             $invoiceIncrementId = $invoice->getIncrementId();
         }
@@ -1118,7 +1115,6 @@ abstract class AbstractAction extends Action
                 $this->_midtransLogger->midtransError("AbstractAction.class CreateCreditMemo:: Failed create Credit Memo with order-id " . $orderId . " Invoice not found");
             }
             $creditMemo->setState(Order\Creditmemo::STATE_REFUNDED);
-            $this->cancelOrder($orderId, Order::STATE_CLOSED, $refund_note);
         }
         try {
             if (isset($creditMemo)) {
@@ -1130,5 +1126,114 @@ abstract class AbstractAction extends Action
             $error_exception = "AbstractAction.class saveCreditMemo :" . $e;
             $this->_midtransLogger->midtransError($error_exception);
         }
+    }
+
+    /**
+     * Find orders from database by field key
+     *
+     * @param $fieldKey
+     * @param $value
+     * @return OrderInterface[]
+     */
+    public function getOrderCollection($fieldKey, $value)
+    {
+        $searchCriteriaBuilder = $this->_objectManager->create('Magento\Framework\Api\SearchCriteriaBuilder');
+        $searchCriteria = $searchCriteriaBuilder->addFilter(
+            $fieldKey,
+            $value,
+            'eq'
+        )->create();
+        return $this->_orderRepository->getList($searchCriteria)->getItems();
+    }
+
+    /**
+     * Find increment ids by quote id
+     *
+     * @param $quoteId
+     * @return array
+     */
+    public function getIncrementIdsByQuoteId($quoteId)
+    {
+        $orderIds = [];
+        $orders = $this->getOrderCollection('quote_id', $quoteId);
+        foreach ($orders as $order) {
+            $realOrderId = $order->getRealOrderId();
+            $orderIds[] = $realOrderId;
+        }
+        return $orderIds;
+    }
+
+    /**
+     * Get payment code by quote id
+     *
+     * @param $quoteId
+     * @return string|null
+     */
+    public function getPaymentCodeByQuoteId($quoteId)
+    {
+        $paymentCode = null;
+        $orders = $this->getOrderCollection('quote_id', $quoteId);
+        foreach ($orders as $order) {
+            $paymentCode = $order->getPayment()->getMethod();
+        }
+        return $paymentCode;
+    }
+
+    /**
+     * Check order is available
+     *
+     * @param Order $order
+     * @return bool
+     */
+    public function canProcess(Order $order)
+    {
+        /**
+         * Do not process if order not found,
+         * if Log enable, add record to /var/log/midtrans/notification.log
+         */
+        if ($order->isEmpty() || $order === null) {
+            $_info = "NOTIFICATION: 404 NOT FOUND - Order not found on Magento 2";
+            $this->_midtransLogger->midtransNotification($_info);
+            return false;
+        } else {
+            return true;
+        }
+    }
+
+    /**
+     * Get Midtrans status via API
+     *
+     * @param $param
+     * @param null $code
+     * @return mixed[]
+     * @throws \Exception
+     */
+    public function midtransGetStatus($param, $code = null)
+    {
+        $orderId = null;
+        if ($param instanceof Order) {
+            $orderId = $param->getIncrementId();
+            $code = $param->getPayment()->getMethod();
+        } else {
+            $orderId = $param;
+        }
+        Config::$serverKey = $this->getMidtransDataConfig()->getServerKey($code);
+        Config::$isProduction = $this->getMidtransDataConfig()->isProduction();
+        return MidtransTransaction::status($orderId);
+    }
+
+    /**
+     * Set payment gateway information to Order
+     *
+     * @param Order $order
+     * @param $trxId
+     * @param $paymentType
+     * @throws \Exception
+     */
+    public function setPaymentInformation(Order $order, $trxId, $paymentType)
+    {
+        $order->getPayment()->setAdditionalInformation('payment_method', strtoupper($paymentType));
+        $order->getPayment()->setAdditionalInformation('midtrans_trx_id', $trxId);
+        $this->saveOrder($order);
     }
 }
