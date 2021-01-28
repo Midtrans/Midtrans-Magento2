@@ -17,7 +17,7 @@ Midtrans ❤️ Magento! Midtrans is highly concerned with customer experience (
 ## Install Midtrans Snap plugins through Composer
 Before you begin to install through the composer, you need Magento marketplace account and make sure that you have installed Composer. In your terminal, go to the Magento folder and run the following commands:
 1. Install the plugins: `composer require midtrans/snap`
-2. Enable the plugin:  `bin/magento module:enable Midtrans_Snap --clear-static-content`
+2. Enable the plugin:  `bin/magento module:enable Midtrans_Snap`
 3. Execute upgrade script : `bin/magento setup:upgrade`
 4. Clean cache storage :  `bin/magento cache:clean`
 5. Check the module status:  `bin/magento module:status Midtrans_Snap`
@@ -39,7 +39,7 @@ With these steps, you can custom/modify our Magento plugins to handle the busine
 4. Copy the app folders into the Magento root folder.
 5. Run this command on terminal
 
-    `bin/magento module:enable Midtrans_Snap --clear-static-content`
+    `bin/magento module:enable Midtrans_Snap`
     
     `bin/magento setup:upgrade`
     
