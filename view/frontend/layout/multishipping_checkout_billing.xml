@@ -1,0 +1,21 @@
+<?xml version="1.0"?>
+<!--
+/**
+ * Copyright © Magento, Inc. All rights reserved.
+ * See COPYING.txt for license details.
+ */
+-->
+<page xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+      xsi:noNamespaceSchemaLocation="urn:magento:framework:View/Layout/etc/page_configuration.xsd">
+    <body>
+        <referenceBlock name="checkout_billing">
+            <arguments>
+                <argument name="form_templates" xsi:type="array">
+                    <item name="snap" xsi:type="string">Midtrans_Snap::multishipping/snap.phtml</item>
+                    <item name="specific" xsi:type="string">Midtrans_Snap::multishipping/specific.phtml</item>
+                    <item name="installment" xsi:type="string">Midtrans_Snap::multishipping/installment.phtml</item>
+                </argument>
+            </arguments>
+        </referenceBlock>
+    </body>
+</page>

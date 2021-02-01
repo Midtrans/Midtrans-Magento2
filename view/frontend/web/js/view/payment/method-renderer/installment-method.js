@@ -111,13 +111,13 @@ define(
                                                     messageList.addErrorMessage({
                                                         message: result.status_message
                                                     });
-                                                    window.location.replace(url.build('snap/payment/cancel'));
+                                                    window.location.replace(url.build('snap/index/close'));
                                                     console.log(result.status_message);
                                                 },
                                                 onClose: function () {
                                                     console.log("Payment page close")
                                                     trackResult(data, merchant_id, 'Fullpayment Snap', 'close');
-                                                    window.location.replace(url.build('snap/payment/cancel'));
+                                                    window.location.replace(url.build('snap/index/close'));
                                                 }
                                             });
                                         var snapExecuted = true;

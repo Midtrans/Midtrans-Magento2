@@ -26,9 +26,7 @@ class ConfigProvider implements ConfigProviderInterface
 
         $magentoversion = ObjectManager::getInstance()->get('Magento\Framework\App\ProductMetadataInterface')->getVersion();
 
-        $composer = file_get_contents(dirname(__FILE__) . '/../../composer.json');
-        $json = json_decode($composer, true); // decode the JSON into an associative array
-        $pluginversion = $json['version'];
+        $pluginversion = $this->data->getModuleVersion();
 
         return [
             'payment' => [

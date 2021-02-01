@@ -13,7 +13,7 @@
                             <p>If you have any further questions, please visit <a target="_blank" href="https://docs.midtrans.com">our documentation web</a> website or email <a href="mailto:support@midtrans.com">support@midtrans.com</a>.</p>
                             ]]></comment>
         <field id="version" translate="label" type="label" sortOrder="10" showInDefault="1" showInWebsite="1" showInStore="0">
-            <label>Current Version</label>
+            <label>Module Version</label>
             <frontend_model>Midtrans\Snap\Block\Adminhtml\Config\Version</frontend_model>
         </field>
     </group>

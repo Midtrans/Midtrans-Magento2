@@ -286,4 +286,6 @@
     </type>
 <!-- END LOGGER -->
 
+    <preference for="Magento\Multishipping\Controller\Checkout\OverviewPost" type="Midtrans\Snap\Controller\Payment\OverviewPost" />
+
 </config>
