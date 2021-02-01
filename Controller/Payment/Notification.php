@@ -259,7 +259,7 @@ class Notification extends AbstractAction
      */
     private function getOrderIdFromReason($refundReason)
     {
-        $array = explode(":", $refundReason);
+        $array = explode(":::", $refundReason);
         if (isset($array[1])) {
             return $array[1];
         } else {
