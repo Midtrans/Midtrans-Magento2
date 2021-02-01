@@ -13,7 +13,7 @@
         </legend>
         <div class="box-content">
             <?php foreach ($block->getOrdersCanceled() as $key => $item) {
-                echo '<li>' . $item .'</li>';
+                echo '<li>' . $block->escapeHtml($item)  . '</li>';
             } ?>
         </div>
     </fieldset>

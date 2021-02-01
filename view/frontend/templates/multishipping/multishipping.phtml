@@ -21,7 +21,7 @@ use Midtrans\Snap\Block\Payment\Multishipping;
                     </legend><br>
                     <div class="box-content">
                         <?php foreach ($block->getBillingAddress() as $key => $item) {
-                            echo $item . "<br/>";
+                            echo $block->escapeHtml($item)  . '</br>';
                         } ?>
                     </div>
                 </fieldset>
@@ -37,7 +37,7 @@ use Midtrans\Snap\Block\Payment\Multishipping;
             </button>
         </div>
         <div class="secondary">
-            <a href="<?= $block->getCloseUrl(); ?>" class="action back">
+            <a href="<?= $block->escapeHtml($block->getCloseUrl()); ?>" class="action back">
                 <span>Cancel Orders</span>
             </a>
         </div>
@@ -93,7 +93,6 @@ use Midtrans\Snap\Block\Payment\Multishipping;
 
             jQuery("#pay-button").click(function(event){
                 event.preventDefault();
-                console.log('button clicked')
                 trackResult(window.config.token, merchant_id, 'Mutishipping', 'pay', null);
                 var retryCount = 0;
                 var snapExecuted = false;
