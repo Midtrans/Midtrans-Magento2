@@ -28,7 +28,8 @@ class Finish extends AbstractAction
             /* Handle for direct debit, cardless credit, gopay, cc */
             else {
                 if ($orderIdRequest == null) {
-                    $response = $_POST['response'];
+                    $postValue = $this->getRequest()->getPostValue();
+                    $response = $postValue['response'];
                     $decoded_response = json_decode($response);
                     $orderIdRequest = $decoded_response->order_id;
                 }
