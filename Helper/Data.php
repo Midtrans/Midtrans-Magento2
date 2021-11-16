@@ -9,8 +9,8 @@ use Midtrans\Snap\Model\Config\Source\Payment\Settings;
 
 class Data
 {
-    private $settings;
-    private $_encryptor;
+    private Settings $settings;
+    private EncryptorInterface $_encryptor;
 
     /**
      * Serialize data to JSON, unserialize JSON encoded data
@@ -21,7 +21,7 @@ class Data
     /**
      * @var ComponentRegistrarInterface
      */
-    private $componentRegistrar;
+    private ComponentRegistrarInterface $componentRegistrar;
 
     /**
      * Data constructor.
@@ -59,8 +59,7 @@ class Data
 
     public function enableLog()
     {
-        $enableLog = $this->settings->enableLog();
-        return $enableLog;
+        return $this->settings->enableLog();
     }
 
     public function getMerchantId($code)
@@ -78,34 +77,28 @@ class Data
 
     public function isRedirect()
     {
-        $isRedirect = $this->settings->isRedirect();
-        return $isRedirect;
+        return $this->settings->isRedirect();
     }
 
     public function isProduction()
     {
-        $isProduction = $this->settings->isProduction();
-        return $isProduction;
+        return $this->settings->isProduction();
     }
 
     public function getServerKey($paymentCode)
     {
         if ($paymentCode == 'snap') {
             $serverKey = $this->settings->getDefaultServerKey();
-            $key = $this->_encryptor->decrypt($serverKey);
-            return $key;
+            return $this->_encryptor->decrypt($serverKey);
         } elseif ($paymentCode == 'specific') {
             $serverKey = $this->settings->getSpecificServerKey();
-            $specificServerKey = $this->_encryptor->decrypt($serverKey);
-            return $specificServerKey;
+            return $this->_encryptor->decrypt($serverKey);
         } elseif ($paymentCode == 'installment') {
             $serverKey = $this->settings->getInstallmentServerKey();
-            $installmentServerKey = $this->_encryptor->decrypt($serverKey);
-            return $installmentServerKey;
+            return $this->_encryptor->decrypt($serverKey);
         } elseif ($paymentCode == 'offline') {
             $serverKey = $this->settings->getOfflineServerKey();
-            $offlineServerKey = $this->_encryptor->decrypt($serverKey);
-            return $offlineServerKey;
+            return $this->_encryptor->decrypt($serverKey);
         }
     }
 
@@ -113,20 +106,16 @@ class Data
     {
         if ($paymentCode == 'snap') {
             $clientKey = $this->settings->getDefaultClientKey();
-            $key = $this->_encryptor->decrypt($clientKey);
-            return $key;
+            return $this->_encryptor->decrypt($clientKey);
         } elseif ($paymentCode == 'specific') {
             $clientKey = $this->settings->getSpecificClientKey();
-            $specificClientKey = $this->_encryptor->decrypt($clientKey);
-            return $specificClientKey;
+            return $this->_encryptor->decrypt($clientKey);
         } elseif ($paymentCode == 'installment') {
             $clientKey = $this->settings->getInstallmentClientKey();
-            $installmentClientKey = $this->_encryptor->decrypt($clientKey);
-            return $installmentClientKey;
+            return $this->_encryptor->decrypt($clientKey);
         } elseif ($paymentCode == 'offline') {
             $clientKey = $this->settings->getOfflineClientKey();
-            $offlineClientKey = $this->_encryptor->decrypt($clientKey);
-            return $offlineClientKey;
+            return $this->_encryptor->decrypt($clientKey);
         }
     }
 
