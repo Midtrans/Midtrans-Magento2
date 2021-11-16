@@ -2,6 +2,7 @@
 
 namespace Midtrans\Snap\Logger;
 
+use Exception;
 use Midtrans\Snap\Model\Config\Source\Payment\Settings;
 use Monolog\Logger;
 
@@ -15,7 +16,7 @@ class MidtransLogger extends Logger
     const REQUEST = 100;
     const ERROR = 400;
     const NOTIFICATION = 200;
-    protected $settings;
+    protected Settings $settings;
 
     /**
      * MidtransLogger constructor.
@@ -24,7 +25,7 @@ class MidtransLogger extends Logger
      * @param array $handlers
      * @param array $processors
      */
-    function __construct($name, Settings $settings, array $handlers = array(), array $processors = array())
+    public function __construct(string $name, Settings $settings, array $handlers = [], array $processors = [])
     {
         $this->settings = $settings;
         parent::__construct($name, $handlers, $processors);
@@ -33,11 +34,11 @@ class MidtransLogger extends Logger
     /**
      * Do record the notification log
      *
-     * @param $message
+     * @param string $message
      * @param array $context
      * @return bool|null
      */
-    public function midtransNotification($message, array $context = [])
+    public function midtransNotification(string $message, array $context = [])
     {
         if ($this->settings->isNotificationLogEnabled()) {
             return $this->addRecord(static::NOTIFICATION, $message, $context);
@@ -48,11 +49,11 @@ class MidtransLogger extends Logger
     /**
      * Do a record request log payload to midtrans gateway
      *
-     * @param $message
+     * @param string $message
      * @param array $context
      * @return bool|null
      */
-    public function midtransRequest($message, array $context = [])
+    public function midtransRequest(string $message, array $context = [])
     {
         if ($this->settings->isRequestLogEnabled()) {
             return $this->addRecord(static::REQUEST, $message, $context);
@@ -63,17 +64,17 @@ class MidtransLogger extends Logger
     /**
      * Do record a Midtrans Error log exception. If logging is disabled,
      * return throw new exception if exception is enabled.
-     * @param $message
+     * @param string $message
      * @param array $context
      * @return bool
-     * @throws \Exception
+     * @throws Exception
      */
-    public function midtransError($message, array $context = [])
+    public function midtransError(string $message, array $context = [])
     {
         if ($this->settings->isErrorLogEnabled()) {
             return $this->addRecord(static::ERROR, $message, $context);
         } elseif ($this->settings->isExceptionEnabled()) {
-            throw new \Exception($message, self::ERROR);
+            throw new Exception($message, self::ERROR);
         } else {
             return null;
         }
@@ -82,14 +83,14 @@ class MidtransLogger extends Logger
     /**
      * Global function to record log
      *
-     * @param int $level
-     * @param string $message
+     * @param $level
+     * @param $message
      * @param array $context
      * @return bool
      */
-    public function addRecord($level, $message, array $context = array())
+    public function addRecord($level, $message, array $context = [])
     {
-        $context['is_exception'] = $message instanceof \Exception;
+        $context['is_exception'] = $message instanceof Exception;
         return parent::addRecord($level, $message, $context);
     }
 }
