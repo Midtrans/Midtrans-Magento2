@@ -19,8 +19,8 @@ class Notification extends AbstractAction
     public function execute()
     {
         // 1. Get body from request
-        $input_source = "php://input";
-        $rawBody = json_decode(file_get_contents($input_source), true);
+        $input_source = $this->getRequest()->getContent();
+        $rawBody = $this->data->json->unserialize($input_source);
         $orderIdRequest = $rawBody['order_id'];
 
         $order = null;

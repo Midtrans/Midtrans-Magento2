@@ -4,12 +4,19 @@ namespace Midtrans\Snap\Helper;
 
 use Magento\Framework\Component\ComponentRegistrarInterface;
 use Magento\Framework\Encryption\EncryptorInterface;
+use Magento\Framework\Serialize\Serializer\Json;
 use Midtrans\Snap\Model\Config\Source\Payment\Settings;
 
 class Data
 {
     private $settings;
     private $_encryptor;
+
+    /**
+     * Serialize data to JSON, unserialize JSON encoded data
+     * @var Json
+     */
+    public Json $json;
 
     /**
      * @var ComponentRegistrarInterface
@@ -21,15 +28,18 @@ class Data
      * @param Settings $settings
      * @param EncryptorInterface $encryptor
      * @param ComponentRegistrarInterface $componentRegistrar
+     * @param Json $json
      */
     public function __construct(
         Settings $settings,
         EncryptorInterface $encryptor,
-        ComponentRegistrarInterface $componentRegistrar
+        ComponentRegistrarInterface $componentRegistrar,
+        Json $json
     ) {
         $this->settings = $settings;
         $this->_encryptor = $encryptor;
         $this->componentRegistrar = $componentRegistrar;
+        $this->json = $json;
     }
 
     public function getMixPanelKey()
@@ -141,7 +151,7 @@ class Data
         );
 
         $composerJson = file_get_contents($moduleDir . '/composer.json');
-        $composerJson = json_decode($composerJson, true);
+        $composerJson = $this->json->unserialize($composerJson);
 
         if (empty($composerJson['version'])) {
             return "Version is not available in composer.json";

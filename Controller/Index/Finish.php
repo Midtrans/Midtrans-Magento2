@@ -30,7 +30,7 @@ class Finish extends AbstractAction
                 if ($orderIdRequest == null) {
                     $postValue = $this->getRequest()->getPostValue();
                     $response = $postValue['response'];
-                    $decoded_response = json_decode($response);
+                    $decoded_response = $this->data->json->unserialize($response);
                     $orderIdRequest = $decoded_response->order_id;
                 }
 
