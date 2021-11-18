@@ -2,33 +2,68 @@
 
 namespace Midtrans\Snap\Helper;
 
+use Magento\Framework\Component\ComponentRegistrarInterface;
 use Magento\Framework\Encryption\EncryptorInterface;
+use Magento\Framework\Serialize\Serializer\Json;
 use Midtrans\Snap\Model\Config\Source\Payment\Settings;
 
 class Data
 {
-    private $settings;
-    private $_encryptor;
+    private Settings $settings;
+    private EncryptorInterface $_encryptor;
 
+    /**
+     * Serialize data to JSON, unserialize JSON encoded data
+     * @var Json
+     */
+    public Json $json;
+
+    /**
+     * @var ComponentRegistrarInterface
+     */
+    private ComponentRegistrarInterface $componentRegistrar;
+
+    /**
+     * Data constructor.
+     * @param Settings $settings
+     * @param EncryptorInterface $encryptor
+     * @param ComponentRegistrarInterface $componentRegistrar
+     * @param Json $json
+     */
     public function __construct(
         Settings $settings,
-        EncryptorInterface $encryptor
-    )
-    {
+        EncryptorInterface $encryptor,
+        ComponentRegistrarInterface $componentRegistrar,
+        Json $json
+    ) {
         $this->settings = $settings;
         $this->_encryptor = $encryptor;
+        $this->componentRegistrar = $componentRegistrar;
+        $this->json = $json;
     }
 
-    public function getMixPanelKey() {
+    public function getMixPanelKey()
+    {
         return $this->isProduction() == true ? '17253088ed3a39b1e2bd2cbcfeca939a' : '9dcba9b440c831d517e8ff1beff40bd9';
     }
 
-    public function enableLog() {
-        $enableLog = $this->settings->enableLog();
-        return $enableLog;
+    public function getNotificationEndpoint()
+    {
+        return $this->settings->getNotificationEndpoint();
     }
 
-    public function getMerchantId($code) {
+    public function isOverrideNotification()
+    {
+        return $this->settings->isOverrideNotification();
+    }
+
+    public function enableLog()
+    {
+        return $this->settings->enableLog();
+    }
+
+    public function getMerchantId($code)
+    {
         if ($code == 'snap') {
             return $this->settings->getMerchantId();
         } elseif ($code == 'specific') {
@@ -40,65 +75,77 @@ class Data
         }
     }
 
-    public function isRedirect() {
-        $isRedirect = $this->settings->isRedirect();
-        return $isRedirect;
+    public function isRedirect()
+    {
+        return $this->settings->isRedirect();
     }
 
-    public function isProduction() {
-        $isProduction = $this->settings->isProduction();
-        return $isProduction;
+    public function isProduction()
+    {
+        return $this->settings->isProduction();
     }
 
-    public function getServerKey($paymentCode) {
+    public function getServerKey($paymentCode)
+    {
         if ($paymentCode == 'snap') {
             $serverKey = $this->settings->getDefaultServerKey();
-            $key = $this->_encryptor->decrypt($serverKey);
-            return $key;
+            return $this->_encryptor->decrypt($serverKey);
         } elseif ($paymentCode == 'specific') {
             $serverKey = $this->settings->getSpecificServerKey();
-            $specificServerKey = $this->_encryptor->decrypt($serverKey);
-            return $specificServerKey;
+            return $this->_encryptor->decrypt($serverKey);
         } elseif ($paymentCode == 'installment') {
             $serverKey = $this->settings->getInstallmentServerKey();
-            $installmentServerKey = $this->_encryptor->decrypt($serverKey);
-            return $installmentServerKey;
+            return $this->_encryptor->decrypt($serverKey);
         } elseif ($paymentCode == 'offline') {
             $serverKey = $this->settings->getOfflineServerKey();
-            $offlineServerKey = $this->_encryptor->decrypt($serverKey);
-            return $offlineServerKey;
+            return $this->_encryptor->decrypt($serverKey);
         }
     }
 
-    public function getClientKey($paymentCode) {
+    public function getClientKey($paymentCode)
+    {
         if ($paymentCode == 'snap') {
             $clientKey = $this->settings->getDefaultClientKey();
-            $key = $this->_encryptor->decrypt($clientKey);
-            return $key;
+            return $this->_encryptor->decrypt($clientKey);
         } elseif ($paymentCode == 'specific') {
             $clientKey = $this->settings->getSpecificClientKey();
-            $specificClientKey = $this->_encryptor->decrypt($clientKey);
-            return $specificClientKey;
+            return $this->_encryptor->decrypt($clientKey);
         } elseif ($paymentCode == 'installment') {
             $clientKey = $this->settings->getInstallmentClientKey();
-            $installmentClientKey = $this->_encryptor->decrypt($clientKey);
-            return $installmentClientKey;
+            return $this->_encryptor->decrypt($clientKey);
         } elseif ($paymentCode == 'offline') {
             $clientKey = $this->settings->getOfflineClientKey();
-            $offlineClientKey = $this->_encryptor->decrypt($clientKey);
-            return $offlineClientKey;
+            return $this->_encryptor->decrypt($clientKey);
         }
     }
 
-    public function getRequestConfig($paymentCode) {
+    public function getRequestConfig($paymentCode)
+    {
         if ($paymentCode == 'snap') {
             return $this->settings->getConfigSnap();
-        } else if ($paymentCode == 'specific') {
+        } elseif ($paymentCode == 'specific') {
             return $this->settings->getConfigSpecific();
-        } else if ($paymentCode == 'installment') {
+        } elseif ($paymentCode == 'installment') {
             return $this->settings->getConfigInstallment();
-        } else if ($paymentCode == 'offline') {
+        } elseif ($paymentCode == 'offline') {
             return $this->settings->getConfigOffline();
         }
+    }
+
+    public function getModuleVersion()
+    {
+        $moduleDir = $this->componentRegistrar->getPath(
+            \Magento\Framework\Component\ComponentRegistrar::MODULE,
+            'Midtrans_Snap'
+        );
+
+        $composerJson = file_get_contents($moduleDir . '/composer.json');
+        $composerJson = $this->json->unserialize($composerJson);
+
+        if (empty($composerJson['version'])) {
+            return "Version is not available in composer.json";
+        }
+
+        return $composerJson['version'];
     }
 }

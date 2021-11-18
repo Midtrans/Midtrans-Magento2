@@ -15,6 +15,7 @@ class Pending extends Action
     public function __construct(Context $context, PageFactory $pageFactory)
     {
         $this->resultPageFactory = $pageFactory;
+
         parent::__construct($context);
     }
 
@@ -23,7 +24,6 @@ class Pending extends Action
         if (!$this->_objectManager->get(SuccessValidator::class)->isValid()) {
             return $this->resultRedirectFactory->create()->setPath('checkout/cart');
         }
-        $resultPage = $this->resultPageFactory->create();
-        return $resultPage;
+        return $this->resultPageFactory->create();
     }
 }

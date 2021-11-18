@@ -3,6 +3,7 @@
 namespace Midtrans\Snap\Gateway\Http\Client;
 
 use Midtrans\Snap\Gateway\Config\Config;
+
 /**
  * Send request to Midtrans API
  * Better don't use this class directly, use CoreApi, Transaction
@@ -53,26 +54,26 @@ class ApiRequestor
     {
         $ch = curl_init();
 
-        $curl_options = array(
+        $curl_options = [
             CURLOPT_URL => $url,
-            CURLOPT_HTTPHEADER => array(
+            CURLOPT_HTTPHEADER => [
                 'Content-Type: application/json',
                 'Accept: application/json',
                 'user-agent : Magento 2 Module',
-                'x-plugin-name : midtrans-magento2',
+                'x-plugin-name : midtrans-magento-2.5.3',
                 'Authorization: Basic ' . base64_encode($server_key . ':')
-            ),
+            ],
             CURLOPT_RETURNTRANSFER => 1
-        );
+        ];
 
         // merging with Config::$curlOptions
         if (count(Config::$curlOptions)) {
             // We need to combine headers manually, because it's array and it will no be merged
             if (Config::$curlOptions[CURLOPT_HTTPHEADER]) {
                 $mergedHeders = array_merge($curl_options[CURLOPT_HTTPHEADER], Config::$curlOptions[CURLOPT_HTTPHEADER]);
-                $headerOptions = array( CURLOPT_HTTPHEADER => $mergedHeders );
+                $headerOptions = [ CURLOPT_HTTPHEADER => $mergedHeders ];
             } else {
-                $mergedHeders = array();
+                $mergedHeders = [];
             }
 
             $curl_options = array_replace_recursive($curl_options, Config::$curlOptions, $headerOptions);
@@ -99,16 +100,15 @@ class ApiRequestor
             // curl_close($ch);
         }
 
-
         if ($result === false) {
             throw new \Exception('CURL Error: ' . curl_error($ch), curl_errno($ch));
         } else {
             try {
                 $result_array = json_decode($result);
             } catch (\Exception $e) {
-                throw new \Exception("API Request Error unable to json_decode API response: ".$result . ' | Request url: '.$url);
+                throw new \Exception("API Request Error unable to json_decode API response: " . $result . ' | Request url: ' . $url);
             }
-            if (!in_array($result_array->status_code, array(200, 201, 202, 407))) {
+            if (!in_array($result_array->status_code, [200, 201, 202, 407])) {
                 $message = 'Midtrans Error (' . $result_array->status_code . '): '
                 . $result_array->status_message;
                 if (isset($result_array->validation_messages)) {
@@ -126,13 +126,13 @@ class ApiRequestor
 
     private static function processStubed($curl, $url, $server_key, $data_hash, $post)
     {
-        VT_Tests::$lastHttpRequest = array(
+        VT_Tests::$lastHttpRequest = [
             "url" => $url,
             "server_key" => $server_key,
             "data_hash" => $data_hash,
             "post" => $post,
             "curl" => $curl
-        );
+        ];
 
         return VT_Tests::$stubHttpResponse;
     }

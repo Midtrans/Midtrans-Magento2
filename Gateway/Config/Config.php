@@ -33,6 +33,18 @@ class Config
      */
     public static $is3ds = false;
     /**
+     *  Set Append URL notification
+     *
+     * @static
+     */
+    public static $appendNotifUrl;
+    /**
+     *  Set Override URL notification
+     *
+     * @static
+     */
+    public static $overrideNotifUrl;
+    /**
      * Enable request params sanitizer (validate and modify charge request params).
      * See Midtrans_Sanitizer for more details
      *
@@ -44,7 +56,7 @@ class Config
      *
      * @static
      */
-    public static $curlOptions = array();
+    public static $curlOptions = [];
 
     const SANDBOX_BASE_URL = 'https://api.sandbox.midtrans.com/v2';
     const PRODUCTION_BASE_URL = 'https://api.midtrans.com/v2';

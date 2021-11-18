@@ -4,6 +4,7 @@ namespace Midtrans\Snap\Model\Config\Source\Payment;
 
 use Magento\Framework\Event\ManagerInterface;
 use Magento\Framework\Exception\LocalizedException;
+use Magento\Framework\UrlInterface;
 use Magento\Payment\Gateway\Command\CommandManagerInterface;
 use Magento\Payment\Gateway\Command\CommandPoolInterface;
 use Magento\Payment\Gateway\Config\ValueHandlerPoolInterface;
@@ -13,6 +14,7 @@ use Magento\Payment\Model\InfoInterface;
 use Magento\Payment\Model\Method\Adapter;
 use Magento\Payment\Model\MethodInterface;
 use Magento\Sales\Model\Order;
+use Magento\Store\Model\StoreManagerInterface;
 use Midtrans\Snap\Gateway\Config\Config;
 use Midtrans\Snap\Gateway\Transaction;
 use Midtrans\Snap\Helper\Data;
@@ -66,11 +68,23 @@ class AbstractPayment extends Adapter
     protected $midtransLogger;
 
     /**
+     * @var UrlInterface
+     */
+    public $urlInterface;
+
+    /**
+     * @var StoreManagerInterface
+     */
+    public $storeManager;
+
+    /**
      * AbstractPayment constructor.
      * @param ManagerInterface $eventManager
      * @param ValueHandlerPoolInterface $valueHandlerPool
      * @param PaymentDataObjectFactory $paymentDataObjectFactory
      * @param Data $dataConfig
+     * @param UrlInterface $urlInterface
+     * @param StoreManagerInterface $storeManager
      * @param MidtransLogger $midtransLogger
      * @param string $code
      * @param string $formBlockType
@@ -84,10 +98,12 @@ class AbstractPayment extends Adapter
         ValueHandlerPoolInterface $valueHandlerPool,
         PaymentDataObjectFactory $paymentDataObjectFactory,
         Data $dataConfig,
+        UrlInterface $urlInterface,
+        StoreManagerInterface $storeManager,
         MidtransLogger $midtransLogger,
-        $code,
-        $formBlockType,
-        $infoBlockType,
+        string $code,
+        string $formBlockType,
+        string $infoBlockType,
         CommandPoolInterface $commandPool = null,
         ValidatorPoolInterface $validatorPool = null,
         CommandManagerInterface $commandExecutor = null
@@ -104,10 +120,14 @@ class AbstractPayment extends Adapter
             $commandExecutor
         );
         $this->dataConfig = $dataConfig;
+        $this->urlInterface = $urlInterface;
+        $this->storeManager = $storeManager;
         $this->midtransLogger = $midtransLogger;
     }
 
     /**
+     * Function to handle refund from Magento dashboard
+     *
      * @param InfoInterface $payment
      * @param $amount
      * @return Adapter|MethodInterface|void
@@ -119,42 +139,57 @@ class AbstractPayment extends Adapter
             throw new LocalizedException(__('The refund action is not available.'));
         }
 
+        /* Override notification, if override notification from admin setting is active (default is active) */
+        if ($this->dataConfig->isOverrideNotification() && $this->dataConfig->getNotificationEndpoint() != null) {
+            Config::$overrideNotifUrl = $this->dataConfig->getNotificationEndpoint();
+        }
+
         $order = $payment->getOrder();
         $paymentCode = $order->getPayment()->getMethod();
-        $orderId = $order->getRealOrderId();
+        $midtransOrderId = $payment->getAdditionalInformation('midtrans_order_id');
+        $orderId = $order->getIncrementId();
 
         Config::$serverKey = $this->dataConfig->getServerKey($paymentCode);
+        Config::$isProduction = $this->dataConfig->isProduction();
+
         $transaction = new Transaction();
 
-        // Check is full refund or partial
-        $canRefundMore = $payment->getCreditmemo()->getInvoice()->canRefund();
-        $isFullRefund = !$canRefundMore && (double)$order->getBaseTotalOnlineRefunded() == (double)$payment->getBaseAmountPaid();
-
-        $refundKey = $orderId . '-' . time();
-        $reasonRefund = "Refund From Magento Dashboard";
-        $refundParams = [
-            'refund_key' => $refundKey,
-            'amount' => $amount,
-            'reason' => $reasonRefund
-        ];
+        if (strpos($midtransOrderId, 'multishipping-') !== false) {
+            $refundKey = $midtransOrderId . '-' . time();
+            $reasonRefund = "Refund " . (double)$amount . ", " . $refundKey . ", from Magento dashboard order :::" . $orderId;
+            $refundParams = [
+                'refund_key' => $refundKey,
+                'amount' => $amount,
+                'reason' => $reasonRefund
+            ];
+        } else {
+            $refundKey = 'regular-' . $midtransOrderId . '-' . time();
+            $reasonRefund = "Refund " . (double)$amount . ", " . $refundKey . ", from Magento dashboard order :::" . $orderId;
+            $refundParams = [
+                'refund_key' => $refundKey,
+                'amount' => $amount,
+                'reason' => $reasonRefund
+            ];
+        }
 
         /*
          * Request refund to midtrans
          */
-        $order->addStatusToHistory(Order::STATE_PROCESSING, 'Request Refund with Refund-Key: ' . $refundKey, false, false);
-        $order->save();
-        $response = $transaction::refund($orderId, $refundParams);
+        $response = $transaction::refund($midtransOrderId, $refundParams);
+
         if (isset($response)) {
-            if ($response->status_code == 200) {
-                if ($isFullRefund) {
-                    $refund_message = sprintf('Full Refunded %1$s | Refund-Key %2$s | %3$s', $response->refund_amount, $response->refund_key, $reasonRefund);
-                    $order->addStatusToHistory(Order::STATE_CLOSED, $refund_message, false);
+            if (isset($response->status_code)) {
+                if ($response->status_code == 200) {
+                    $order->addStatusToHistory(Order::STATE_PROCESSING, $reasonRefund, false);
+                    $order->save();
                 } else {
-                    $refund_message = sprintf('Partial Refunded %1$s | Refund-Key %2$s | %3$s', $response->refund_amount, $response->refund_key, $reasonRefund);
-                    $order->addStatusToHistory(Order::STATE_PROCESSING, $refund_message, false);
+                    $this->midtransLogger->midtransRequest('RefundRequest: ' . print_r($response, true));
+                    $message = isset($response->status_message) ? $response->status_message : "Something went wrong..";
+                    throw new LocalizedException(__("Oops, Request refund failed :" . $message));
                 }
-                $order->save();
             }
+        } else {
+            throw new LocalizedException(__("Oops, Request refund failed : Please try again letter"));
         }
     }
 }

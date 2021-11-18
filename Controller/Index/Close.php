@@ -2,17 +2,54 @@
 
 namespace Midtrans\Snap\Controller\Index;
 
-use Magento\Checkout\Model\Session\SuccessValidator;
+use Magento\Sales\Model\Order;
 use Midtrans\Snap\Controller\Payment\AbstractAction;
 
 class Close extends AbstractAction
 {
     public function execute()
     {
-        if (!$this->_objectManager->get(SuccessValidator::class)->isValid()) {
+        $param = $this->getValue();
+
+        $ordersCanceled = [];
+        if ($param !== null) {
+            if (strpos($param, 'multishipping-') !== false) {
+                $quoteId = str_replace('multishipping-', '', $param);
+                $incrementIds = $this->getIncrementIdsByQuoteId($quoteId);
+
+                foreach ($incrementIds as $key => $orderId) {
+                    $order  = $this->getOrderByIncrementId($orderId);
+                    $this->closedOrder($order);
+                    $ordersCanceled[$orderId] = $orderId;
+                }
+            } else {
+                $order = $this->_order->loadByIncrementId($param);
+                $this->closedOrder($order);
+                $ordersCanceled[$param] = $param;
+            }
+            $this->registry->register('orders_canceled', $ordersCanceled, false);
+        } else {
             return $this->resultRedirectFactory->create()->setPath('checkout/cart');
         }
-        $resultPage = $this->_pageFactory->create();
-        return $resultPage;
+        $this->unSetValue();
+        return $this->_pageFactory->create();
+    }
+
+    /**
+     * Function to close order
+     *
+     * @param Order $order
+     * @throws \Exception
+     */
+    private function closedOrder(Order $order)
+    {
+        if ($order->getState() == Order::STATE_NEW && !$order->hasInvoices()) {
+            $order_note = "Midtrans | Payment Page close - by User";
+            try {
+                $this->cancelOrder($order, Order::STATE_CANCELED, $order_note);
+            } catch (\Exception $e) {
+                $this->_midtransLogger->midtransError('PaymentClose: ' . $e);
+            }
+        }
     }
 }

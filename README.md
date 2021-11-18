@@ -1,11 +1,20 @@
-Midtrans ❤️ Magento! Midtrans is highly concerned with customer experience (UX). We strive to make payments simple for both the merchant and customers. With this plugin,  you can make your Magento store using Midtrans payment.
+[![Latest Stable Version](https://poser.pugx.org/midtrans/snap/v)](//packagist.org/packages/midtrans/snap) 
+[![Monthly Downloads](https://poser.pugx.org/midtrans/snap/d/monthly)](//packagist.org/packages/midtrans/snap)
+[![Total Downloads](https://poser.pugx.org/midtrans/snap/downloads)](//packagist.org/packages/midtrans/snap) 
+[![License](https://poser.pugx.org/midtrans/snap/license)](//packagist.org/packages/midtrans/snap)
+
+Midtrans ❤️ Magento! Midtrans is highly concerned with customer experience (UX). We strive to make payments simple for both the merchant and customers. With this plugin, you can make your Magento store using Midtrans payment.
+
+## Live Demo
+Want to see Midtrans Magento payment plugins in action? We have some demo web-stores for Magento that you can use to try the payment journey directly, click the link below.
+* [Midtrans CMS Demo Store](https://docs.midtrans.com/en/snap/with-plugins?id=midtrans-payment-plugin-live-demonstration)
 
 ## Requirements:
-*   An online store with Magento infrastructure. This plugin is tested with Magento v2.3.4
+*   An online store with Magento infrastructure. This plugin tested with Magento v2.1.0, v2.2.0, v2.3.1, v2.4.1
 *   PHP v5.6 or greater.
 *   MySQL v5.7 or greater.
 *   Midtrans plugin for Magento v2.x [ [Github](https://github.com/Midtrans/Midtrans-Magento2) | [Zip](https://github.com/Midtrans/Midtrans-Magento2/archive/master.zip) ]
-*   This plugin supports Magento2 version 2.1.0, 2.2.0, 2.3.4 and higher.
+*   This plugin supports Magento2 version 2.1.0 - 2.4.1 and higher.
 
 
 # How to install the plugins
@@ -14,11 +23,14 @@ Before you begin to install through the composer, you need Magento marketplace a
 1. Install the plugins: `composer require midtrans/snap`
 2. Enable the plugin:  `bin/magento module:enable Midtrans_Snap`
 3. Execute upgrade script : `bin/magento setup:upgrade`
-4. Flush cache storage :  `bin/magento cache:flush`
+4. Clean cache storage :  `bin/magento cache:clean`
+5. Check the module status:  `bin/magento module:status Midtrans_Snap`
+
+>Note: If you do have a previous version installed and upgrade the plugins to the latest version. After upgrade our plugins, You need to run `bin/magento setup:upgrade --keep-generated`, `bin/magento setup:static-content:deploy` and clean cache `bin/magento cachce:clean`.
 
 
 ## Install Midtrans Snap plugins through Magento marketplace 
-
+You can install Midtrans Snap plugins through Magento Marketplace. Please, visit Midtrans on [Magento Marketplace](https://marketplace.magento.com/midtrans-snap.html) and follow step-by-step installation instructions from the [Official Magento extension docs](https://devdocs.magento.com/extensions/install)
 
 ## Install Midtrans Snap plugins from GitHub project
 
@@ -35,7 +47,9 @@ With these steps, you can custom/modify our Magento plugins to handle the busine
     
     `bin/magento setup:upgrade`
     
-    `bin/magento cache:flush`
+    `bin/magento cache:clean`
+    
+    `bin/magento module:status Midtrans_Snap`
 
 
 # Plugin Usage Instruction
@@ -96,8 +110,9 @@ In the Midtrans Magento plugins we have 4 option to use Snap model payment metho
 
 >Note: You can use different Midtrans Account for every Snap model payment method, should configure the access-key in Optional section `“Use different Midtrans account”`. If the optional access-key is empty, the plugins will automatically use access key on Basic Settings.
 
->INFO: The built-in BCA Klikpay landing page for now will only use server key from basic settings of Snap payment integration
-
+>INFO: 
+><li> The built-in BCA Klikpay landing page for now will only use server key from basic settings of Snap payment integration.</li>
+><li> Multishipping only support on version Midtrans Magento Plugins v2.5.3 or greater and not support in offline installment payment</li>
 In case you need to customize configuration these field are configurable, and described as follows:
 
 | Field                  | Description            
@@ -114,28 +129,29 @@ In case you need to customize configuration these field are configurable, and de
 
 
 
-
 ### Midtrans&nbsp;  MAP Configuration
 1. Login to your [Midtrans&nbsp;  Account](https://dashboard.midtrans.com), select your environment (sandbox/production), go to menu `settings -> configuration`
    * Payment Notification URL: 
-    >`http://[your-site-url]/snap/payment/notification`
+    >`https://[your-site-url]/snap/payment/notification`
    * Finish Redirect URL: 
-    >`http://[your-site-url]/snap/index/finish`
+    >`https://[your-site-url]/snap/index/finish`
    * Unfinish Redirect URL: 
-    >`http://[your-site-url]/snap/index/finish`
+    >`https://[your-site-url]/snap/index/finish`
    * Error Redirect URL: 
-    >`http://[your-site-url]/snap/index/finish`
+    >`https://[your-site-url]/snap/index/finish`
 
 2. Go to menu **settings > Snap Preference > System Settings**
-  * Insert `http://[your-site-url]/snap/index/finish` link as Finish/Unfinish/Error Redirect URL.
+  * Insert `https://[your-site-url]/snap/index/finish` link as Finish/Unfinish/Error Redirect URL.
 
 
 ## How to online refund transaction
 
-You can request refunds either from the [Midtrans Dashboard](https://dashboard.midtrans.com/transactions) or from the Magento admin. After a refund is issued, it cannot be cancelled or undone. Before you trigger this request, make sure that the refund amount and any other details are correct. The online refund feature is available for payment method gopay and credit card.
+<details><summary>Click to expand info</summary>
+<br>
+
+You can request refunds either from the [Midtrans Dashboard](https://dashboard.midtrans.com/transactions) or from the Magento admin. After a refund is issued, it cannot be cancelled or undone. Before you trigger this request, make sure that the refund amount and any other details are correct.
 
 If you make refund from the Midtrans Dashboard, Refund notification is sent to Magento, set transaction state to CLOSED and for now is not created the credit memo.
-
 
 ### Request refund from Magento Admin:
 
@@ -151,11 +167,13 @@ If you make refund from the Midtrans Dashboard, Refund notification is sent to M
     *   **Refund Offline**: An offline refund does not trigger request refund to midtrans it’s only refund in Magento side. You need to take action and carry out the refund manually from Midtrans dashboard.After a refund operation, the order status changes to **Closed**. This order status change is controlled by the Magento system. 
     
     The status change may not mean that the refund has carried out successfully on Midtrans side. When the transaction status in Midtrans dashboard changes to REFUND, then the refund went through successfully
+</details>
     
 #### Get help
 
 * [General Documentation Midtrans](http://docs.midtrans.com)
 * Technical Support Team Midtrans [support@midtrans.com](mailto:support@midtrans.com)
+* [Midtrans Magento Demo Store](https://docs.midtrans.com/en/snap/with-plugins?id=midtrans-payment-plugin-live-demonstration) 
 * [SNAP Documentation Product Midtrans](https://snap-docs.midtrans.com/)
 * [CoreAPI Documentation Product Midtrans](https://api-docs.midtrans.com/)
 * [Mobile Documentation Product Midtrans](http://mobile-docs.midtrans.com/)

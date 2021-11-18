@@ -1,7 +1,20 @@
 <?php
 
 /**
+ * Midtrans payment close page
+ *
  * @var \Midtrans\Snap\Block\Close $block
  */
-
-echo $block->cancelOrders();
+?>
+<div class="content" >
+    <fieldset class="fieldset">
+        <legend class="legend box-title">
+            <span><?= $block->escapeHtml(__('Your order has been canceled')); ?></span>
+        </legend>
+        <div class="box-content">
+            <?php foreach ($block->getOrdersCanceled() as $key => $item) {
+                echo '<li>' . $block->escapeHtml($item)  . '</li>';
+            } ?>
+        </div>
+    </fieldset>
+</div>

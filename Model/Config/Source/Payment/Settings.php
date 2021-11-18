@@ -4,7 +4,9 @@ namespace Midtrans\Snap\Model\Config\Source\Payment;
 
 use Magento\Framework\App\Config\ScopeConfigInterface;
 use Magento\Framework\Encryption\EncryptorInterface;
+use Magento\Framework\Exception\NoSuchEntityException;
 use Magento\Store\Model\ScopeInterface;
+use Magento\Store\Model\StoreManagerInterface;
 
 class Settings extends AbstractPayment
 {
@@ -15,13 +17,16 @@ class Settings extends AbstractPayment
 
     public $code = self::SETTINGS_PAYMENT_CODE;
     protected $_scopeConfig;
+    protected $_storeManager;
 
     /**
      * Settings constructor.
      * @param ScopeConfigInterface $scopeConfig
+     * @param StoreManagerInterface $storeManager
      */
-    public function __construct(ScopeConfigInterface $scopeConfig)
+    public function __construct(ScopeConfigInterface $scopeConfig, StoreManagerInterface $storeManager)
     {
+        $this->_storeManager = $storeManager;
         $this->_scopeConfig = $scopeConfig;
     }
 
@@ -73,6 +78,20 @@ class Settings extends AbstractPayment
     public function getOrderStatus()
     {
         return $this->getDataConfig('payment/settings/order_status');
+    }
+
+    public function getNotificationEndpoint()
+    {
+        try {
+            return $this->_storeManager->getStore()->getBaseUrl() . 'snap/payment/notification';
+        } catch (NoSuchEntityException $e) {
+            return null;
+        }
+    }
+
+    public function isOverrideNotification()
+    {
+        return $this->getDataConfig('payment/settings/notification_override') == 1;
     }
 
     public function getConfigSnap()

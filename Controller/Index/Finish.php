@@ -5,8 +5,8 @@ namespace Midtrans\Snap\Controller\Index;
 use Exception;
 use Magento\Framework\View\Result\Page;
 use Midtrans\Snap\Controller\Payment\AbstractAction;
-use Midtrans\Snap\Gateway\Transaction;
 use Midtrans\Snap\Gateway\Config\Config;
+use Midtrans\Snap\Gateway\Transaction;
 
 class Finish extends AbstractAction
 {
@@ -14,30 +14,46 @@ class Finish extends AbstractAction
 
     public function execute()
     {
+        $orderIdRequest = $this->getRequest()->getParam('order_id');
+        $midtransResult = null;
         try {
+            /* Handle for BCA Klikpay */
             $transactionId = $this->getRequest()->getParam('id');
-            $orderId = $this->getRequest()->getParam('order_id');
             if ($transactionId != null) {
-                $param = $transactionId;
-                $paymentCode = self::PAYMENT_CODE;
-            } elseif ($orderId != null) {
-                $param = $orderId;
-                $code = $this->getQuoteByOrderId($orderId)->getPayment()->getMethod();
-                $paymentCode = $code;
-            } else {
-                return $this->resultRedirectFactory->create()->setPath('checkout/cart');
+                Config::$isProduction = $this->data->isProduction();
+                Config::$serverKey = $this->data->getServerKey(self::PAYMENT_CODE);
+                $transaction = new Transaction();
+                $midtransResult = $transaction::status($transactionId);
             }
+            /* Handle for direct debit, cardless credit, gopay, cc */
+            else {
+                if ($orderIdRequest == null) {
+                    $postValue = $this->getRequest()->getPostValue();
+                    $response = $postValue['response'];
+                    $decoded_response = $this->data->json->unserialize($response);
+                    $orderIdRequest = $decoded_response['order_id'];
+                }
 
-            Config::$isProduction = $this->data->isProduction();
-            Config::$serverKey = $this->data->getServerKey($paymentCode);
+                if (strpos($orderIdRequest, 'multishipping-') !== false) {
+                    // 2. Finish for multishipping
+                    $quoteId = str_replace('multishipping-', '', $orderIdRequest);
+                    $incrementIds = $this->getIncrementIdsByQuoteId($quoteId);
 
-            $transaction = new Transaction();
-            $statusResult = $transaction::status($param);
-
-            $orderId = $statusResult->order_id;
-            $amount = $statusResult->gross_amount;
-            $transaction = $statusResult->transaction_status;
-            $payment_type = $statusResult->payment_type;
+                    foreach ($incrementIds as $key => $id) {
+                        $order  = $this->getOrderByIncrementId($id);
+                        $paymentCode = $order->getPayment()->getMethod();
+                        $midtransResult = $this->midtransGetStatus($orderIdRequest, $paymentCode);
+                    }
+                } // if not multishipping order
+                else {
+                    $order = $this->_order->loadByIncrementId($orderIdRequest);
+                    $midtransResult = $this->midtransGetStatus($order);
+                }
+            }
+            $orderId = $midtransResult->order_id;
+            $amount = $midtransResult->gross_amount;
+            $transaction = $midtransResult->transaction_status;
+            $payment_type = $midtransResult->payment_type;
 
             $this->registry->register('amount', $amount, false);
             $this->registry->register('transaction_status', $transaction, false);
@@ -45,7 +61,8 @@ class Finish extends AbstractAction
             $this->registry->register('order_id', $orderId, false);
         } catch (Exception $e) {
             error_log($e->getMessage());
-            $this->_midtransLogger->midtransError($e->getMessage());
+            $this->_midtransLogger->midtransError('FinishController-' . $e->getMessage());
+            return $this->resultRedirectFactory->create()->setPath('checkout/cart');
         }
         /** @var Page $resultPage */
         $resultPage = $this->_pageFactory->create();

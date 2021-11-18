@@ -270,6 +270,7 @@
     <type name="Midtrans\Snap\Model\Config\Source\Payment\Settings">
         <arguments>
             <argument name="_scopeConfig" xsi:type="object">Magento\Framework\App\Config\ScopeConfigInterface</argument>
+            <argument name="settings" xsi:type="object">Midtrans\Snap\Helper\Data</argument>
         </arguments>
     </type>
 
@@ -285,9 +286,6 @@
     </type>
 <!-- END LOGGER -->
 
-    <type name="Midtrans\Snap\Model\Config\Source\Payment\Settings">
-        <arguments>
-            <argument name="settings" xsi:type="object">Midtrans\Snap\Helper\Data</argument>
-        </arguments>
-    </type>
+    <preference for="Magento\Multishipping\Controller\Checkout\OverviewPost" type="Midtrans\Snap\Controller\Payment\OverviewPost" />
+
 </config>

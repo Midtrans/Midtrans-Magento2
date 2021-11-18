@@ -17,6 +17,11 @@ class Finish extends Template
         $this->registry = $registry;
     }
 
+    /**
+     * Function to get status order transaction
+     *
+     * @return mixed
+     */
     public function getDataTransaction()
     {
         $transaction['gross_amount'] = $this->registry->registry('amount');
