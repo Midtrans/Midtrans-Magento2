@@ -178,13 +178,18 @@ class AbstractPayment extends Adapter
         $response = $transaction::refund($midtransOrderId, $refundParams);
 
         if (isset($response)) {
-            if ($response->status_code == 200) {
-                $order->addStatusToHistory(Order::STATE_PROCESSING, $reasonRefund, false);
-                $order->save();
-            } else {
-                $this->midtransLogger->midtransRequest('RefundRequest: ' . print_r($response, true));
-                throw new LocalizedException(__("Oops, Request refund failed :" . $response->status_message));
+            if (isset($response->status_code)) {
+                if ($response->status_code == 200) {
+                    $order->addStatusToHistory(Order::STATE_PROCESSING, $reasonRefund, false);
+                    $order->save();
+                } else {
+                    $this->midtransLogger->midtransRequest('RefundRequest: ' . print_r($response, true));
+                    $message = isset($response->status_message) ? $response->status_message : "Something went wrong..";
+                    throw new LocalizedException(__("Oops, Refund request failed :" . $message));
+                }
             }
+        } else {
+            throw new LocalizedException(__("Oops, Refund request failed. Due to no response received. Please try again later."));
         }
     }
 }

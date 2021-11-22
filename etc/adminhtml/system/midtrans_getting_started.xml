@@ -1,18 +1,22 @@
 <?xml version="1.0"?>
-<include xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="urn:magento:module:Magento_Config:etc/system_include.xsd">
-    <group id="getting_started" translate="label" type="text" sortOrder="10" showInDefault="1" showInWebsite="1" showInStore="1">
+<include xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:noNamespaceSchemaLocation="urn:magento:module:Magento_Config:etc/system_include.xsd">
+    <group id="getting_started" translate="label" type="text" sortOrder="10" showInDefault="1" showInWebsite="1"
+           showInStore="1">
         <label><![CDATA[Getting Started]]></label>
         <frontend_model>Magento\Config\Block\System\Config\Form\Fieldset</frontend_model>
         <comment><![CDATA[
-                           <h3>Midtrans Magento Payment Gateway Module</h3>
-                           <ul>
-                                <li>Midtrans Magento <a target="_blank" href="https://docs.midtrans.com/en/snap/with-plugins?id=magento">Documentation</a></li>
-                                <li>Get Sandbox <a target="_blank" href="https://dashboard.sandbox.midtrans.com/settings/config_info">Access Key</a> or Get Production<a target="_blank" href="https://dashboard.midtrans.com/settings/config_info"> Access Key</a></li>
-                                <li>Midtrans <a target="_blank" href="https://docs.midtrans.com/en/technical-reference/sandbox-test</a>.</li>
-                            </ul>
-                            <p>If you have any further questions, please visit <a target="_blank" href="https://docs.midtrans.com">our documentation web</a> website or email <a href="mailto:support@midtrans.com">support@midtrans.com</a>.</p>
-                            ]]></comment>
-        <field id="version" translate="label" type="label" sortOrder="10" showInDefault="1" showInWebsite="1" showInStore="0">
+        <h3>Midtrans Magento Payment Gateway Module</h3>
+        <p>Secure payment via Midtrans that accept various payment methods, with mobile friendly built-in interface, or (optionally) redirection. This is the main payment button, 1 single button for multiple available payments methods. <a href="https://docs.midtrans.com/en/snap/with-plugins?id=magento-2-plugin-configuration" target="_blank">Please follow "how-to configure guide" here</a>. Any feedback & request <a href="https://docs.midtrans.com/en/snap/with-plugins?id=feedback-and-request" target="_blank">let us know here</a>.</p>
+        <ul>
+            <li>Midtrans Magento <a target="_blank" href="https://docs.midtrans.com/en/snap/with-plugins?id=magento">Documentation</a></li>
+            <li>Get Sandbox <a target="_blank" href="https://dashboard.sandbox.midtrans.com/settings/config_info">Access Key</a> or Get Production<a target="_blank" href="https://dashboard.midtrans.com/settings/config_info"> Access Key</a></li>
+            <li>Midtrans <a target="_blank" href="https://docs.midtrans.com/en/technical-reference/sandbox-test">Sandbox Testing Payment</a></li>
+        </ul>
+        <p>If you have any further questions, please visit <a target="_blank" href="https://docs.midtrans.com">our documentation</a> or email <a href="mailto:support@midtrans.com">support@midtrans.com</a>.</p>
+        ]]></comment>
+        <field id="version" translate="label" type="label" sortOrder="10" showInDefault="1" showInWebsite="1"
+               showInStore="0">
             <label>Module Version</label>
             <frontend_model>Midtrans\Snap\Block\Adminhtml\Config\Version</frontend_model>
         </field>

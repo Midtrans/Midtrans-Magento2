@@ -3,7 +3,10 @@
 [![Total Downloads](https://poser.pugx.org/midtrans/snap/downloads)](//packagist.org/packages/midtrans/snap) 
 [![License](https://poser.pugx.org/midtrans/snap/license)](//packagist.org/packages/midtrans/snap)
 
-Midtrans ❤️ Magento! Midtrans is highly concerned with customer experience (UX). We strive to make payments simple for both the merchant and customers. With this plugin,  you can make your Magento store using Midtrans payment.
+Midtrans ❤️ Magento! Midtrans strive to make payments simple for both the merchant and customers. With Midtrans Magento extension/plugin, your Magento Store can easily start accepting payments via Midtrans.
+## Live Demo
+Want to see Midtrans Magento payment plugins in action? We have some demo web-stores for Magento that you can use to try the payment journey directly, click the link below.
+* [Midtrans CMS Demo Store](https://docs.midtrans.com/en/snap/with-plugins?id=midtrans-payment-plugin-live-demonstration)
 
 ## Requirements:
 *   An online store with Magento infrastructure. This plugin tested with Magento v2.1.0, v2.2.0, v2.3.1, v2.4.1
@@ -168,7 +171,9 @@ If you make refund from the Midtrans Dashboard, Refund notification is sent to M
 #### Get help
 
 * [General Documentation Midtrans](http://docs.midtrans.com)
+* Please follow [this step by step guide](https://docs.midtrans.com/en/snap/with-plugins?id=magento) for complete configuration. If you have any feedback or request, please [do let us know here](https://docs.midtrans.com/en/snap/with-plugins?id=feedback-and-request).
 * Technical Support Team Midtrans [support@midtrans.com](mailto:support@midtrans.com)
+* [Midtrans Magento Demo Store](https://docs.midtrans.com/en/snap/with-plugins?id=midtrans-payment-plugin-live-demonstration) 
 * [SNAP Documentation Product Midtrans](https://snap-docs.midtrans.com/)
 * [CoreAPI Documentation Product Midtrans](https://api-docs.midtrans.com/)
 * [Mobile Documentation Product Midtrans](http://mobile-docs.midtrans.com/)

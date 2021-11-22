@@ -30,8 +30,8 @@ class Finish extends AbstractAction
                 if ($orderIdRequest == null) {
                     $postValue = $this->getRequest()->getPostValue();
                     $response = $postValue['response'];
-                    $decoded_response = json_decode($response);
-                    $orderIdRequest = $decoded_response->order_id;
+                    $decoded_response = $this->data->json->unserialize($response);
+                    $orderIdRequest = $decoded_response['order_id'];
                 }
 
                 if (strpos($orderIdRequest, 'multishipping-') !== false) {
