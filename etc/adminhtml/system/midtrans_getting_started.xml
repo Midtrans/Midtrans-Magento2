@@ -7,6 +7,7 @@
         <frontend_model>Magento\Config\Block\System\Config\Form\Fieldset</frontend_model>
         <comment><![CDATA[
         <h3>Midtrans Magento Payment Gateway Module</h3>
+        <p>Secure payment via Midtrans that accept various payment methods, with mobile friendly built-in interface, or (optionally) redirection. This is the main payment button, 1 single button for multiple available payments methods. <a href="https://docs.midtrans.com/en/snap/with-plugins?id=magento-2-plugin-configuration" target="_blank">Please follow "how-to configure guide" here</a>. Any feedback & request <a href="https://docs.midtrans.com/en/snap/with-plugins?id=feedback-and-request" target="_blank">let us know here</a>.</p>
         <ul>
             <li>Midtrans Magento <a target="_blank" href="https://docs.midtrans.com/en/snap/with-plugins?id=magento">Documentation</a></li>
             <li>Get Sandbox <a target="_blank" href="https://dashboard.sandbox.midtrans.com/settings/config_info">Access Key</a> or Get Production<a target="_blank" href="https://dashboard.midtrans.com/settings/config_info"> Access Key</a></li>
