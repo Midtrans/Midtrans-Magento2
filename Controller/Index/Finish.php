@@ -26,13 +26,12 @@ class Finish extends Action
                 $midtransResult = $transaction::status($transactionId);
             }
             /* Handle for direct debit, cardless credit, gopay, cc */
-            else {
-                if ($orderIdRequest == null) {
-                    $postValue = $this->getRequest()->getPostValue();
-                    $response = $postValue['response'];
-                    $decoded_response = $this->data->json->unserialize($response);
-                    $orderIdRequest = $decoded_response['order_id'];
-                }
+
+            elseif ($this->getRequest()->getPostValue() != null) {
+                $postValue = $this->getRequest()->getPostValue();
+                $response = $postValue['response'];
+                $decoded_response = $this->data->json->unserialize($response);
+                $orderIdRequest = $decoded_response['order_id'];
 
                 if (strpos($orderIdRequest, 'multishipping-') !== false) {
                     // 2. Finish for multishipping
@@ -49,7 +48,30 @@ class Finish extends Action
                     $order = $this->_order->loadByIncrementId($orderIdRequest);
                     $midtransResult = $this->midtransGetStatus($order);
                 }
+            } else {
+                $checkoutSession = $this->_checkoutSession->getData();
+                $param = $this->_checkoutSession->getLastRealOrder()->getIncrementId();
+
+                if (isset($checkoutSession['checkout_state']) && $checkoutSession['checkout_state'] === 'multishipping_success') {
+                    $quoteId = $checkoutSession['last_quote_id'];
+                    $incrementIds = $this->paymentOrderRepository->getIncrementIdsByQuoteId($quoteId);
+
+                    $paymentCode = null;
+                    foreach ($incrementIds as $key => $orderId) {
+                        $order  = $this->paymentOrderRepository->getOrderByIncrementId($orderId);
+                        $paymentCode = $order->getPayment()->getMethod();
+                    }
+                    $param = 'multishipping-' . $quoteId;
+                    $midtransResult = $this->midtransGetStatus($param, $paymentCode);
+                } elseif ($param !== null) {
+                    $order = $this->paymentOrderRepository->getOrderByIncrementId($param);
+                    $midtransResult = $this->midtransGetStatus($order);
+                } else {
+                    return $this->resultRedirectFactory->create()->setPath('checkout/cart');
+                }
+                $this->unSetValue();
             }
+
             $orderId = $midtransResult->order_id;
             $amount = $midtransResult->gross_amount;
             $transaction = $midtransResult->transaction_status;
@@ -62,9 +84,9 @@ class Finish extends Action
         } catch (Exception $e) {
             error_log($e->getMessage());
             $this->_midtransLogger->midtransError('FinishController-' . $e->getMessage());
+            $this->unSetValue();
             return $this->resultRedirectFactory->create()->setPath('checkout/cart');
         }
-        /** @var Page $resultPage */
         $resultPage = $this->_pageFactory->create();
         return $resultPage;
     }
