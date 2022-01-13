@@ -3,12 +3,13 @@
  * @var \Midtrans\Snap\Block\Finish $block
  */
 ?>
+
 <?php $transaction = $block->getDataTransaction(); ?>
 <?php if ($transaction['status'] == 'settlement' || $transaction['status'] == 'capture') {
     ?>
     <hr>
     <h2>Payment Success!</h2>
-    <p>We have received your payment, your order is being processed. Thank you!</p>
+    <p>We have received your payment, your payment number #<?php echo $transaction['order_id']?> is being processed. Thank you!</p>
     <?php
 } elseif ($transaction['status'] == 'pending') {
         ?>
@@ -17,14 +18,14 @@
         // BCA Klikpay specific, all non-settlement are considered failure
         ?>
         <hr>
-        <h2>Payment Failed</h2>
+        <h2>Payment Failed for payment number #<?php echo $transaction['order_id']?></h2>
         <p>Sorry, we are unable to receive your payment.</p>
         <?php
     } else {
         // Other payment, pending is pending
         ?>
         <hr>
-        <h2>Your Order #<?php echo $transaction['order_id']?> is Awaiting Your Payment</h2>
+        <h2>Your payment number #<?php echo $transaction['order_id']?> is Awaiting Your Payment</h2>
         <p>Please complete the payment as instructed earlier. Thank you!</p>
         <?php
     } ?>
@@ -33,7 +34,8 @@
         ?>
     <hr>
     <h2>Payment Is Not Received</h2>
-    <p>Your payment is not yet completed. Please complete your payment or do another checkout. Thank you!</p>
+    <p>Your payment for payment number #<?php echo $transaction['order_id']?> is not yet completed. Please complete your payment or do another checkout. Thank you!</p>
     <?php
     }
 ?>
+<?php
