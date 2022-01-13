@@ -192,4 +192,10 @@ class AbstractPayment extends Adapter
             throw new LocalizedException(__("Oops, Refund request failed. Due to no response received. Please try again later."));
         }
     }
+
+    public function getCode()
+    {
+        return parent::getCode();
+    }
+
 }
