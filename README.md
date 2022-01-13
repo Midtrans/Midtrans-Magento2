@@ -167,6 +167,10 @@ If you make refund from the Midtrans Dashboard, Refund notification is sent to M
     
     The status change may not mean that the refund has carried out successfully on Midtrans side. When the transaction status in Midtrans dashboard changes to REFUND, then the refund went through successfully
 </details>
+
+### Add Payment Fee
+Payment fees can be enable by using external extension. You can use [Mageprince Magento2 PaymentFee](https://github.com/mageprince/magento2-paymentfee/) extension. Payment Fee extension for Magento 2 allows adding extra charges for specific payment methods and displays them on the cart page, checkout page, invoice, and credit memo.
+All fee calculation will handle by external extension. We only put the PaymentFee value from Magento order object as items. 
     
 #### Get help
 
