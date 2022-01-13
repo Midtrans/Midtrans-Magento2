@@ -9,7 +9,10 @@ use Midtrans\Snap\Helper\Data;
 
 class NotificationEndpoint extends Field
 {
-    protected Data $_midtransHelper;
+    /**
+     * @var Data
+     */
+    protected $_midtransHelper;
 
     /**
      * constructor.

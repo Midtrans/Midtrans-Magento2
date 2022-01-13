@@ -8,7 +8,17 @@ use Magento\Framework\View\Element\Template\Context;
 
 class Finish extends Template
 {
+    /**
+     * @var Registry
+     */
     protected $registry;
+
+    /**
+     * Finish constructor.
+     *
+     * @param Context $context
+     * @param Registry $registry
+     */
     public function __construct(
         Context $context,
         Registry $registry

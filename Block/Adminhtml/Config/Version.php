@@ -9,6 +9,9 @@ use Midtrans\Snap\Helper\Data;
 
 class Version extends Field
 {
+    /**
+     * @var Data
+     */
     protected $_midtransHelper;
 
     /**

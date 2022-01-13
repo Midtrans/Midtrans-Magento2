@@ -9,19 +9,26 @@ use Midtrans\Snap\Model\Config\Source\Payment\Settings;
 
 class Data
 {
-    private Settings $settings;
-    private EncryptorInterface $_encryptor;
+    /**
+     * @var Settings
+     */
+    private $settings;
+
+    /**
+     * @var EncryptorInterface
+     */
+    private $_encryptor;
 
     /**
      * Serialize data to JSON, unserialize JSON encoded data
      * @var Json
      */
-    public Json $json;
+    public $json;
 
     /**
      * @var ComponentRegistrarInterface
      */
-    private ComponentRegistrarInterface $componentRegistrar;
+    private $componentRegistrar;
 
     /**
      * Data constructor.
