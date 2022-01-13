@@ -3,12 +3,11 @@
 namespace Midtrans\Snap\Controller\Index;
 
 use Exception;
-use Magento\Framework\View\Result\Page;
-use Midtrans\Snap\Controller\Payment\AbstractAction;
+use Midtrans\Snap\Controller\Payment\Action;
 use Midtrans\Snap\Gateway\Config\Config;
 use Midtrans\Snap\Gateway\Transaction;
 
-class Finish extends AbstractAction
+class Finish extends Action
 {
     const PAYMENT_CODE = 'snap';
 
@@ -16,6 +15,7 @@ class Finish extends AbstractAction
     {
         $orderIdRequest = $this->getRequest()->getParam('order_id');
         $midtransResult = null;
+
         try {
             /* Handle for BCA Klikpay */
             $transactionId = $this->getRequest()->getParam('id');
@@ -37,10 +37,10 @@ class Finish extends AbstractAction
                 if (strpos($orderIdRequest, 'multishipping-') !== false) {
                     // 2. Finish for multishipping
                     $quoteId = str_replace('multishipping-', '', $orderIdRequest);
-                    $incrementIds = $this->getIncrementIdsByQuoteId($quoteId);
+                    $incrementIds = $this->paymentOrderRepository->getIncrementIdsByQuoteId($quoteId);
 
                     foreach ($incrementIds as $key => $id) {
-                        $order  = $this->getOrderByIncrementId($id);
+                        $order  = $this->paymentOrderRepository->getOrderByIncrementId($id);
                         $paymentCode = $order->getPayment()->getMethod();
                         $midtransResult = $this->midtransGetStatus($orderIdRequest, $paymentCode);
                     }
