@@ -24,6 +24,9 @@ use Midtrans\Snap\Logger\MidtransLogger;
 
 /**
  * Class AbstractAction to handle basic action order
+ * @deprecated since version 2.5.5 AbstractAction classes no longer used, will be deleted on the next major release
+ * @see \Midtrans\Snap\Controller\Payment\Action
+ *
  */
 abstract class AbstractAction extends Action
 {
