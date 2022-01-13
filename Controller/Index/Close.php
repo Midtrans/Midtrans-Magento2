@@ -3,9 +3,9 @@
 namespace Midtrans\Snap\Controller\Index;
 
 use Magento\Sales\Model\Order;
-use Midtrans\Snap\Controller\Payment\AbstractAction;
+use Midtrans\Snap\Controller\Payment\Action;
 
-class Close extends AbstractAction
+class Close extends Action
 {
     public function execute()
     {
@@ -15,10 +15,10 @@ class Close extends AbstractAction
         if ($param !== null) {
             if (strpos($param, 'multishipping-') !== false) {
                 $quoteId = str_replace('multishipping-', '', $param);
-                $incrementIds = $this->getIncrementIdsByQuoteId($quoteId);
+                $incrementIds = $this->paymentOrderRepository->getIncrementIdsByQuoteId($quoteId);
 
                 foreach ($incrementIds as $key => $orderId) {
-                    $order  = $this->getOrderByIncrementId($orderId);
+                    $order  = $this->paymentOrderRepository->getOrderByIncrementId($orderId);
                     $this->closedOrder($order);
                     $ordersCanceled[$orderId] = $orderId;
                 }
@@ -46,7 +46,7 @@ class Close extends AbstractAction
         if ($order->getState() == Order::STATE_NEW && !$order->hasInvoices()) {
             $order_note = "Midtrans | Payment Page close - by User";
             try {
-                $this->cancelOrder($order, Order::STATE_CANCELED, $order_note);
+                $this->paymentOrderRepository->cancelOrder($order, Order::STATE_CANCELED, $order_note);
             } catch (\Exception $e) {
                 $this->_midtransLogger->midtransError('PaymentClose: ' . $e);
             }
