@@ -95,7 +95,7 @@ define(
                                                     messageList.addSuccessMessage({
                                                         message: result.status_message
                                                     });
-                                                    window.location.replace(url.build('checkout/onepage/success'));
+                                                    window.location.replace(url.build('snap/index/finish'));
                                                     console.log(result.status_message);
                                                 },
                                                 onPending: function (result) {
@@ -103,8 +103,8 @@ define(
                                                     messageList.addSuccessMessage({
                                                         message: result.status_message
                                                     });
-                                                    window.location.replace(url.build('snap/index/pending'));
-                                                    console.log(url.build('snap/index/pending'))
+                                                    window.location.replace(url.build('snap/index/finish'));
+                                                    console.log(url.build('snap/index/finish'))
                                                 },
                                                 onError: function (result) {
                                                     trackResult(data, merchant_id, 'Fullpayment Snap', 'error', result);
