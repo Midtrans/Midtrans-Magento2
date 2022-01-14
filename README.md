@@ -168,10 +168,30 @@ If you make refund from the Midtrans Dashboard, Refund notification is sent to M
     The status change may not mean that the refund has carried out successfully on Midtrans side. When the transaction status in Midtrans dashboard changes to REFUND, then the refund went through successfully
 </details>
 
-### Add Payment Fee
-Payment fees can be enable by using external extension. You can use [Mageprince Magento2 PaymentFee](https://github.com/mageprince/magento2-paymentfee/) extension. Payment Fee extension for Magento 2 allows adding extra charges for specific payment methods and displays them on the cart page, checkout page, invoice, and credit memo.
-All fee calculation will handle by external extension. We only put the PaymentFee value from Magento order object as items. 
-    
+### Configuring Custom Payment Fee
+In case you need it, payment fee can optionally be added by using additional (3rd party) extension: [Mageprince Magento2 PaymentFee](https://github.com/mageprince/magento2-paymentfee/) extension. It allows adding extra charges for specific payment methods and displays them on the cart page, checkout page, invoice, and credit memo.
+
+All the fee calculation will be handled by that extension. Midtrans extension will then take the produced PaymentFee value (from Magento order object), and parse it into additional item object for Midtrans API param.
+
+#### How to use that plugin to add PaymentFee
+<details><summary>Click to expand info</summary>
+<br>
+You can try the demo extension [here](https://github.com/mageprince/magento2-paymentfee/#demo)
+
+#### Installation & Configuration Instructions
+May you can install from Magento Marketplace [here](https://marketplace.magento.com/prince-magento2-paymentfee.html) or Follow the step manual installation [here](https://github.com/mageprince/magento2-paymentfee/#installation-instruction)
+
+#### How to configure the extension
+1. Go to menu `Stores -> Configuration -> MagePrince -> Payment Fee`
+2. Set Enable field to `Yes`
+3. Go to `Payment Fee Settings` section, choose `PriceType`, Fill in `Minimum` and `Maximum order amount`.
+4. Add Midtrans Payment method on `Payment Method Fee` and Fill in `Fee Amount`
+5. Click `Save Config`
+
+The details of configuration Mageprince PaymentFee extension, you can find from the official extension documentation [here](https://github.com/mageprince/magento2-paymentfee/#configuration)
+
+</details>
+
 #### Get help
 
 * [General Documentation Midtrans](http://docs.midtrans.com)
