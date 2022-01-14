@@ -176,6 +176,7 @@ All the fee calculation will be handled by that extension. Midtrans extension wi
 #### How to use that plugin to add PaymentFee
 <details><summary>Click to expand info</summary>
 <br>
+    
 You can try the demo extension [here](https://github.com/mageprince/magento2-paymentfee/#demo)
 
 #### Installation & Configuration Instructions
