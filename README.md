@@ -186,7 +186,7 @@ May you can install from Magento Marketplace [here](https://marketplace.magento.
 1. Go to menu `Stores -> Configuration -> MagePrince -> Payment Fee`
 2. Set Enable field to `Yes`
 3. Go to `Payment Fee Settings` section, choose `PriceType`, Fill in `Minimum` and `Maximum order amount`.
-4. Add Midtrans Payment method on `Payment Method Fee` and Fill in `Fee Amount`
+4. Click `Add Fee` button, then choose Midtrans Payment method on `Payment Method Fee` and Fill in `Fee Amount`
 5. Click `Save Config`
 
 The details of configuration Mageprince PaymentFee extension, you can find from the official extension documentation [here](https://github.com/mageprince/magento2-paymentfee/#configuration)
