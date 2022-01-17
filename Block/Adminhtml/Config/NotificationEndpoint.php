@@ -5,25 +5,25 @@ namespace Midtrans\Snap\Block\Adminhtml\Config;
 use Magento\Backend\Block\Template\Context;
 use Magento\Config\Block\System\Config\Form\Field;
 use Magento\Framework\Data\Form\Element\AbstractElement;
-use Midtrans\Snap\Helper\Data;
+use Midtrans\Snap\Helper\MidtransDataConfiguration;
 
 class NotificationEndpoint extends Field
 {
     /**
-     * @var Data
+     * @var MidtransDataConfiguration
      */
-    protected $_midtransHelper;
+    protected $midtransDataConfiguration;
 
     /**
      * constructor.
      * @param Context $context
      * @param array $data
-     * @param Data $midtransHelper
+     * @param MidtransDataConfiguration $midtransDataConfiguration
      */
-    public function __construct(Data $midtransHelper, Context $context, array $data = [])
+    public function __construct(MidtransDataConfiguration $midtransDataConfiguration, Context $context, array $data = [])
     {
         parent::__construct($context, $data);
-        $this->_midtransHelper = $midtransHelper;
+        $this->midtransDataConfiguration = $midtransDataConfiguration;
     }
 
     /**
@@ -34,6 +34,6 @@ class NotificationEndpoint extends Field
      */
     protected function _getElementHtml(AbstractElement $element)
     {
-        return $this->_midtransHelper->getNotificationEndpoint();
+        return $this->midtransDataConfiguration->getNotificationEndpoint();
     }
 }

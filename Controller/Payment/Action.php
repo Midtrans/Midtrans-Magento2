@@ -24,7 +24,7 @@ use Magento\Sales\Model\Service\CreditmemoService;
 use Magento\Sales\Model\Service\InvoiceService;
 use Midtrans\Snap\Gateway\Config\Config;
 use Midtrans\Snap\Gateway\Transaction as MidtransTransaction;
-use Midtrans\Snap\Helper\Data;
+use Midtrans\Snap\Helper\MidtransDataConfiguration;
 use Midtrans\Snap\Logger\MidtransLogger;
 use Midtrans\Snap\Model\PaymentRequestRepository;
 
@@ -36,9 +36,9 @@ abstract class Action implements ActionInterface
     protected $_coreSession;
 
     /**
-     * @var Data
+     * @var MidtransDataConfiguration
      */
-    protected $data;
+    protected $midtransDataConfiguration;
 
     /**
      * @var Session
@@ -168,7 +168,7 @@ abstract class Action implements ActionInterface
      * @param Session $checkoutSession
      * @param Order $order
      * @param ObjectManagerInterface $objectManager
-     * @param Data $data
+     * @param MidtransDataConfiguration $midtransDataConfiguration
      * @param InvoiceService $invoiceService
      * @param Transaction $transaction
      * @param ResourceModel $resourceModel
@@ -191,7 +191,7 @@ abstract class Action implements ActionInterface
         Session $checkoutSession,
         Order $order,
         ObjectManagerInterface $objectManager,
-        Data $data,
+        MidtransDataConfiguration $midtransDataConfiguration,
         InvoiceService $invoiceService,
         Transaction $transaction,
         ResourceModel $resourceModel,
@@ -211,7 +211,7 @@ abstract class Action implements ActionInterface
         $this->_coreSession = $coreSession;
         $this->_checkoutSession = $checkoutSession;
         $this->_order = $order;
-        $this->data = $data;
+        $this->midtransDataConfiguration = $midtransDataConfiguration;
         $this->objectManager = $objectManager;
         $this->_pageFactory = $pageFactory;
         $this->_invoiceService = $invoiceService;
@@ -292,11 +292,11 @@ abstract class Action implements ActionInterface
     /**
      * Get Midtrans data config
      *
-     * @return Data
+     * @return MidtransDataConfiguration
      */
     public function getMidtransDataConfig()
     {
-        return $this->data;
+        return $this->midtransDataConfiguration;
     }
 
     /**
@@ -335,21 +335,21 @@ abstract class Action implements ActionInterface
     /**
      * Get Midtrans status via API
      *
-     * @param $param
-     * @param null $code
+     * @param $param | it can be Midtrans order-id/transaction-id or Magento Order object
+     * @param null $paymentCode
      * @return mixed[]
      * @throws \Exception
      */
-    public function midtransGetStatus($param, $code = null)
+    public function midtransGetStatus($param, $paymentCode = null)
     {
         $orderId = null;
         if ($param instanceof Order) {
             $orderId = $param->getIncrementId();
-            $code = $param->getPayment()->getMethod();
+            $paymentCode = $param->getPayment()->getMethod();
         } else {
             $orderId = $param;
         }
-        Config::$serverKey = $this->getMidtransDataConfig()->getServerKey($code);
+        Config::$serverKey = $this->getMidtransDataConfig()->getServerKey($paymentCode);
         Config::$isProduction = $this->getMidtransDataConfig()->isProduction();
         return MidtransTransaction::status($orderId);
     }

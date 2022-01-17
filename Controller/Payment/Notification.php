@@ -20,7 +20,7 @@ class Notification extends Action
     {
         // 1. Get body from request
         $input_source = $this->getRequest()->getContent();
-        $rawBody = $this->data->json->unserialize($input_source);
+        $rawBody = $this->midtransDataConfiguration->json->unserialize($input_source);
         $orderIdRequest = $rawBody['order_id'];
 
         $order = null;

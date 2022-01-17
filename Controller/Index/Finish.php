@@ -20,8 +20,8 @@ class Finish extends Action
             /* Handle for BCA Klikpay */
             $transactionId = $this->getRequest()->getParam('id');
             if ($transactionId != null) {
-                Config::$isProduction = $this->data->isProduction();
-                Config::$serverKey = $this->data->getServerKey(self::PAYMENT_CODE);
+                Config::$isProduction = $this->midtransDataConfiguration->isProduction();
+                Config::$serverKey = $this->midtransDataConfiguration->getServerKey(self::PAYMENT_CODE);
                 $transaction = new Transaction();
                 $midtransResult = $transaction::status($transactionId);
             }
@@ -30,7 +30,7 @@ class Finish extends Action
             elseif ($this->getRequest()->getPostValue() != null) {
                 $postValue = $this->getRequest()->getPostValue();
                 $response = $postValue['response'];
-                $decoded_response = $this->data->json->unserialize($response);
+                $decoded_response = $this->midtransDataConfiguration->json->unserialize($response);
                 $orderIdRequest = $decoded_response['order_id'];
 
                 if (strpos($orderIdRequest, 'multishipping-') !== false) {

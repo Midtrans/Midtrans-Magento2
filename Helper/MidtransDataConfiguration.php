@@ -7,7 +7,7 @@ use Magento\Framework\Encryption\EncryptorInterface;
 use Magento\Framework\Serialize\Serializer\Json;
 use Midtrans\Snap\Model\Config\Source\Payment\Settings;
 
-class Data
+class MidtransDataConfiguration
 {
     /**
      * @var Settings

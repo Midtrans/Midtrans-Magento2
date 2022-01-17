@@ -4,20 +4,20 @@ namespace Midtrans\Snap\Model\Ui;
 
 use Magento\Checkout\Model\ConfigProviderInterface;
 use Magento\Framework\App\ObjectManager;
-use Midtrans\Snap\Helper\Data;
+use Midtrans\Snap\Helper\MidtransDataConfiguration;
 
 class SpecificConfigProvider implements ConfigProviderInterface
 {
     const CODE = 'specific';
-    protected $data;
+    protected $midtransDataConfiguration;
 
     /**
      * SpecificConfigProvider constructor.
-     * @param $data
+     * @param $midtransDataConfiguration
      */
-    public function __construct(Data $data)
+    public function __construct(MidtransDataConfiguration $midtransDataConfiguration)
     {
-        $this->data = $data;
+        $this->midtransDataConfiguration = $midtransDataConfiguration;
     }
 
     /**
@@ -26,15 +26,15 @@ class SpecificConfigProvider implements ConfigProviderInterface
      */
     public function getConfig()
     {
-        $production = $this->data->isProduction();
-        $clientkey = $this->data->getClientKey(self::CODE);
-        $merchantid = $this->data->getMerchantId(self::CODE);
-        $enableredirect = $this->data->isRedirect();
-        $mixpanelkey = $this->data->getMixPanelKey();
+        $production = $this->midtransDataConfiguration->isProduction();
+        $clientkey = $this->midtransDataConfiguration->getClientKey(self::CODE);
+        $merchantid = $this->midtransDataConfiguration->getMerchantId(self::CODE);
+        $enableredirect = $this->midtransDataConfiguration->isRedirect();
+        $mixpanelkey = $this->midtransDataConfiguration->getMixPanelKey();
 
         $magentoversion = ObjectManager::getInstance()->get('Magento\Framework\App\ProductMetadataInterface')->getVersion();
 
-        $pluginversion = $this->data->getModuleVersion();
+        $pluginversion = $this->midtransDataConfiguration->getModuleVersion();
 
         return [
             'payment' => [

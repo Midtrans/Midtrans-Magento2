@@ -4,7 +4,7 @@ namespace Midtrans\Snap\Model;
 
 use Exception;
 use Magento\Sales\Model\Order;
-use Midtrans\Snap\Helper\Data;
+use Midtrans\Snap\Helper\MidtransDataConfiguration;
 use Midtrans\Snap\Helper\Utils;
 use Midtrans\Snap\Model\Order\OrderRepository;
 
@@ -16,7 +16,7 @@ class PaymentRequestRepository
     protected $paymentOrderRepository;
 
     /**
-     * @var Data
+     * @var MidtransDataConfiguration
      */
     protected $midtransDataConfig;
 
@@ -28,10 +28,10 @@ class PaymentRequestRepository
     /**
      * PaymentRequestRepository constructor.
      * @param OrderRepository $paymentOrderRepository
-     * @param Data $midtransDataConfig
+     * @param MidtransDataConfiguration $midtransDataConfig
      * @param Utils $utils
      */
-    public function __construct(OrderRepository $paymentOrderRepository, Data $midtransDataConfig, Utils $utils)
+    public function __construct(OrderRepository $paymentOrderRepository, MidtransDataConfiguration $midtransDataConfig, Utils $utils)
     {
         $this->paymentOrderRepository = $paymentOrderRepository;
         $this->midtransDataConfig = $midtransDataConfig;
