@@ -97,7 +97,7 @@ class PaymentRequestRepository
                 'id' => 'ITEM-ID ' . $newItem->getProductId() . $itemPrefix,
                 'price' => (string)round($newItem->getPrice()),
                 'quantity' => (string)round($newItem->getQtyOrdered()),
-                'name' => $this->utils->repString($this->utils->getName($newItem->getName()))
+                'name' => $this->utils->sanitizeItemName($newItem->getName())
             ];
             $item_details[] = $newItem;
         }

@@ -8,30 +8,20 @@ class Utils
 {
 
     /**
-     * Replace string for items name
-     *
-     * @param $str
-     * @return string|string[]|null
-     */
-    public function repString($str)
-    {
-        return preg_replace("/[^a-zA-Z0-9]+/", " ", $str);
-    }
-
-    /**
      * Sanitize for item name
      *
-     * @param $s
-     * @return false|string
+     * @param $itemName
+     * @return string
      */
-    public function getName($s)
+    public function sanitizeItemName($itemName)
     {
+        $cleanItemName = preg_replace("/[^a-zA-Z0-9]+/", " ", $itemName);
         $max_length = 20;
-        if (strlen($s) > $max_length) {
-            $offset = ($max_length - 3) - strlen($s);
-            $s = substr($s, 0, strrpos($s, ' ', $offset));
+        if (strlen($itemName) > $max_length) {
+            $offset = ($max_length - 3) - strlen($cleanItemName);
+            $cleanItemName = substr($cleanItemName, 0, strrpos($cleanItemName, ' ', $offset));
         }
-        return $s;
+        return $cleanItemName;
     }
 
     /**
