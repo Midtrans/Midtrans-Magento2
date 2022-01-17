@@ -335,9 +335,9 @@ abstract class Action implements ActionInterface
     /**
      * Get Midtrans status via API
      *
-     * @param $param | it can be Midtrans order-id/transaction-id or Magento Order object
-     * @param null $paymentCode
-     * @return mixed[]
+     * @param mixed $param it can be Midtrans order-id/transaction-id or Magento Order object
+     * @param null $paymentCode Magento payment method code
+     * @return mixed[] Midtrans API response
      * @throws \Exception
      */
     public function midtransGetStatus($param, $paymentCode = null)
