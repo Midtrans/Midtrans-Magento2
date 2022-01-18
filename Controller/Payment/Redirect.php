@@ -7,18 +7,20 @@ use Magento\Framework\Controller\ResultFactory;
 use Midtrans\Snap\Gateway\Config\Config;
 use Midtrans\Snap\Gateway\SnapApi;
 
-class Redirect extends AbstractAction
+class Redirect extends Action
 {
     public function execute()
     {
         try {
             $incrementId = $this->_checkoutSession->getLastRealOrder()->getIncrementId();
-            $paymentCode = $this->getPaymentCode($incrementId);
+            $paymentCode = $this->paymentOrderRepository->getPaymentCode($incrementId);
 
             $requestConfig = $this->getMidtransDataConfig()->getRequestConfig($paymentCode);
             $enableRedirect = $this->getMidtransDataConfig()->isRedirect();
 
-            $payloads = $this->getPayload($requestConfig, $paymentCode);
+            $order = $this->getOrderFromSession();
+
+            $payloads = $this->paymentRequestRepository->getPayload($requestConfig, $paymentCode, $order);
             $is3ds = $requestConfig['is3ds'];
             $isProduction = $this->getMidtransDataConfig()->isProduction();
 
@@ -48,6 +50,8 @@ class Redirect extends AbstractAction
                 $_info = 'Info - Redirect URL :' . print_r($data, true);
                 $this->_midtransLogger->midtransRequest($_info);
             }
+            $paymentOrderId = $payloads['transaction_details']['order_id'];
+            $this->setValue($paymentOrderId);
             $result = $this->resultFactory->create(ResultFactory::TYPE_JSON);
             $result->setData($data);
             return $result;

@@ -15,7 +15,7 @@
             </action>
         </referenceBlock>
         <referenceContainer name="content">
-            <block class="Midtrans\Snap\Block\Finish" name="snap_finish" template="Midtrans_Snap::finish.phtml"/>
+            <block class="Midtrans\Snap\Block\Finish" name="snap_finish" template="Midtrans_Snap::finish.phtml" cacheable="false"/>
         </referenceContainer>
     </body>
 </page>

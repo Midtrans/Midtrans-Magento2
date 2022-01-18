@@ -111,8 +111,8 @@ use Midtrans\Snap\Block\Payment\Multishipping;
                                     },
                                     onPending: function (result) {
                                         trackResult(window.config.token, merchant_id, 'Multishipping Snap', 'pending', result);
-                                        window.location.replace(url.build('snap/index/pending'));
-                                        console.log(url.build('snap/index/pending'))
+                                        window.location.replace(url.build('snap/index/finish'));
+                                        console.log(url.build('snap/index/finish'))
                                     },
                                     onError: function (result) {
                                         trackResult(window.config.token, merchant_id, 'Multishipping Snap', 'error', result);

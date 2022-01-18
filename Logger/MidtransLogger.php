@@ -16,7 +16,11 @@ class MidtransLogger extends Logger
     const REQUEST = 100;
     const ERROR = 400;
     const NOTIFICATION = 200;
-    protected Settings $settings;
+
+    /**
+     * @var Settings
+     */
+    protected $settings;
 
     /**
      * MidtransLogger constructor.
