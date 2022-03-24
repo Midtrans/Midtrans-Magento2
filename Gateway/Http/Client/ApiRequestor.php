@@ -98,23 +98,20 @@ class ApiRequestor
 
         $result = $curl->getBody();
 
-        if ($result === '') {
-            $curl->doError("Midtrans Error: Something went wrong when request with Magento CURL");
-        } else {
-            try {
-                $result_array = json_decode($result);
-            } catch (Exception $e) {
-                throw new Exception("API Request Error unable to json_decode API response: ".$result . ' | Request url: '.$url);
-            }
-            $httpCode = $curl->getStatus();
-            if (isset($result_array->status_code) && $result_array->status_code >= 401 && $result_array->status_code != 407) {
-                throw new Exception('Midtrans API is returning API error. HTTP status code: ' . $result_array->status_code . ' API response: ' . $result, $result_array->status_code);
-            } elseif ($httpCode >= 400) {
-                throw new Exception('Midtrans API is returning API error. HTTP status code: ' . $httpCode . ' API response: ' . $result, $httpCode);
-            } else {
-                return $result_array;
-            }
+        try {
+            $result_array = json_decode($result);
+        } catch (Exception $e) {
+            throw new Exception("API Request Error unable to json_decode API response: ".$result . ' | Request url: '.$url);
         }
+        $httpCode = $curl->getStatus();
+        if (isset($result_array->status_code) && $result_array->status_code >= 401 && $result_array->status_code != 407) {
+            throw new Exception('Midtrans API is returning API error. HTTP status code: ' . $result_array->status_code . ' API response: ' . $result, $result_array->status_code);
+        } elseif ($httpCode >= 400) {
+            throw new Exception('Midtrans API is returning API error. HTTP status code: ' . $httpCode . ' API response: ' . $result, $httpCode);
+        } else {
+            return $result_array;
+        }
+
     }
 
     private static function processStubed($curl, $url, $server_key, $data_hash, $post)
