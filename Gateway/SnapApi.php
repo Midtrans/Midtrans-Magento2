@@ -2,8 +2,9 @@
 
 namespace Midtrans\Snap\Gateway;
 
+use Exception;
 use Midtrans\Snap\Gateway\Config\Config;
-use Midtrans\Snap\Gateway\Http\Client\SnapApiRequestor;
+use Midtrans\Snap\Gateway\Http\Client\ApiRequestor;
 use Midtrans\Snap\Gateway\Utility\Sanitizer;
 
 /**
@@ -31,7 +32,7 @@ class SnapApi
      *
      * @param  array $params Payment options
      * @return string Snap token.
-     * @throws Exception|\Exception curl error or midtrans error
+     * @throws Exception curl error or midtrans error
      */
     public static function getSnapToken($params)
     {
@@ -55,7 +56,7 @@ class SnapApi
      *
      * @param  array $params Payment options
      * @return object Snap response (token and redirect_url).
-     * @throws Exception|\Exception curl error or midtrans error
+     * @throws Exception curl error or midtrans error
      */
     public static function createTransaction($params)
     {
@@ -77,17 +78,9 @@ class SnapApi
             Sanitizer::jsonRequest($params);
         }
 
-        if (Config::$appendNotifUrl) {
-            Config::$curlOptions[CURLOPT_HTTPHEADER][] = 'X-Append-Notification: ' . Config::$appendNotifUrl;
-        }
-
-        if (Config::$overrideNotifUrl) {
-            Config::$curlOptions[CURLOPT_HTTPHEADER][] = 'X-Override-Notification: ' . Config::$overrideNotifUrl;
-        }
-
         $params = array_replace_recursive($payloads, $params);
 
-        return SnapApiRequestor::post(
+        return ApiRequestor::post(
             Config::getSnapBaseUrl() . '/transactions',
             Config::$serverKey,
             $params
