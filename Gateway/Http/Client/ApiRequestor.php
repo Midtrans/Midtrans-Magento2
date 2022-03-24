@@ -2,6 +2,8 @@
 
 namespace Midtrans\Snap\Gateway\Http\Client;
 
+use Exception;
+use Magento\Framework\HTTP\Client\Curl;
 use Midtrans\Snap\Gateway\Config\Config;
 
 /**
@@ -19,11 +21,11 @@ class ApiRequestor
      * @param string $server_key
      * @param mixed[] $data_hash
      * @return mixed
-     * @throws \Exception
+     * @throws Exception
      */
     public static function get($url, $server_key, $data_hash)
     {
-        return self::remoteCall($url, $server_key, $data_hash, false);
+        return self::remoteCall($url, $server_key, $data_hash, "GET");
     }
 
     /**
@@ -33,11 +35,11 @@ class ApiRequestor
      * @param string $server_key
      * @param mixed[] $data_hash
      * @return mixed
-     * @throws \Exception
+     * @throws Exception
      */
     public static function post($url, $server_key, $data_hash)
     {
-        return self::remoteCall($url, $server_key, $data_hash, true);
+        return self::remoteCall($url, $server_key, $data_hash, "POST");
     }
 
     /**
@@ -46,78 +48,69 @@ class ApiRequestor
      * @param string $url
      * @param string $server_key
      * @param mixed[] $data_hash
-     * @param bool $post
+     * @param $method
      * @return mixed
-     * @throws \Exception
+     * @throws Exception
      */
-    public static function remoteCall($url, $server_key, $data_hash, $post = true)
+    public static function remoteCall($url, $server_key, $data_hash, $method)
     {
-        $ch = curl_init();
-
-        $curl_options = [
-            CURLOPT_URL => $url,
-            CURLOPT_HTTPHEADER => [
-                'Content-Type: application/json',
-                'Accept: application/json',
-                'user-agent : Magento 2 Module',
-                'x-plugin-name : midtrans-magento-2.5.3',
-                'Authorization: Basic ' . base64_encode($server_key . ':')
-            ],
-            CURLOPT_RETURNTRANSFER => 1
-        ];
-
-        // merging with Config::$curlOptions
-        if (count(Config::$curlOptions)) {
-            // We need to combine headers manually, because it's array and it will no be merged
-            if (Config::$curlOptions[CURLOPT_HTTPHEADER]) {
-                $mergedHeders = array_merge($curl_options[CURLOPT_HTTPHEADER], Config::$curlOptions[CURLOPT_HTTPHEADER]);
-                $headerOptions = [ CURLOPT_HTTPHEADER => $mergedHeders ];
-            } else {
-                $mergedHeders = [];
-            }
-
-            $curl_options = array_replace_recursive($curl_options, Config::$curlOptions, $headerOptions);
-        }
-
-        if ($post) {
-            $curl_options[CURLOPT_POST] = 1;
-
-            if ($data_hash) {
-                $body = json_encode($data_hash);
-                $curl_options[CURLOPT_POSTFIELDS] = $body;
-            } else {
-                $curl_options[CURLOPT_POSTFIELDS] = '';
-            }
-        }
-
-        curl_setopt_array($ch, $curl_options);
-
-        // For testing purpose
-        if (class_exists('\Midtrans\VT_Tests') && VT_Tests::$stubHttp) {
-            $result = self::processStubed($curl_options, $url, $server_key, $data_hash, $post);
+        $curl = new Curl();
+        if (!$server_key) {
+            throw new Exception(
+                'The ServerKey/ClientKey is null, You need to set the server-key from Config. Please double-check Config and ServerKey key. ' .
+                'You can check from the Midtrans Dashboard. ' .
+                'See https://docs.midtrans.com/en/midtrans-account/overview?id=retrieving-api-access-keys ' .
+                'for the details.'
+            );
         } else {
-            $result = curl_exec($ch);
-            // curl_close($ch);
+            if ($server_key == "") {
+                throw new Exception(
+                    'The ServerKey/ClientKey is invalid, as it is an empty string. Please double-check your ServerKey key. ' .
+                    'You can check from the Midtrans Dashboard. ' .
+                    'See https://docs.midtrans.com/en/midtrans-account/overview?id=retrieving-api-access-keys ' .
+                    'for the details.'
+                );
+            }
         }
 
-        if ($result === false) {
-            throw new \Exception('CURL Error: ' . curl_error($ch), curl_errno($ch));
+        $headers = array(
+            "Content-Type" => "application/json",
+            "Accept" => "application/json",
+            "User-Agent" => "Magento 2 Module",
+            "X-Plugin-Name" => "midtrans-magento2-v2.6.5"
+        );
+        $curl->setOption(CURLOPT_RETURNTRANSFER, true);
+
+        // Set append notification to header
+        if (Config::$appendNotifUrl) $headers['X-Append-Notification'] = Config::$appendNotifUrl;
+        // Set override notification to header
+        if (Config::$overrideNotifUrl) $headers['X-Override-Notification'] = Config::$overrideNotifUrl;
+
+        $curl->setHeaders($headers);
+        $curl->setCredentials($server_key, "");
+
+        if ($method === "POST") {
+            $body = json_encode($data_hash);
+            $curl->post($url, $body);
+        } elseif ($method === "GET") {
+            $curl->get($url);
+        }
+
+        $result = $curl->getBody();
+
+        if ($result === '') {
+            $curl->doError("Midtrans Error: Something went wrong when request with Magento CURL");
         } else {
             try {
                 $result_array = json_decode($result);
-            } catch (\Exception $e) {
-                throw new \Exception("API Request Error unable to json_decode API response: " . $result . ' | Request url: ' . $url);
+            } catch (Exception $e) {
+                throw new Exception("API Request Error unable to json_decode API response: ".$result . ' | Request url: '.$url);
             }
-            if (!in_array($result_array->status_code, [200, 201, 202, 407])) {
-                $message = 'Midtrans Error (' . $result_array->status_code . '): '
-                . $result_array->status_message;
-                if (isset($result_array->validation_messages)) {
-                    $message .= '. Validation Messages (' . implode(", ", $result_array->validation_messages) . ')';
-                }
-                if (isset($result_array->error_messages)) {
-                    $message .= '. Error Messages (' . implode(", ", $result_array->error_messages) . ')';
-                }
-                throw new \Exception($message, $result_array->status_code);
+            $httpCode = $curl->getStatus();
+            if (isset($result_array->status_code) && $result_array->status_code >= 401 && $result_array->status_code != 407) {
+                throw new Exception('Midtrans API is returning API error. HTTP status code: ' . $result_array->status_code . ' API response: ' . $result, $result_array->status_code);
+            } elseif ($httpCode >= 400) {
+                throw new Exception('Midtrans API is returning API error. HTTP status code: ' . $httpCode . ' API response: ' . $result, $httpCode);
             } else {
                 return $result_array;
             }
@@ -127,13 +120,14 @@ class ApiRequestor
     private static function processStubed($curl, $url, $server_key, $data_hash, $post)
     {
         VT_Tests::$lastHttpRequest = [
-            "url" => $url,
-            "server_key" => $server_key,
-            "data_hash" => $data_hash,
-            "post" => $post,
-            "curl" => $curl
+             "url" => $url,
+             "server_key" => $server_key,
+             "data_hash" => $data_hash,
+             "post" => $post,
+             "curl" => $curl
         ];
 
         return VT_Tests::$stubHttpResponse;
     }
+
 }
