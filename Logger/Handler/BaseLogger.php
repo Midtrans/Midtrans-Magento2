@@ -6,7 +6,7 @@ use Magento\Framework\Logger\Handler\Base;
 
 class BaseLogger extends Base
 {
-    public function isHandling(array $record)
+    public function isHandling(array $record) : bool
     {
         return $record['level'] == $this->level;
     }
