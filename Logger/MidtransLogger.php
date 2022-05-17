@@ -92,7 +92,7 @@ class MidtransLogger extends Logger
      * @param array $context
      * @return bool
      */
-    public function addRecord($level, $message, array $context = []) : bool
+    public function addRecord($level, $message, array $context = [])
     {
         $context['is_exception'] = $message instanceof Exception;
         return parent::addRecord($level, $message, $context);
