@@ -17,7 +17,7 @@ use Magento\Sales\Model\Order;
 use Magento\Store\Model\StoreManagerInterface;
 use Midtrans\Snap\Gateway\Config\Config;
 use Midtrans\Snap\Gateway\Transaction;
-use Midtrans\Snap\Helper\Data;
+use Midtrans\Snap\Helper\MidtransDataConfiguration;
 use Midtrans\Snap\Logger\MidtransLogger;
 
 /**
@@ -58,7 +58,7 @@ class AbstractPayment extends Adapter
     public $infoBlockType;
 
     /**
-     * @var Data
+     * @var MidtransDataConfiguration
      */
     protected $dataConfig;
 
@@ -82,7 +82,7 @@ class AbstractPayment extends Adapter
      * @param ManagerInterface $eventManager
      * @param ValueHandlerPoolInterface $valueHandlerPool
      * @param PaymentDataObjectFactory $paymentDataObjectFactory
-     * @param Data $dataConfig
+     * @param MidtransDataConfiguration $dataConfig
      * @param UrlInterface $urlInterface
      * @param StoreManagerInterface $storeManager
      * @param MidtransLogger $midtransLogger
@@ -97,7 +97,7 @@ class AbstractPayment extends Adapter
         ManagerInterface $eventManager,
         ValueHandlerPoolInterface $valueHandlerPool,
         PaymentDataObjectFactory $paymentDataObjectFactory,
-        Data $dataConfig,
+        MidtransDataConfiguration $dataConfig,
         UrlInterface $urlInterface,
         StoreManagerInterface $storeManager,
         MidtransLogger $midtransLogger,
@@ -192,4 +192,10 @@ class AbstractPayment extends Adapter
             throw new LocalizedException(__("Oops, Refund request failed. Due to no response received. Please try again later."));
         }
     }
+
+    public function getCode()
+    {
+        return parent::getCode();
+    }
+
 }

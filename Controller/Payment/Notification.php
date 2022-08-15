@@ -8,7 +8,7 @@ use Magento\Sales\Model\Order;
  * Class Notification
  * Handle notifications from midtrans http notifications
  */
-class Notification extends AbstractAction
+class Notification extends Action
 {
     /**
      * Main function
@@ -20,7 +20,7 @@ class Notification extends AbstractAction
     {
         // 1. Get body from request
         $input_source = $this->getRequest()->getContent();
-        $rawBody = $this->data->json->unserialize($input_source);
+        $rawBody = $this->midtransDataConfiguration->json->unserialize($input_source);
         $orderIdRequest = $rawBody['order_id'];
 
         $order = null;
@@ -28,14 +28,14 @@ class Notification extends AbstractAction
         if (strpos($orderIdRequest, 'multishipping-') !== false) {
             // 2. Process notification multishipping
             $quoteId = str_replace('multishipping-', '', $orderIdRequest);
-            $incrementIds = $this->getIncrementIdsByQuoteId($quoteId);
+            $incrementIds = $this->paymentOrderRepository->getIncrementIdsByQuoteId($quoteId);
 
             $this->getResponse()->setBody('ok');
             foreach ($incrementIds as $key => $id) {
-                $order  = $this->getOrderByIncrementId($id);
+                $order  = $this->paymentOrderRepository->getOrderByIncrementId($id);
                 $paymentCode = $order->getPayment()->getMethod();
 
-                if ($this->canProcess($order)) {
+                if ($this->paymentOrderRepository->canProcess($order)) {
                     $midtransStatusResult = $this->midtransGetStatus($orderIdRequest, $paymentCode);
                     $this->processOrder($order, $midtransStatusResult, $rawBody);
                 } else {
@@ -47,7 +47,7 @@ class Notification extends AbstractAction
             // 3. Process notification regular order
             $this->getResponse()->setBody('OK');
             $order = $this->_order->loadByIncrementId($orderIdRequest);
-            if ($this->canProcess($order)) {
+            if ($this->paymentOrderRepository->canProcess($order)) {
                 $midtransStatusResult = $this->midtransGetStatus($order);
                 $this->processOrder($order, $midtransStatusResult, $rawBody);
             } else {
@@ -81,42 +81,42 @@ class Notification extends AbstractAction
 
         $note_prefix = "MIDTRANS NOTIFICATION  |  ";
         if ($transaction == 'capture') {
-            $this->setPaymentInformation($order, $trxId, $payment_type);
+            $this->paymentOrderRepository->setPaymentInformation($order, $trxId, $payment_type);
             if ($fraud == 'challenge') {
                 $order_note = $note_prefix . 'Payment status challenged. Please take action on your Merchant Administration Portal - ' . $payment_type;
-                $this->setOrderStateAndStatus($order, Order::STATE_PAYMENT_REVIEW, $order_note);
+                $this->paymentOrderRepository->setOrderStateAndStatus($order, Order::STATE_PAYMENT_REVIEW, $order_note);
             } elseif ($fraud == 'accept') {
                 $order_note = $note_prefix . 'Payment Completed - ' . $payment_type;
                 if ($order->canInvoice()) {
-                    $this->generateInvoice($order);
+                    $this->paymentOrderRepository->generateInvoice($order);
                 }
-                $this->setOrderStateAndStatus($order, Order::STATE_PROCESSING, $order_note);
+                $this->paymentOrderRepository->setOrderStateAndStatus($order, Order::STATE_PROCESSING, $order_note);
             }
         } elseif ($transaction == 'settlement') {
-            $this->setPaymentInformation($order, $trxId, $payment_type);
+            $this->paymentOrderRepository->setPaymentInformation($order, $trxId, $payment_type);
             if ($payment_type != 'credit_card') {
                 $order_note = $note_prefix . 'Payment Completed - ' . $payment_type;
                 if ($order->canInvoice()) {
-                    $this->generateInvoice($order);
+                    $this->paymentOrderRepository->generateInvoice($order);
                 }
-                $this->setOrderStateAndStatus($order, Order::STATE_PROCESSING, $order_note);
+                $this->paymentOrderRepository->setOrderStateAndStatus($order, Order::STATE_PROCESSING, $order_note);
             }
         } elseif ($transaction == 'pending') {
-            $this->setPaymentInformation($order, $trxId, $payment_type);
+            $this->paymentOrderRepository->setPaymentInformation($order, $trxId, $payment_type);
             $order_note = $note_prefix . 'Awaiting Payment - ' . $payment_type;
-            $this->setOrderStateAndStatus($order, Order::STATE_PENDING_PAYMENT, $order_note);
+            $this->paymentOrderRepository->setOrderStateAndStatus($order, Order::STATE_PENDING_PAYMENT, $order_note);
         } elseif ($transaction == 'cancel') {
             $order_note = $note_prefix . 'Canceled Payment - ' . $payment_type;
-            $this->cancelOrder($order, Order::STATE_CANCELED, $order_note);
+            $this->paymentOrderRepository->cancelOrder($order, Order::STATE_CANCELED, $order_note);
         } elseif ($transaction == 'expire') {
             if ($order->canCancel()) {
                 $order_note = $note_prefix . 'Expired Payment - ' . $payment_type;
-                $this->cancelOrder($order, Order::STATE_CANCELED, $order_note);
+                $this->paymentOrderRepository->cancelOrder($order, Order::STATE_CANCELED, $order_note);
             }
         } elseif ($transaction == 'deny') {
-            $this->setPaymentInformation($order, $trxId, $payment_type);
+            $this->paymentOrderRepository->setPaymentInformation($order, $trxId, $payment_type);
             $order_note = $note_prefix . 'Payment Deny - ' . $payment_type;
-            $this->setOrderStateAndStatus($order, Order::STATE_PAYMENT_REVIEW, $order_note);
+            $this->paymentOrderRepository->setOrderStateAndStatus($order, Order::STATE_PAYMENT_REVIEW, $order_note);
         } elseif ($transaction == 'refund' || $transaction == 'partial_refund') {
 
             /**
@@ -138,7 +138,7 @@ class Notification extends AbstractAction
                  */
                 $midtransOrderId = $this->getOrderIdFromReason($refund_reason);
                 if ($midtransOrderId !== null) {
-                    $orderRefund = $this->getOrderByIncrementId($midtransOrderId);
+                    $orderRefund = $this->paymentOrderRepository->getOrderByIncrementId($midtransOrderId);
                     $this->processRefund($orderRefund, $refunds, true, $grossAmount);
                 } else {
                     /**
@@ -148,14 +148,14 @@ class Notification extends AbstractAction
 
                     /** Check order-id is not contain multishipping */
                     if (strpos($midtransOrderId, 'multishipping-') !== true) {
-                        $order = $this->getOrderByIncrementId($midtransOrderId);
+                        $order = $this->paymentOrderRepository->getOrderByIncrementId($midtransOrderId);
                         $this->processRefund($order, $refunds, false, $grossAmount);
                     }
                 }
             }
         }
 
-        $this->saveOrder($order);
+        $this->paymentOrderRepository->saveOrder($order);
 
         /**
          * If log request isEnabled, add request payload to var/log/midtrans/request.log
@@ -184,7 +184,7 @@ class Notification extends AbstractAction
 
         /** Handling full refund */
         if ($isFullRefund && $orderRefund->getStatus() != Order::STATE_CLOSED && $orderRefund->getState() != Order::STATE_CLOSED) {
-            $this->cancelOrder($orderRefund, Order::STATE_CLOSED, $refund_note);
+            $this->paymentOrderRepository->cancelOrder($orderRefund, Order::STATE_CLOSED, $refund_note);
         }
         /** Handling partial refund */
         elseif ($orderRefund->getStatus() != Order::STATE_CLOSED && $orderRefund->getState() != Order::STATE_CLOSED) {
@@ -192,10 +192,10 @@ class Notification extends AbstractAction
             if (!$this->isOrderCommentExist($orderRefund, $refund_note)) {
                 if ($isFullRefund) {
                     /** Close order if total amount refund array is equal with grand total order / gross amount */
-                    $this->cancelOrder($orderRefund, Order::STATE_CLOSED, $refund_note);
+                    $this->paymentOrderRepository->cancelOrder($orderRefund, Order::STATE_CLOSED, $refund_note);
                 } else {
                     /** Put status history if total amount refund array is not equal with grand total order / gross amount */
-                    $this->setOrderStateAndStatus($orderRefund, Order::STATE_PROCESSING, $refund_note);
+                    $this->paymentOrderRepository->setOrderStateAndStatus($orderRefund, Order::STATE_PROCESSING, $refund_note);
                 }
             }
         }

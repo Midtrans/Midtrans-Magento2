@@ -3,27 +3,24 @@
 namespace Midtrans\Snap\Controller\Index;
 
 use Magento\Checkout\Model\Session\SuccessValidator;
-use Magento\Framework\App\Action\Action;
-use Magento\Framework\App\Action\Context;
-use Magento\Framework\View\Result\PageFactory;
+use Midtrans\Snap\Controller\Payment\Action;
 
+/**
+ * Class Pending controller is to handle information when the payment order is still pending
+ * @deprecated since version 2.5.5 Pending class no longer used, the pending page merged on finish page. Will be deleted
+ * on the next major release
+ * @see \Midtrans\Snap\Controller\Index\Finish
+ *
+ */
 class Pending extends Action
 {
-    protected $request;
-    protected $resultPageFactory;
-
-    public function __construct(Context $context, PageFactory $pageFactory)
-    {
-        $this->resultPageFactory = $pageFactory;
-
-        parent::__construct($context);
-    }
-
     public function execute()
     {
-        if (!$this->_objectManager->get(SuccessValidator::class)->isValid()) {
+        $param = $this->getValue();
+
+        if (!$this->objectManager->get(SuccessValidator::class)->isValid()) {
             return $this->resultRedirectFactory->create()->setPath('checkout/cart');
         }
-        return $this->resultPageFactory->create();
+        return $this->_pageFactory->create();
     }
 }

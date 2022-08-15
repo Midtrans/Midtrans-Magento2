@@ -7,7 +7,7 @@ use Magento\Customer\Model\Context;
 use Midtrans\Snap\Gateway\Config\Config;
 use Midtrans\Snap\Gateway\SnapApi;
 
-class Multishipping extends AbstractAction
+class Multishipping extends Action
 {
     public function execute()
     {
@@ -21,7 +21,7 @@ class Multishipping extends AbstractAction
                     // 2. Get quote-id from checkout session
                     $quoteId = $checkoutSession['last_quote_id'];
 
-                    $paymentCode = $this->getPaymentCodeByQuoteId($quoteId);
+                    $paymentCode = $this->paymentOrderRepository->getPaymentCodeByQuoteId($quoteId);
 
                     $requestConfig = $this->getMidtransDataConfig()->getRequestConfig($paymentCode);
                     $isRedirect = $this->getMidtransDataConfig()->isRedirect();
@@ -35,7 +35,7 @@ class Multishipping extends AbstractAction
                     Config::$isSanitized = true;
                     Config::$is3ds = $is3ds;
 
-                    $payloads = $this->getPayload($requestConfig, $paymentCode, $multishipping);
+                    $payloads = $this->paymentRequestRepository->getPayload($requestConfig, $paymentCode, null, $multishipping);
 
                     /*Override notification, if override notification from admin setting is active (default is active) */
                     if ($this->getMidtransDataConfig()->isOverrideNotification() && $this->getMidtransDataConfig()->getNotificationEndpoint() != null) {
@@ -44,6 +44,9 @@ class Multishipping extends AbstractAction
 
                     $_info = 'Info - Payloads: ' . print_r($payloads, true);
                     $this->_midtransLogger->midtransRequest($_info);
+
+                    $paymentOrderId = $payloads['transaction_details']['order_id'];
+                    $this->setValue($paymentOrderId);
 
                     $snapApi = new SnapApi();
                     $data = null;

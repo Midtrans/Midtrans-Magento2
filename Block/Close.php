@@ -8,6 +8,9 @@ use Magento\Framework\View\Element\Template\Context;
 
 class Close extends Template
 {
+    /**
+     * @var Registry
+     */
     protected $registry;
 
     /**

@@ -19,11 +19,14 @@ use Magento\Sales\Model\Service\CreditmemoService;
 use Magento\Sales\Model\Service\InvoiceService;
 use Midtrans\Snap\Gateway\Config\Config;
 use Midtrans\Snap\Gateway\Transaction as MidtransTransaction;
-use Midtrans\Snap\Helper\Data;
+use Midtrans\Snap\Helper\MidtransDataConfiguration;
 use Midtrans\Snap\Logger\MidtransLogger;
 
 /**
  * Class AbstractAction to handle basic action order
+ * @deprecated since version 2.5.5 AbstractAction classes no longer used, will be deleted on the next major release
+ * @see \Midtrans\Snap\Controller\Payment\Action
+ *
  */
 abstract class AbstractAction extends Action
 {
@@ -32,7 +35,7 @@ abstract class AbstractAction extends Action
      */
     protected $_coreSession;
     /**
-     * @var Data
+     * @var MidtransDataConfiguration
      */
     protected $data;
     /**
@@ -101,7 +104,7 @@ abstract class AbstractAction extends Action
      * @param Session $checkoutSession
      * @param Order $order
      * @param Session\SuccessValidator $successValidator
-     * @param Data $data
+     * @param MidtransDataConfiguration $data
      * @param InvoiceService $invoiceService
      * @param Transaction $transaction
      * @param ResourceModel $resourceModel
@@ -122,7 +125,7 @@ abstract class AbstractAction extends Action
         Session $checkoutSession,
         Order $order,
         Session\SuccessValidator $successValidator,
-        Data $data,
+        MidtransDataConfiguration $data,
         InvoiceService $invoiceService,
         Transaction $transaction,
         ResourceModel $resourceModel,
@@ -193,7 +196,7 @@ abstract class AbstractAction extends Action
     /**
      * Get Midtrans data config
      *
-     * @return Data
+     * @return MidtransDataConfiguration
      */
     public function getMidtransDataConfig()
     {

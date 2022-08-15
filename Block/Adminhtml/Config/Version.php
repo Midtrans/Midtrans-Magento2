@@ -5,22 +5,25 @@ namespace Midtrans\Snap\Block\Adminhtml\Config;
 use Magento\Backend\Block\Template\Context;
 use Magento\Config\Block\System\Config\Form\Field;
 use Magento\Framework\Data\Form\Element\AbstractElement;
-use Midtrans\Snap\Helper\Data;
+use Midtrans\Snap\Helper\MidtransDataConfiguration;
 
 class Version extends Field
 {
-    protected $_midtransHelper;
+    /**
+     * @var MidtransDataConfiguration
+     */
+    protected $midtransDataConfiguration;
 
     /**
      * Version constructor.
      * @param Context $context
      * @param array $data
-     * @param Data $midtransHelper
+     * @param MidtransDataConfiguration $midtransDataConfiguration
      */
-    public function __construct(Data $midtransHelper, Context $context, array $data = [])
+    public function __construct(MidtransDataConfiguration $midtransDataConfiguration, Context $context, array $data = [])
     {
         parent::__construct($context, $data);
-        $this->_midtransHelper = $midtransHelper;
+        $this->midtransDataConfiguration = $midtransDataConfiguration;
     }
 
     /**
@@ -32,7 +35,7 @@ class Version extends Field
      */
     protected function _getElementHtml(AbstractElement $element)
     {
-        $moduleVersion = $this->_midtransHelper->getModuleVersion();
+        $moduleVersion = $this->midtransDataConfiguration->getModuleVersion();
         $response = $this->getModuleLatestVersion();
 
         $latestModuleVersion = isset($response['tag_name']) ? $response['tag_name'] : 'Not Found!';
