@@ -83,18 +83,4 @@ class MidtransLogger extends Logger
             return null;
         }
     }
-
-    /**
-     * Global function to record log
-     *
-     * @param $level
-     * @param $message
-     * @param array $context
-     * @return bool
-     */
-    public function addRecord($level, $message, array $context = [])
-    {
-        $context['is_exception'] = $message instanceof Exception;
-        return parent::addRecord($level, $message, $context);
-    }
 }
