@@ -179,7 +179,7 @@ class OrderRepository
         try {
             $this->magentoOrderRepository->save($order);
         } catch (Exception $e) {
-            $error_exception = "AbstractAction.class SaveOrder : " . $e;
+            $error_exception = "OrderRepository.class SaveOrder : " . $e;
             $this->midtransLogger->midtransError($error_exception);
         }
     }
