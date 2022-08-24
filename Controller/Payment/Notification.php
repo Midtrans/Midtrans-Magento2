@@ -87,19 +87,19 @@ class Notification extends Action
                 $this->paymentOrderRepository->setOrderStateAndStatus($order, Order::STATE_PAYMENT_REVIEW, $order_note);
             } elseif ($fraud == 'accept') {
                 $order_note = $note_prefix . 'Payment Completed - ' . $payment_type;
+                $this->paymentOrderRepository->setOrderStateAndStatus($order, Order::STATE_PROCESSING, $order_note);
                 if ($order->canInvoice()) {
                     $this->paymentOrderRepository->generateInvoice($order);
                 }
-                $this->paymentOrderRepository->setOrderStateAndStatus($order, Order::STATE_PROCESSING, $order_note);
             }
         } elseif ($transaction == 'settlement') {
             $this->paymentOrderRepository->setPaymentInformation($order, $trxId, $payment_type);
             if ($payment_type != 'credit_card') {
                 $order_note = $note_prefix . 'Payment Completed - ' . $payment_type;
+                $this->paymentOrderRepository->setOrderStateAndStatus($order, Order::STATE_PROCESSING, $order_note);
                 if ($order->canInvoice()) {
                     $this->paymentOrderRepository->generateInvoice($order);
                 }
-                $this->paymentOrderRepository->setOrderStateAndStatus($order, Order::STATE_PROCESSING, $order_note);
             }
         } elseif ($transaction == 'pending') {
             $this->paymentOrderRepository->setPaymentInformation($order, $trxId, $payment_type);
