@@ -156,21 +156,16 @@ class AbstractPayment extends Adapter
 
         if (strpos($midtransOrderId, 'multishipping-') !== false) {
             $refundKey = $midtransOrderId . '-' . time();
-            $reasonRefund = "Refund " . (double)$amount . ", " . $refundKey . ", from Magento dashboard order :::" . $orderId;
-            $refundParams = [
-                'refund_key' => $refundKey,
-                'amount' => $amount,
-                'reason' => $reasonRefund
-            ];
         } else {
             $refundKey = 'regular-' . $midtransOrderId . '-' . time();
-            $reasonRefund = "Refund " . (double)$amount . ", " . $refundKey . ", from Magento dashboard order :::" . $orderId;
-            $refundParams = [
-                'refund_key' => $refundKey,
-                'amount' => $amount,
-                'reason' => $reasonRefund
-            ];
         }
+
+        $reasonRefund = "Refund " . (double)$amount . ", " . $refundKey . ", from Magento dashboard order :::" . $orderId;
+        $refundParams = [
+            'refund_key' => $refundKey,
+            'amount' => $amount,
+            'reason' => $reasonRefund
+        ];
 
         /*
          * Request refund to midtrans
