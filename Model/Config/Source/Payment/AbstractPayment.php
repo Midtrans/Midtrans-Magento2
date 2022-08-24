@@ -177,6 +177,11 @@ class AbstractPayment extends Adapter
                 if ($response->status_code == 200) {
                     $order->addStatusToHistory(Order::STATE_PROCESSING, $reasonRefund, false);
                     $order->save();
+
+                    $payment->setTransactionId($response->refund_key);
+                    $payment->setParentTransactionId($response->transaction_id);
+                    $payment->setIsTransactionClosed(1);
+                    $payment->setShouldCloseParentTransaction(!$this->canRefund());
                 } else {
                     $this->midtransLogger->midtransRequest('RefundRequest: ' . print_r($response, true));
                     $message = isset($response->status_message) ? $response->status_message : "Something went wrong..";
