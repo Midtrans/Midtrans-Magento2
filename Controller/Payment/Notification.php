@@ -82,8 +82,7 @@ class Notification extends Action
         $order_note = $note_prefix . 'Payment Completed - ' . $payment_type;
         $payment = $order->getPayment();
         if ($transaction == 'capture') {
-            $payment = $order->getPayment();
-            $payment->setTransactionId(trxId);
+            $payment->setTransactionId($trxId);
             $payment->setIsTransactionClosed(false);
             $this->paymentOrderRepository->setPaymentInformation($order, $trxId, $payment_type);
             if ($fraud == 'challenge') {
