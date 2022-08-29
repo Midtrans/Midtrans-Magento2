@@ -72,7 +72,6 @@ class Notification extends Action
     public function processOrder(Order $order, $midtransStatusResult, $rawBody)
     {
         $midtransOrderId = $midtransStatusResult->order_id;
-
         $grossAmount = $midtransStatusResult->gross_amount;
         $transaction = $midtransStatusResult->transaction_status;
         $fraud = $midtransStatusResult->fraud_status;
@@ -80,6 +79,7 @@ class Notification extends Action
         $trxId = $midtransStatusResult->transaction_id;
 
         $note_prefix = "MIDTRANS NOTIFICATION  |  ";
+        $order_note = $note_prefix . 'Payment Completed - ' . $payment_type;
         $payment = $order->getPayment();
         if ($transaction == 'capture') {
             $payment = $order->getPayment();
@@ -87,11 +87,10 @@ class Notification extends Action
             $payment->setIsTransactionClosed(false);
             $this->paymentOrderRepository->setPaymentInformation($order, $trxId, $payment_type);
             if ($fraud == 'challenge') {
-                $order_note = $note_prefix . 'Payment status challenged. Please take action on your Merchant Administration Portal - ' . $payment_type;
+                $order_note = $note_prefix . 'Payment status challenged. Please take action on your Midtrans Dashboard - ' . $payment_type;
                 $payment->setIsFraudDetected(true);
                 $this->paymentOrderRepository->setOrderStateAndStatus($order, Order::STATE_PAYMENT_REVIEW, $order_note);
             } elseif ($fraud == 'accept') {
-                $order_note = $note_prefix . 'Payment Completed - ' . $payment_type;
                 $payment->setIsFraudDetected(false);
                 $payment->addTransaction(TransactionInterface::TYPE_CAPTURE, null, true);
                 $this->paymentOrderRepository->setOrderStateAndStatus($order, Order::STATE_PROCESSING, $order_note);
@@ -100,9 +99,8 @@ class Notification extends Action
                 }
             }
         } elseif ($transaction == 'settlement') {
-            $this->paymentOrderRepository->setPaymentInformation($order, $trxId, $payment_type);
             if ($payment_type != 'credit_card') {
-                $order_note = $note_prefix . 'Payment Completed - ' . $payment_type;
+                $this->paymentOrderRepository->setPaymentInformation($order, $trxId, $payment_type);
                 $payment->setIsFraudDetected(false);
                 $this->paymentOrderRepository->setOrderStateAndStatus($order, Order::STATE_PROCESSING, $order_note);
                 $payment->setTransactionId($trxId);
