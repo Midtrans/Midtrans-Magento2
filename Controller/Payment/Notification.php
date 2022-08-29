@@ -96,13 +96,13 @@ class Notification extends Action
                 $this->paymentOrderRepository->generateInvoice($order, $trxId);
             }
         } elseif ($transaction == 'settlement') {
+            $payment->setIsFraudDetected(false);
+            $payment->setTransactionId($trxId);
+            $payment->setIsTransactionClosed(true);
+            $payment->addTransaction(TransactionInterface::TYPE_CAPTURE, null, true);
             if ($payment_type != 'credit_card') {
                 $this->paymentOrderRepository->setPaymentInformation($order, $trxId, $payment_type);
-                $payment->setIsFraudDetected(false);
                 $this->paymentOrderRepository->setOrderStateAndStatus($order, Order::STATE_PROCESSING, $order_note);
-                $payment->setTransactionId($trxId);
-                $payment->setIsTransactionClosed(true);
-                $payment->addTransaction(TransactionInterface::TYPE_CAPTURE, null, true);
                 $this->paymentOrderRepository->generateInvoice($order, $trxId);
             }
         } elseif ($transaction == 'pending') {
