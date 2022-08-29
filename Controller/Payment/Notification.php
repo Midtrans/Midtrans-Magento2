@@ -31,7 +31,7 @@ class Notification extends Action
             $incrementIds = $this->paymentOrderRepository->getIncrementIdsByQuoteId($quoteId);
 
             $this->getResponse()->setBody('ok');
-            foreach ($incrementIds as $key => $id) {
+            foreach ($incrementIds as $id) {
                 $order  = $this->paymentOrderRepository->getOrderByIncrementId($id);
                 $paymentCode = $order->getPayment()->getMethod();
 
