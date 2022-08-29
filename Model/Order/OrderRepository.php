@@ -133,7 +133,7 @@ class OrderRepository
      */
     public function getOrderByIncrementId($realOrderId)
     {
-        return $this->order->loadByIncrementId($realOrderId);
+        return $this->magentoOrderRepository->get($realOrderId);
     }
 
     /**
