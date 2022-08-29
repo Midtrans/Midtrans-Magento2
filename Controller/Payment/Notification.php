@@ -94,9 +94,7 @@ class Notification extends Action
                 $payment->setIsFraudDetected(false);
                 $payment->addTransaction(TransactionInterface::TYPE_CAPTURE, null, true);
                 $this->paymentOrderRepository->setOrderStateAndStatus($order, Order::STATE_PROCESSING, $order_note);
-                if ($order->canInvoice()) {
-                    $this->paymentOrderRepository->generateInvoice($order);
-                }
+                $this->paymentOrderRepository->generateInvoice($order, $trxId);
             }
         } elseif ($transaction == 'settlement') {
             if ($payment_type != 'credit_card') {
@@ -106,9 +104,7 @@ class Notification extends Action
                 $payment->setTransactionId($trxId);
                 $payment->setIsTransactionClosed(true);
                 $payment->addTransaction(TransactionInterface::TYPE_CAPTURE, null, true);
-                if ($order->canInvoice()) {
-                    $this->paymentOrderRepository->generateInvoice($order);
-                }
+                $this->paymentOrderRepository->generateInvoice($order, $trxId);
             }
         } elseif ($transaction == 'pending') {
             $this->paymentOrderRepository->setPaymentInformation($order, $trxId, $payment_type);
