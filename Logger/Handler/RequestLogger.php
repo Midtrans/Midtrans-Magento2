@@ -3,11 +3,12 @@
 namespace Midtrans\Snap\Logger\Handler;
 
 use Midtrans\Snap\Logger\MidtransLogger;
+use Magento\Framework\Logger\Handler\Base;
 
 /**
  * Class RequestLogger for specify the file name, logger type and level
  */
-class RequestLogger extends BaseLogger
+class RequestLogger extends Base
 {
     /**
      * path of request log file

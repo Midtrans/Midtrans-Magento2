@@ -3,11 +3,13 @@
 namespace Midtrans\Snap\Logger\Handler;
 
 use Midtrans\Snap\Logger\MidtransLogger;
+use Magento\Framework\Logger\Handler\Base;
+
 
 /**
  * Class NotificationLogger for specify the file name, logger type and level
  */
-class NotificationLogger extends BaseLogger
+class NotificationLogger extends Base
 {
     /**
      * path of notification log file

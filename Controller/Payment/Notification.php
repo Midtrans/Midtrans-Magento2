@@ -2,6 +2,7 @@
 
 namespace Midtrans\Snap\Controller\Payment;
 
+use Magento\Sales\Api\Data\TransactionInterface;
 use Magento\Sales\Model\Order;
 
 /**
@@ -23,7 +24,6 @@ class Notification extends Action
         $rawBody = $this->midtransDataConfiguration->json->unserialize($input_source);
         $orderIdRequest = $rawBody['order_id'];
 
-        $order = null;
         // Check if order for multishipping
         if (strpos($orderIdRequest, 'multishipping-') !== false) {
             // 2. Process notification multishipping
@@ -31,7 +31,7 @@ class Notification extends Action
             $incrementIds = $this->paymentOrderRepository->getIncrementIdsByQuoteId($quoteId);
 
             $this->getResponse()->setBody('ok');
-            foreach ($incrementIds as $key => $id) {
+            foreach ($incrementIds as $id) {
                 $order  = $this->paymentOrderRepository->getOrderByIncrementId($id);
                 $paymentCode = $order->getPayment()->getMethod();
 
@@ -72,7 +72,6 @@ class Notification extends Action
     public function processOrder(Order $order, $midtransStatusResult, $rawBody)
     {
         $midtransOrderId = $midtransStatusResult->order_id;
-
         $grossAmount = $midtransStatusResult->gross_amount;
         $transaction = $midtransStatusResult->transaction_status;
         $fraud = $midtransStatusResult->fraud_status;
@@ -80,26 +79,31 @@ class Notification extends Action
         $trxId = $midtransStatusResult->transaction_id;
 
         $note_prefix = "MIDTRANS NOTIFICATION  |  ";
+        $order_note = $note_prefix . 'Payment Completed - ' . $payment_type;
+        $payment = $order->getPayment();
         if ($transaction == 'capture') {
+            $payment->setTransactionId($trxId);
+            $payment->setIsTransactionClosed(false);
             $this->paymentOrderRepository->setPaymentInformation($order, $trxId, $payment_type);
             if ($fraud == 'challenge') {
-                $order_note = $note_prefix . 'Payment status challenged. Please take action on your Merchant Administration Portal - ' . $payment_type;
+                $order_note = $note_prefix . 'Payment status challenged. Please take action on your Midtrans Dashboard - ' . $payment_type;
+                $payment->setIsFraudDetected(true);
                 $this->paymentOrderRepository->setOrderStateAndStatus($order, Order::STATE_PAYMENT_REVIEW, $order_note);
             } elseif ($fraud == 'accept') {
-                $order_note = $note_prefix . 'Payment Completed - ' . $payment_type;
-                if ($order->canInvoice()) {
-                    $this->paymentOrderRepository->generateInvoice($order);
-                }
+                $payment->setIsFraudDetected(false);
+                $payment->addTransaction(TransactionInterface::TYPE_CAPTURE, null, true);
                 $this->paymentOrderRepository->setOrderStateAndStatus($order, Order::STATE_PROCESSING, $order_note);
+                $this->paymentOrderRepository->generateInvoice($order, $trxId);
             }
         } elseif ($transaction == 'settlement') {
-            $this->paymentOrderRepository->setPaymentInformation($order, $trxId, $payment_type);
+            $payment->setIsFraudDetected(false);
+            $payment->setTransactionId($trxId);
+            $payment->setIsTransactionClosed(true);
+            $payment->addTransaction(TransactionInterface::TYPE_CAPTURE, null, true);
             if ($payment_type != 'credit_card') {
-                $order_note = $note_prefix . 'Payment Completed - ' . $payment_type;
-                if ($order->canInvoice()) {
-                    $this->paymentOrderRepository->generateInvoice($order);
-                }
+                $this->paymentOrderRepository->setPaymentInformation($order, $trxId, $payment_type);
                 $this->paymentOrderRepository->setOrderStateAndStatus($order, Order::STATE_PROCESSING, $order_note);
+                $this->paymentOrderRepository->generateInvoice($order, $trxId);
             }
         } elseif ($transaction == 'pending') {
             $this->paymentOrderRepository->setPaymentInformation($order, $trxId, $payment_type);
@@ -107,6 +111,14 @@ class Notification extends Action
             $this->paymentOrderRepository->setOrderStateAndStatus($order, Order::STATE_PENDING_PAYMENT, $order_note);
         } elseif ($transaction == 'cancel') {
             $order_note = $note_prefix . 'Canceled Payment - ' . $payment_type;
+            // add to transaction menu record list if cancel req for status capture only
+            if ($order->hasInvoices()) {
+                $payment = $order->getPayment();
+                $payment->setParentTransactionId($trxId);
+                $payment->setIsTransactionClosed(true);
+                $payment->setTransactionId($trxId . '-' . strtoupper($transaction));
+                $payment->addTransaction(TransactionInterface::TYPE_VOID, null, true);
+            }
             $this->paymentOrderRepository->cancelOrder($order, Order::STATE_CANCELED, $order_note);
         } elseif ($transaction == 'expire') {
             if ($order->canCancel()) {

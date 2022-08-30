@@ -3,11 +3,13 @@
 namespace Midtrans\Snap\Logger\Handler;
 
 use Midtrans\Snap\Logger\MidtransLogger;
+use Magento\Framework\Logger\Handler\Base;
+
 
 /**
  * Class ErrorLogger for specify the file name, logger type and level
  */
-class ErrorLogger extends BaseLogger
+class ErrorLogger extends Base
 {
     /**
      * path of Error log file

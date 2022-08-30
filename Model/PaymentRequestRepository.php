@@ -207,13 +207,12 @@ class PaymentRequestRepository
             $midtransOrderId = "multishipping-" . $quoteId;
 
             $item_details = [];
-            foreach ($incrementIds as $key => $orderId) {
+            foreach ($incrementIds as $orderId) {
                 $order  = $this->paymentOrderRepository->getOrderByIncrementId($orderId);
                 $payment = $order->getPayment();
                 $payment->setAdditionalInformation('payment_gateway', 'Midtrans');
                 $payment->setAdditionalInformation('merchant_id', $merchantId);
                 $payment->setAdditionalInformation('midtrans_order_id', $midtransOrderId);
-                //$this->saveOrder($order);
                 $this->paymentOrderRepository->saveOrder($order);
                 foreach ($this->payloadItemDetail($order, true) as $item) {
                     $item_details[] = $item;

@@ -3,12 +3,14 @@
 namespace Midtrans\Snap\Model\Order;
 
 use Exception;
+use Magento\Framework\Api\SearchCriteriaBuilder;
 use Magento\Framework\DB\Transaction;
 use Magento\Framework\Exception\CouldNotSaveException;
 use Magento\Framework\Message\ManagerInterface as MessageManagerInterface;
 use Magento\Framework\ObjectManagerInterface;
 use Magento\Sales\Api\Data\InvoiceInterface;
 use Magento\Sales\Api\Data\OrderInterface;
+use Magento\Sales\Api\InvoiceRepositoryInterface;
 use Magento\Sales\Model\Order;
 use Magento\Sales\Model\Order\CreditmemoFactory;
 use Magento\Sales\Model\Order\CreditmemoRepository;
@@ -75,6 +77,12 @@ class OrderRepository
     protected $messageManager;
 
     /**
+     * @var InvoiceRepositoryInterface
+     */
+    private $invoiceRepository;
+
+
+    /**
      * OrderFactory constructor.
      *
      * @param Order $order
@@ -100,7 +108,8 @@ class OrderRepository
         CreditmemoService $creditmemoService,
         CreditmemoRepository $creditmemoRepository,
         Transaction $transaction,
-        MessageManagerInterface $messageManager
+        MessageManagerInterface $messageManager,
+        InvoiceRepositoryInterface $invoiceRepository
     ) {
         $this->order = $order;
         $this->objectManager = $objectManager;
@@ -113,6 +122,7 @@ class OrderRepository
         $this->creditmemoRepository = $creditmemoRepository;
         $this->transaction = $transaction;
         $this->messageManager = $messageManager;
+        $this->invoiceRepository = $invoiceRepository;
     }
 
     /**
@@ -123,7 +133,7 @@ class OrderRepository
      */
     public function getOrderByIncrementId($realOrderId)
     {
-        return $this->order->loadByIncrementId($realOrderId);
+        return $this->magentoOrderRepository->get($realOrderId);
     }
 
     /**
@@ -179,7 +189,7 @@ class OrderRepository
         try {
             $this->magentoOrderRepository->save($order);
         } catch (Exception $e) {
-            $error_exception = "AbstractAction.class SaveOrder : " . $e;
+            $error_exception = "OrderRepository.class SaveOrder : " . $e;
             $this->midtransLogger->midtransError($error_exception);
         }
     }
@@ -298,7 +308,7 @@ class OrderRepository
      * @param Order $order
      * @return InvoiceInterface|Order\Invoice
      */
-    public function generateInvoice(Order $order)
+    public function generateInvoice(Order $order, $midtransTrxId)
     {
         try {
             if ($order->isEmpty()) {
@@ -318,22 +328,21 @@ class OrderRepository
                 throw new \Magento\Framework\Exception\LocalizedException(__('MIDTRANS-INFO: You can\'t create an invoice without products.'));
             }
 
-            $invoice->setTransactionId($order->getIncrementId());
+            if ($midtransTrxId) {
+                $invoice->setTransactionId($midtransTrxId);
+                $order->getPayment()->setLastTransId($midtransTrxId);
+            }
             $invoice->setRequestedCaptureCase(\Magento\Sales\Model\Order\Invoice::CAPTURE_OFFLINE);
             //  $invoice->pay();
 
             $invoice->register();
             $invoice->getOrder()->setCustomerNoteNotify(false);
 
-            //Save Invoice
-            $transactionSave = $this->transaction
-                ->addObject($invoice)
-                ->addObject($invoice->getOrder());
-            $transactionSave->save();
+            $this->invoiceRepository->save($invoice);
+            $this->magentoOrderRepository->save($order);
         } catch (\Exception $e) {
             $this->messageManager->addErrorMessage($e->getMessage());
         }
-        return $invoice;
     }
 
     /**
