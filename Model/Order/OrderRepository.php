@@ -137,6 +137,18 @@ class OrderRepository
     }
 
     /**
+     * Get order by entity id
+     *
+     * @return OrderInterface
+     * @throws \Magento\Framework\Exception\InputException
+     * @throws \Magento\Framework\Exception\NoSuchEntityException
+     */
+    public function getOrderByEntityId($entityId)
+    {
+        return $this->magentoOrderRepository->get($entityId);
+    }
+
+    /**
      * Get payment code from Order by incrementId
      *
      * @param $incrementId
