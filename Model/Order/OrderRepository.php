@@ -133,7 +133,19 @@ class OrderRepository
      */
     public function getOrderByIncrementId($realOrderId)
     {
-        return $this->magentoOrderRepository->get($realOrderId);
+        return $this->order->loadByIncrementId($realOrderId);
+    }
+
+    /**
+     * Get order by entity id
+     *
+     * @return OrderInterface
+     * @throws \Magento\Framework\Exception\InputException
+     * @throws \Magento\Framework\Exception\NoSuchEntityException
+     */
+    public function getOrderByEntityId($entityId)
+    {
+        return $this->magentoOrderRepository->get($entityId);
     }
 
     /**
