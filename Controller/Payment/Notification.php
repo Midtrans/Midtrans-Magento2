@@ -34,7 +34,6 @@ class Notification extends Action
             foreach ($incrementIds as $id) {
                 $entityId = $this->paymentOrderRepository->getOrderByIncrementId($id)->getEntityId();
                 $order  = $this->paymentOrderRepository->getOrderByEntityId($entityId);
-                $order->getEntityId();
                 $paymentCode = $order->getPayment()->getMethod();
 
                 if ($this->paymentOrderRepository->canProcess($order)) {
