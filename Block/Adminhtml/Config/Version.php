@@ -31,17 +31,11 @@ class Version extends Field
      *
      * @param AbstractElement $element
      * @return string
-     * @throws \Zend_Json_Exception
      */
     protected function _getElementHtml(AbstractElement $element)
     {
         $moduleVersion = $this->midtransDataConfiguration->getModuleVersion();
-        $response = $this->getModuleLatestVersion();
-
-        $latestModuleVersion = isset($response['tag_name']) ? $response['tag_name'] : 'Not Found!';
-        $urlVersion = isset($response['html_url']) ? $response['html_url'] : '#';
-
-        $html = '<td>
+        return '<td>
                         <label for="module_version">
                             <span><b>Installed Version</b></span>
                         </label>
@@ -50,12 +44,11 @@ class Version extends Field
                     </td>
                     <td>
                         <label for="current_version">
-                            <span><b>Latest Version</b></span>
+                            <span><b>Midtrans Magento Latest Version</b></span>
                         </label>
                         <div class="value"></div>
-                        <a target="_blank" href="' . $urlVersion . '">' . $latestModuleVersion . '</a>
+                        <a target="_blank" href="https://github.com/Midtrans/Midtrans-Magento2/releases/latest">Check Latest version</a>
                     </td>';
-        return $html;
     }
 
     /**
