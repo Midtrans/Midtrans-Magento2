@@ -5,6 +5,7 @@ namespace Midtrans\Snap\Block\Adminhtml\Config;
 use Magento\Backend\Block\Template\Context;
 use Magento\Config\Block\System\Config\Form\Field;
 use Magento\Framework\Data\Form\Element\AbstractElement;
+use Magento\Framework\HTTP\Client\Curl;
 use Midtrans\Snap\Helper\MidtransDataConfiguration;
 
 class Version extends Field
@@ -15,15 +16,21 @@ class Version extends Field
     protected $midtransDataConfiguration;
 
     /**
+     * @var Curl Magento CURL
+     */
+    protected $magentoCurl;
+
+    /**
      * Version constructor.
      * @param Context $context
      * @param array $data
      * @param MidtransDataConfiguration $midtransDataConfiguration
      */
-    public function __construct(MidtransDataConfiguration $midtransDataConfiguration, Context $context, array $data = [])
+    public function __construct(MidtransDataConfiguration $midtransDataConfiguration, Context $context, Curl $curl, array $data = [])
     {
         parent::__construct($context, $data);
         $this->midtransDataConfiguration = $midtransDataConfiguration;
+        $this->magentoCurl = $curl;
     }
 
     /**
@@ -55,34 +62,20 @@ class Version extends Field
      * Function to get latest version plugins from release Github repo
      *
      * @return array|mixed|null
-     * @throws \Zend_Json_Exception
+     * @deprecated In order to reduce reliance on external APIs, we have made the decision to remove this function in our upcoming major release.
      */
     protected function getModuleLatestVersion()
     {
-        $curl = curl_init();
-        $agent = 'Mozilla/4.0 (compatible; MSIE 6.0; Windows NT 5.1; SV1)';
-        curl_setopt_array($curl, [
-            CURLOPT_URL => 'https://api.github.com/repos/Midtrans/Midtrans-Magento2/releases/latest',
-            CURLOPT_RETURNTRANSFER => true,
-            CURLOPT_ENCODING => '',
-            CURLOPT_MAXREDIRS => 10,
-            CURLOPT_TIMEOUT => 0,
-            CURLOPT_FOLLOWLOCATION => true,
-            CURLOPT_HTTP_VERSION => CURL_HTTP_VERSION_1_1,
-            CURLOPT_USERAGENT => $agent,
-            CURLOPT_CUSTOMREQUEST => 'GET',
-        ]);
+        $this->magentoCurl->addHeader("Content-Type", "application/json");
+        $this->magentoCurl->addHeader("Content-Length", 200);
+        $this->magentoCurl->addHeader('User-Agent', 'Mozilla/4.0 (compatible; MSIE 6.0; Windows NT 5.1; SV1)');
+        $this->magentoCurl->setOption(CURLOPT_RETURNTRANSFER, true);
+        $this->magentoCurl->get('https://api.github.com/repos/Midtrans/Midtrans-Magento2/releases/latest');
 
-        $response = curl_exec($curl);
-        $httpCode = curl_getinfo($curl, CURLINFO_HTTP_CODE);
-
-        curl_close($curl);
-
-        if ($httpCode === 200) {
-            return \Zend_Json::decode($response);
+        if ($this->magentoCurl->getStatus() === 200) {
+            return $this->magentoCurl->getBody();
         } else {
-            $response = [];
-            return $response;
+            return [];
         }
     }
 }
