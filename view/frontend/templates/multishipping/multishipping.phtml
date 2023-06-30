@@ -45,7 +45,7 @@ use Midtrans\Snap\Block\Payment\Multishipping;
 </form>
 
 
-<script>window.config = <?php /* @escapeNotVerified */ echo \Zend_Json::encode($block->getPaymentConfig()); ?>;</script>
+<script>window.config = <?php /* @escapeNotVerified */ echo json_encode($block->getPaymentConfig()); ?>;</script>
 <script type="text/javascript"
         src="<?php echo $block->getPaymentConfig()['js']; ?>"
         data-client-key="<?php echo $block->getPaymentConfig()['clientkey']; ?>">
