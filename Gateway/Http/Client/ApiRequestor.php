@@ -79,7 +79,7 @@ class ApiRequestor
             "Accept" => "application/json",
             "User-Agent" => "Magento 2 Module",
             "X-Plugin-Name" => "midtrans-magento2-v$pluginVersion",
-            "X-Source" => "Magento 2 plugin",
+            "X-Source" => "Magento-2",
             "X-Source-Version" => "$pluginVersion"
         );
         $curl->setOption(CURLOPT_RETURNTRANSFER, true);
