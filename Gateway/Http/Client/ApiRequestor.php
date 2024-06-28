@@ -73,11 +73,14 @@ class ApiRequestor
             }
         }
 
+        $pluginVersion = Config::getMagentoPluginVersion();
         $headers = array(
             "Content-Type" => "application/json",
             "Accept" => "application/json",
             "User-Agent" => "Magento 2 Module",
-            "X-Plugin-Name" => "midtrans-magento2-v2.6.5"
+            "X-Plugin-Name" => "midtrans-magento2-v$pluginVersion",
+            "X-Source" => "Magento 2 plugin",
+            "X-Source-Version" => "$pluginVersion"
         );
         $curl->setOption(CURLOPT_RETURNTRANSFER, true);
 

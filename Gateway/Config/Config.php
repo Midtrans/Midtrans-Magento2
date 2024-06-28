@@ -84,4 +84,9 @@ class Config
         return Config::$isProduction ?
         Config::SNAP_PRODUCTION_BASE_URL : Config::SNAP_SANDBOX_BASE_URL;
     }
+
+    public static function getMagentoPluginVersion()
+    {
+        return "2.7.3";
+    }
 }
