@@ -13,12 +13,22 @@
         </policy>
         <policy id="script-src">
             <values>
-                <value id="midtrans" type="host">https://app.sandbox.midtrans.com/snap/snap.js</value>
+                <value id="midtrans-sandbox" type="host">https://app.sandbox.midtrans.com/snap/snap.js</value>
             </values>
         </policy>
         <policy id="script-src">
             <values>
-                <value id="midtrans-sandbox" type="host">https://app.midtrans.com/snap/snap.js</value>
+                <value id="midtrans-prod" type="host">https://app.midtrans.com/snap/snap.js</value>
+            </values>
+        </policy>
+        <policy id="connect-src">
+            <values>
+                <value id="clickstream-sandbox" type="host">https://snap-web-raccoon-integration.gojekapi.com/api/v1/events</value>
+            </values>
+        </policy>
+        <policy id="connect-src">
+            <values>
+                <value id="clickstream-prod" type="host">https://snap-web-raccoon.gojekapi.com/api/v1/events</value>
             </values>
         </policy>
     </policies>
