@@ -1,0 +1,35 @@
+<?xml version="1.0"?>
+<csp_whitelist xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="urn:magento:module:Magento_Csp:etc/csp_whitelist.xsd">
+    <policies>
+        <policy id="script-src">
+            <values>
+                <value id="mixpanel-js" type="host">http://cdn.mxpnl.com/libs/mixpanel-2-latest.min.js</value>
+            </values>
+        </policy>
+        <policy id="connect-src">
+            <values>
+                <value id="mixpanel-api" type="host">https://api-js.mixpanel.com/</value>
+            </values>
+        </policy>
+        <policy id="script-src">
+            <values>
+                <value id="midtrans-sandbox" type="host">https://app.sandbox.midtrans.com/snap/snap.js</value>
+            </values>
+        </policy>
+        <policy id="script-src">
+            <values>
+                <value id="midtrans-prod" type="host">https://app.midtrans.com/snap/snap.js</value>
+            </values>
+        </policy>
+        <policy id="connect-src">
+            <values>
+                <value id="clickstream-sandbox" type="host">https://snap-web-raccoon-integration.gojekapi.com/api/v1/events</value>
+            </values>
+        </policy>
+        <policy id="connect-src">
+            <values>
+                <value id="clickstream-prod" type="host">https://snap-web-raccoon.gojekapi.com/api/v1/events</value>
+            </values>
+        </policy>
+    </policies>
+</csp_whitelist>
