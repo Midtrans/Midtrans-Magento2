@@ -18,12 +18,18 @@ class Transaction
      * @return mixed[]
      * @throws \Exception
      */
-    public static function status($id)
+    public static function status($id, $paymentType=null)
     {
+        $additionalHeader = null;
+        if ($paymentType == "dana") {
+            $additionalHeader = array(
+                "transaction-source" => "SNAP_API");
+        }
         return ApiRequestor::get(
             Config::getBaseUrl() . '/' . $id . '/status',
             Config::$serverKey,
-            false
+            false,
+            $additionalHeader
         );
     }
 
@@ -97,7 +103,26 @@ class Transaction
             $params
         );
     }
-
+    /**
+     * Transaction status can be updated into refund
+     * if the customer decides to cancel completed/settlement payment.
+     * The same refund id cannot be reused again.
+     *
+     * @param string $id is transaction ID for SnapBI
+     *
+     * @param $params
+     * @return mixed[]
+     * @throws \Exception
+     */
+    public static function refundWithSnapBi($id, $params)
+    {
+        return ApiRequestor::post(
+            Config::getBaseUrl() . '/' . $id . '/refund',
+            Config::$serverKey,
+            $params,
+            array("transaction-source" => "SNAP_API")
+        );
+    }
     /**
      * Transaction status can be updated into refund
      * if the customer decides to cancel completed/settlement payment.
