@@ -35,6 +35,7 @@ class Info extends \Magento\Sales\Block\Adminhtml\Order\View\Tab\Info
         $merchantId = isset($param['merchant_id']) ? $param['merchant_id'] : "-";
         $orderId = isset($param['midtrans_order_id']) ? $param['midtrans_order_id'] : "-";
         $paymentMethod = isset($param['payment_method']) ? $param['payment_method'] : "-";
+        $transactionId = isset($param['transaction_id']) ? $param['transaction_id'] : "-";
 
         return '<table class="admin__table-secondary order-payment-information-table">
                     <tr>

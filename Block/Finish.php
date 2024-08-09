@@ -39,6 +39,7 @@ class Finish extends Template
         $transaction['payment_type'] = $this->registry->registry('payment_type');
         $transaction['gross_amount'] = $this->registry->registry('amount');
         $transaction['order_id'] = $this->registry->registry('order_id');
+        $transaction['transaction_id'] = $this->registry->registry('transaction_id');
 
         return $transaction;
     }
