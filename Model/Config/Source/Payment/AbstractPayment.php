@@ -148,7 +148,7 @@ class AbstractPayment extends Adapter
         $paymentCode = $order->getPayment()->getMethod();
         $midtransOrderId = $payment->getAdditionalInformation('midtrans_order_id');
         $transactionId = $payment ->getAdditionalInformation('midtrans_trx_id');
-        $paymentMethod = $midtransOrderId = $payment->getAdditionalInformation('payment_method');
+        $paymentMethod = $payment->getAdditionalInformation('payment_method');
         $orderId = $order->getIncrementId();
 
         Config::$serverKey = $this->dataConfig->getServerKey($paymentCode);
