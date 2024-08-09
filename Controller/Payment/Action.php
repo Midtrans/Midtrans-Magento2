@@ -340,7 +340,7 @@ abstract class Action implements ActionInterface
      * @return mixed[] Midtrans API response
      * @throws \Exception
      */
-    public function midtransGetStatus($param, $paymentCode = null)
+    public function midtransGetStatus($param, $paymentCode = null, $transactionId = null, $paymentType = null)
     {
         $orderId = null;
         if ($param instanceof Order) {
@@ -349,8 +349,11 @@ abstract class Action implements ActionInterface
         } else {
             $orderId = $param;
         }
+        if ($paymentType == "dana"){
+            $orderId = $transactionId;
+        }
         Config::$serverKey = $this->getMidtransDataConfig()->getServerKey($paymentCode);
         Config::$isProduction = $this->getMidtransDataConfig()->isProduction();
-        return MidtransTransaction::status($orderId);
+        return MidtransTransaction::status($orderId, $paymentType);
     }
 }
