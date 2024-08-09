@@ -184,10 +184,11 @@ class AbstractPayment extends Adapter
                 if ($response->status_code == 200) {
                     $order->addStatusToHistory(Order::STATE_PROCESSING, $reasonRefund, false);
                     $order->save();
-                    $payment->setTransactionId($response->refund_key);
                     if (strtolower($paymentMethod) == "dana") {
+                        $payment->setTransactionId($response->order_id);
                         $payment->setParentTransactionId($response->order_id);
                     } else {
+                        $payment->setTransactionId($response->refund_key);
                         $payment->setParentTransactionId($response->transaction_id);
                     }
                     $payment->setIsTransactionClosed(1);
