@@ -23,9 +23,9 @@ class ApiRequestor
      * @return mixed
      * @throws Exception
      */
-    public static function get($url, $server_key, $data_hash)
+    public static function get($url, $server_key, $data_hash, $additionalHeader = null)
     {
-        return self::remoteCall($url, $server_key, $data_hash, "GET");
+        return self::remoteCall($url, $server_key, $data_hash, "GET", $additionalHeader);
     }
 
     /**
@@ -37,9 +37,9 @@ class ApiRequestor
      * @return mixed
      * @throws Exception
      */
-    public static function post($url, $server_key, $data_hash)
+    public static function post($url, $server_key, $data_hash, $additionalHeader = null)
     {
-        return self::remoteCall($url, $server_key, $data_hash, "POST");
+        return self::remoteCall($url, $server_key, $data_hash, "POST", $additionalHeader);
     }
 
     /**
@@ -52,7 +52,7 @@ class ApiRequestor
      * @return mixed
      * @throws Exception
      */
-    public static function remoteCall($url, $server_key, $data_hash, $method)
+    public static function remoteCall($url, $server_key, $data_hash, $method, $additionalHeader = null)
     {
         $curl = new Curl();
         if (!$server_key) {
@@ -82,6 +82,9 @@ class ApiRequestor
             "X-Source" => "Magento-2",
             "X-Source-Version" => "$pluginVersion"
         );
+        if ($additionalHeader != null){
+            $headers = $headers + $additionalHeader;
+        }
         $curl->setOption(CURLOPT_RETURNTRANSFER, true);
 
         // Set append notification to header
