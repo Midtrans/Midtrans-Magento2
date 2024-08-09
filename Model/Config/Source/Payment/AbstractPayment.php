@@ -147,6 +147,8 @@ class AbstractPayment extends Adapter
         $order = $payment->getOrder();
         $paymentCode = $order->getPayment()->getMethod();
         $midtransOrderId = $payment->getAdditionalInformation('midtrans_order_id');
+        $transactionId = $payment ->getAdditionalInformation('midtrans_trx_id');
+        $paymentMethod = $midtransOrderId = $payment->getAdditionalInformation('payment_method');
         $orderId = $order->getIncrementId();
 
         Config::$serverKey = $this->dataConfig->getServerKey($paymentCode);
@@ -170,16 +172,24 @@ class AbstractPayment extends Adapter
         /*
          * Request refund to midtrans
          */
-        $response = $transaction::refund($midtransOrderId, $refundParams);
+        if (strtolower($paymentMethod) == "dana"){
+            $response = $transaction::refundWithSnapBi($transactionId, $refundParams);
+        } else {
+            $response = $transaction::refund($midtransOrderId, $refundParams);
+        }
+
 
         if (isset($response)) {
             if (isset($response->status_code)) {
                 if ($response->status_code == 200) {
                     $order->addStatusToHistory(Order::STATE_PROCESSING, $reasonRefund, false);
                     $order->save();
-
                     $payment->setTransactionId($response->refund_key);
-                    $payment->setParentTransactionId($response->transaction_id);
+                    if (strtolower($paymentMethod) == "dana") {
+                        $payment->setParentTransactionId($response->order_id);
+                    } else {
+                        $payment->setParentTransactionId($response->transaction_id);
+                    }
                     $payment->setIsTransactionClosed(1);
                     $payment->setShouldCloseParentTransaction(!$this->canRefund());
                 } else {
