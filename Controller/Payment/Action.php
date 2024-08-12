@@ -349,11 +349,16 @@ abstract class Action implements ActionInterface
         } else {
             $orderId = $param;
         }
-        if ($paymentType == "dana"){
+        if ($this->isOpenApi($paymentType)){
             $orderId = $transactionId;
         }
         Config::$serverKey = $this->getMidtransDataConfig()->getServerKey($paymentCode);
         Config::$isProduction = $this->getMidtransDataConfig()->isProduction();
         return MidtransTransaction::status($orderId, $paymentType);
+    }
+
+    private function isOpenApi($paymentType)
+    {
+        return strtolower($paymentType) == "dana";
     }
 }
