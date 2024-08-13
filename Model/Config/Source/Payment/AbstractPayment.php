@@ -17,6 +17,7 @@ use Magento\Sales\Model\Order;
 use Magento\Store\Model\StoreManagerInterface;
 use Midtrans\Snap\Gateway\Config\Config;
 use Midtrans\Snap\Gateway\Transaction;
+use Midtrans\Snap\Gateway\Utility\PaymentUtils;
 use Midtrans\Snap\Helper\MidtransDataConfiguration;
 use Midtrans\Snap\Logger\MidtransLogger;
 
@@ -172,7 +173,7 @@ class AbstractPayment extends Adapter
         /*
          * Request refund to midtrans
          */
-        if (strtolower($paymentMethod) == "dana"){
+        if (PaymentUtils::isOpenApi($paymentMethod)){
             $response = $transaction::refundWithSnapBi($transactionId, $refundParams);
         } else {
             $response = $transaction::refund($midtransOrderId, $refundParams);
@@ -184,7 +185,7 @@ class AbstractPayment extends Adapter
                 if ($response->status_code == 200) {
                     $order->addStatusToHistory(Order::STATE_PROCESSING, $reasonRefund, false);
                     $order->save();
-                    if (strtolower($paymentMethod) == "dana") {
+                    if (PaymentUtils::isOpenApi($paymentMethod)) {
                         $payment->setTransactionId($response->order_id);
                         $payment->setParentTransactionId($response->order_id);
                     } else {

@@ -129,7 +129,7 @@ class Notification extends Action
                 $payment = $order->getPayment();
                 $payment->setParentTransactionId($trxId);
                 $payment->setIsTransactionClosed(true);
-                if (PaymentUtils::isOpenApi($payment_type)){
+                if (!PaymentUtils::isOpenApi($payment_type)){
                     $payment->setTransactionId($trxId . '-' . strtoupper($transaction));
                 }
                 $payment->addTransaction(TransactionInterface::TYPE_VOID, null, true);
