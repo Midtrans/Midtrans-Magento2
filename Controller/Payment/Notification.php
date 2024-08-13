@@ -4,6 +4,7 @@ namespace Midtrans\Snap\Controller\Payment;
 
 use Magento\Sales\Api\Data\TransactionInterface;
 use Magento\Sales\Model\Order;
+use Midtrans\Snap\Gateway\Utility\PaymentUtils;
 
 /**
  * Class Notification
@@ -50,11 +51,11 @@ class Notification extends Action
             // 3. Process notification regular order
             $this->getResponse()->setBody('OK');
             $order = $this->_order->loadByIncrementId($orderIdRequest);
-            if ($this->paymentOrderRepository->canProcess($order) && strtolower($paymentType) != "dana") {
-                $midtransStatusResult = $this->midtransGetStatus($order, null, null, $paymentType);
+            if ($this->paymentOrderRepository->canProcess($order) && !PaymentUtils::isOpenApi($paymentType)) {
+                $midtransStatusResult = $this->midtransGetStatus($order, null, $paymentType);
                 $this->processOrder($order, $midtransStatusResult, $rawBody);
-            } else if (strtolower($paymentType) == "dana"){
-                $midtransStatusResult = $this->midtransGetStatus($order, null, $transactionId, $paymentType);
+            } else if (!PaymentUtils::isOpenApi($paymentType)){
+                $midtransStatusResult = $this->midtransGetStatus($transactionId, null, $paymentType);
                 $midOrderId = $midtransStatusResult->order_id;
                 $order = $this->_order->loadByIncrementId($midOrderId);
                 if ($this->paymentOrderRepository->canProcess($order)){
@@ -128,7 +129,7 @@ class Notification extends Action
                 $payment = $order->getPayment();
                 $payment->setParentTransactionId($trxId);
                 $payment->setIsTransactionClosed(true);
-                if (strtolower($payment_type) != "dana"){
+                if (PaymentUtils::isOpenApi($payment_type)){
                     $payment->setTransactionId($trxId . '-' . strtoupper($transaction));
                 }
                 $payment->addTransaction(TransactionInterface::TYPE_VOID, null, true);

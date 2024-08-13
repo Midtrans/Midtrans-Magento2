@@ -4,6 +4,8 @@ namespace Midtrans\Snap\Gateway;
 
 use Midtrans\Snap\Gateway\Http\Client\ApiRequestor;
 use Midtrans\Snap\Gateway\Config\Config;
+use Midtrans\Snap\Gateway\Utility\PaymentUtils;
+
 /**
  * API methods to get transaction status, approve and cancel transactions
  */
@@ -24,7 +26,7 @@ class Transaction
             Config::getBaseUrl() . '/' . $id . '/status',
             Config::$serverKey,
             false,
-            self::isOpenApi($paymentType)
+            PaymentUtils::isOpenApi($paymentType)
         );
     }
 
@@ -154,10 +156,5 @@ class Transaction
             Config::$serverKey,
             false
         );
-    }
-
-    private static function isOpenApi($paymentType)
-    {
-        return strtolower($paymentType) == "dana";
     }
 }
