@@ -24,6 +24,7 @@ use Magento\Sales\Model\Service\CreditmemoService;
 use Magento\Sales\Model\Service\InvoiceService;
 use Midtrans\Snap\Gateway\Config\Config;
 use Midtrans\Snap\Gateway\Transaction as MidtransTransaction;
+use Midtrans\Snap\Gateway\Utility\PaymentUtils;
 use Midtrans\Snap\Helper\MidtransDataConfiguration;
 use Midtrans\Snap\Logger\MidtransLogger;
 use Midtrans\Snap\Model\PaymentRequestRepository;
@@ -340,7 +341,7 @@ abstract class Action implements ActionInterface
      * @return mixed[] Midtrans API response
      * @throws \Exception
      */
-    public function midtransGetStatus($param, $paymentCode = null, $paymentType = null)
+    public function midtransGetStatus($param, $paymentCode = null, $transactionId = null, $paymentType = null)
     {
         $orderId = null;
         if ($param instanceof Order) {
@@ -348,6 +349,9 @@ abstract class Action implements ActionInterface
             $paymentCode = $param->getPayment()->getMethod();
         } else {
             $orderId = $param;
+        }
+        if (PaymentUtils::isOpenApi($paymentType)){
+            $orderId = $transactionId;
         }
         Config::$serverKey = $this->getMidtransDataConfig()->getServerKey($paymentCode);
         Config::$isProduction = $this->getMidtransDataConfig()->isProduction();

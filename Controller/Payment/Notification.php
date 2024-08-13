@@ -52,10 +52,10 @@ class Notification extends Action
             $this->getResponse()->setBody('OK');
             $order = $this->_order->loadByIncrementId($orderIdRequest);
             if ($this->paymentOrderRepository->canProcess($order) && !PaymentUtils::isOpenApi($paymentType)) {
-                $midtransStatusResult = $this->midtransGetStatus($order, null, $paymentType);
+                $midtransStatusResult = $this->midtransGetStatus($order, null, null, $paymentType);
                 $this->processOrder($order, $midtransStatusResult, $rawBody);
             } else if (PaymentUtils::isOpenApi($paymentType)){
-                $midtransStatusResult = $this->midtransGetStatus($transactionId, null, $paymentType);
+                $midtransStatusResult = $this->midtransGetStatus($order, null, $transactionId, $paymentType);
                 $midOrderId = $midtransStatusResult->order_id;
                 $order = $this->_order->loadByIncrementId($midOrderId);
                 if ($this->paymentOrderRepository->canProcess($order)){

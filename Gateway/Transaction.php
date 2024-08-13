@@ -111,7 +111,7 @@ class Transaction
      * @return mixed[]
      * @throws \Exception
      */
-    public static function refundWithSnapBi($id, $params): array
+    public static function refundWithSnapBi($id, $params)
     {
         return ApiRequestor::post(
             Config::getBaseUrl() . '/' . $id . '/refund',
