@@ -54,7 +54,7 @@ class Notification extends Action
             if ($this->paymentOrderRepository->canProcess($order) && !PaymentUtils::isOpenApi($paymentType)) {
                 $midtransStatusResult = $this->midtransGetStatus($order, null, $paymentType);
                 $this->processOrder($order, $midtransStatusResult, $rawBody);
-            } else if (!PaymentUtils::isOpenApi($paymentType)){
+            } else if (PaymentUtils::isOpenApi($paymentType)){
                 $midtransStatusResult = $this->midtransGetStatus($transactionId, null, $paymentType);
                 $midOrderId = $midtransStatusResult->order_id;
                 $order = $this->_order->loadByIncrementId($midOrderId);
