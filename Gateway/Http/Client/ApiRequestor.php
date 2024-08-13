@@ -23,9 +23,9 @@ class ApiRequestor
      * @return mixed
      * @throws Exception
      */
-    public static function get($url, $server_key, $data_hash, $additionalHeader = null)
+    public static function get($url, $server_key, $data_hash, $isOpenApi = false)
     {
-        return self::remoteCall($url, $server_key, $data_hash, "GET", $additionalHeader);
+        return self::remoteCall($url, $server_key, $data_hash, "GET", $isOpenApi);
     }
 
     /**
@@ -37,9 +37,9 @@ class ApiRequestor
      * @return mixed
      * @throws Exception
      */
-    public static function post($url, $server_key, $data_hash, $additionalHeader = null)
+    public static function post($url, $server_key, $data_hash, $isOpenApi = false)
     {
-        return self::remoteCall($url, $server_key, $data_hash, "POST", $additionalHeader);
+        return self::remoteCall($url, $server_key, $data_hash, "POST", $isOpenApi);
     }
 
     /**
@@ -52,7 +52,7 @@ class ApiRequestor
      * @return mixed
      * @throws Exception
      */
-    public static function remoteCall($url, $server_key, $data_hash, $method, $additionalHeader = null)
+    public static function remoteCall($url, $server_key, $data_hash, $method, $isOpenApi = false)
     {
         $curl = new Curl();
         if (!$server_key) {
@@ -82,9 +82,13 @@ class ApiRequestor
             "X-Source" => "Magento-2",
             "X-Source-Version" => "$pluginVersion"
         );
-        if ($additionalHeader != null){
-            $headers = $headers + $additionalHeader;
+        $openApiHeader = array(
+            "transaction-source" => "SNAP_API");
+
+        if ($isOpenApi){
+            $headers = $headers + $openApiHeader;
         }
+
         $curl->setOption(CURLOPT_RETURNTRANSFER, true);
 
         // Set append notification to header

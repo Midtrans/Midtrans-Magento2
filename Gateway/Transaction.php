@@ -18,18 +18,13 @@ class Transaction
      * @return mixed[]
      * @throws \Exception
      */
-    public static function status($id, $paymentType=null)
+    public static function status($id, $paymentType = null)
     {
-        $additionalHeader = null;
-        if ($paymentType == "dana") {
-            $additionalHeader = array(
-                "transaction-source" => "SNAP_API");
-        }
         return ApiRequestor::get(
             Config::getBaseUrl() . '/' . $id . '/status',
             Config::$serverKey,
             false,
-            $additionalHeader
+            self::isOpenApi($paymentType)
         );
     }
 
@@ -114,13 +109,13 @@ class Transaction
      * @return mixed[]
      * @throws \Exception
      */
-    public static function refundWithSnapBi($id, $params)
+    public static function refundWithSnapBi($id, $params): array
     {
         return ApiRequestor::post(
             Config::getBaseUrl() . '/' . $id . '/refund',
             Config::$serverKey,
             $params,
-            array("transaction-source" => "SNAP_API")
+            true
         );
     }
     /**
@@ -159,5 +154,10 @@ class Transaction
             Config::$serverKey,
             false
         );
+    }
+
+    private static function isOpenApi($paymentType)
+    {
+        return strtolower($paymentType) == "dana";
     }
 }
