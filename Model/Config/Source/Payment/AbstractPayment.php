@@ -17,6 +17,7 @@ use Magento\Sales\Model\Order;
 use Magento\Store\Model\StoreManagerInterface;
 use Midtrans\Snap\Gateway\Config\Config;
 use Midtrans\Snap\Gateway\Transaction;
+use Midtrans\Snap\Gateway\Utility\PaymentUtils;
 use Midtrans\Snap\Helper\MidtransDataConfiguration;
 use Midtrans\Snap\Logger\MidtransLogger;
 
@@ -147,6 +148,8 @@ class AbstractPayment extends Adapter
         $order = $payment->getOrder();
         $paymentCode = $order->getPayment()->getMethod();
         $midtransOrderId = $payment->getAdditionalInformation('midtrans_order_id');
+        $transactionId = $payment ->getAdditionalInformation('midtrans_trx_id');
+        $paymentMethod = $payment->getAdditionalInformation('payment_method');
         $orderId = $order->getIncrementId();
 
         Config::$serverKey = $this->dataConfig->getServerKey($paymentCode);
@@ -170,16 +173,25 @@ class AbstractPayment extends Adapter
         /*
          * Request refund to midtrans
          */
-        $response = $transaction::refund($midtransOrderId, $refundParams);
+        if (PaymentUtils::isOpenApi($paymentMethod)){
+            $response = $transaction::refundWithSnapBi($transactionId, $refundParams);
+        } else {
+            $response = $transaction::refund($midtransOrderId, $refundParams);
+        }
+
 
         if (isset($response)) {
             if (isset($response->status_code)) {
                 if ($response->status_code == 200) {
                     $order->addStatusToHistory(Order::STATE_PROCESSING, $reasonRefund, false);
                     $order->save();
-
-                    $payment->setTransactionId($response->refund_key);
-                    $payment->setParentTransactionId($response->transaction_id);
+                    if (PaymentUtils::isOpenApi($paymentMethod)) {
+                        $payment->setTransactionId($response->order_id);
+                        $payment->setParentTransactionId($response->order_id);
+                    } else {
+                        $payment->setTransactionId($response->refund_key);
+                        $payment->setParentTransactionId($response->transaction_id);
+                    }
                     $payment->setIsTransactionClosed(1);
                     $payment->setShouldCloseParentTransaction(!$this->canRefund());
                 } else {

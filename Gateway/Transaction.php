@@ -4,6 +4,8 @@ namespace Midtrans\Snap\Gateway;
 
 use Midtrans\Snap\Gateway\Http\Client\ApiRequestor;
 use Midtrans\Snap\Gateway\Config\Config;
+use Midtrans\Snap\Gateway\Utility\PaymentUtils;
+
 /**
  * API methods to get transaction status, approve and cancel transactions
  */
@@ -18,12 +20,13 @@ class Transaction
      * @return mixed[]
      * @throws \Exception
      */
-    public static function status($id)
+    public static function status($id, $paymentType = null)
     {
         return ApiRequestor::get(
             Config::getBaseUrl() . '/' . $id . '/status',
             Config::$serverKey,
-            false
+            false,
+            PaymentUtils::isOpenApi($paymentType)
         );
     }
 
@@ -97,7 +100,26 @@ class Transaction
             $params
         );
     }
-
+    /**
+     * Transaction status can be updated into refund
+     * if the customer decides to cancel completed/settlement payment.
+     * The same refund id cannot be reused again.
+     *
+     * @param string $id is transaction ID for SnapBI
+     *
+     * @param $params
+     * @return mixed[]
+     * @throws \Exception
+     */
+    public static function refundWithSnapBi($id, $params)
+    {
+        return ApiRequestor::post(
+            Config::getBaseUrl() . '/' . $id . '/refund',
+            Config::$serverKey,
+            $params,
+            true
+        );
+    }
     /**
      * Transaction status can be updated into refund
      * if the customer decides to cancel completed/settlement payment.

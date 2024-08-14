@@ -4,6 +4,7 @@ namespace Midtrans\Snap\Controller\Payment;
 
 use Magento\Sales\Api\Data\TransactionInterface;
 use Magento\Sales\Model\Order;
+use Midtrans\Snap\Gateway\Utility\PaymentUtils;
 
 /**
  * Class Notification
@@ -23,6 +24,8 @@ class Notification extends Action
         $input_source = $this->getRequest()->getContent();
         $rawBody = $this->midtransDataConfiguration->json->unserialize($input_source);
         $orderIdRequest = $rawBody['order_id'];
+        $transactionId = $rawBody['transaction_id'];
+        $paymentType = $rawBody['payment_type'];
 
         // Check if order for multishipping
         if (strpos($orderIdRequest, 'multishipping-') !== false) {
@@ -37,7 +40,7 @@ class Notification extends Action
                 $paymentCode = $order->getPayment()->getMethod();
 
                 if ($this->paymentOrderRepository->canProcess($order)) {
-                    $midtransStatusResult = $this->midtransGetStatus($orderIdRequest, $paymentCode);
+                    $midtransStatusResult = $this->midtransGetStatus($orderIdRequest, $paymentCode, $transactionId, $paymentType);
                     $this->processOrder($order, $midtransStatusResult, $rawBody);
                 } else {
                     return $this->getResponse()->setBody('404 Order not found');
@@ -48,9 +51,18 @@ class Notification extends Action
             // 3. Process notification regular order
             $this->getResponse()->setBody('OK');
             $order = $this->_order->loadByIncrementId($orderIdRequest);
-            if ($this->paymentOrderRepository->canProcess($order)) {
-                $midtransStatusResult = $this->midtransGetStatus($order);
+            if ($this->paymentOrderRepository->canProcess($order) && !PaymentUtils::isOpenApi($paymentType)) {
+                $midtransStatusResult = $this->midtransGetStatus($order, null, null, $paymentType);
                 $this->processOrder($order, $midtransStatusResult, $rawBody);
+            } else if (PaymentUtils::isOpenApi($paymentType)){
+                $midtransStatusResult = $this->midtransGetStatus($order, null, $transactionId, $paymentType);
+                $midOrderId = $midtransStatusResult->order_id;
+                $order = $this->_order->loadByIncrementId($midOrderId);
+                if ($this->paymentOrderRepository->canProcess($order)){
+                    $this->processOrder($order, $midtransStatusResult, $rawBody);
+                } else {
+                    return $this->getResponse()->setBody('404 Order not found');
+                }
             } else {
                 return $this->getResponse()->setBody('404 Order not found');
             }
@@ -117,7 +129,9 @@ class Notification extends Action
                 $payment = $order->getPayment();
                 $payment->setParentTransactionId($trxId);
                 $payment->setIsTransactionClosed(true);
-                $payment->setTransactionId($trxId . '-' . strtoupper($transaction));
+                if (!PaymentUtils::isOpenApi($payment_type)){
+                    $payment->setTransactionId($trxId . '-' . strtoupper($transaction));
+                }
                 $payment->addTransaction(TransactionInterface::TYPE_VOID, null, true);
             }
             $this->paymentOrderRepository->cancelOrder($order, Order::STATE_CANCELED, $order_note);
@@ -173,7 +187,7 @@ class Notification extends Action
         /**
          * If log request isEnabled, add request payload to var/log/midtrans/request.log
          */
-        $_info = "status : " . $transaction . " , order : " . $midtransOrderId . ", payment type : " . $payment_type;
+        $_info = "status : " . $transaction . " , order : " . $midtransOrderId . ", payment type : " . $payment_type . "transaction id" . $trxId;
         $this->_midtransLogger->midtransNotification($_info);
     }
 
