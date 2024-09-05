@@ -87,6 +87,6 @@ class Config
 
     public static function getMagentoPluginVersion()
     {
-        return "2.7.3";
+        return "2.7.4";
     }
 }
