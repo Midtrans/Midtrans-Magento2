@@ -6,11 +6,15 @@ use Magento\Sales\Api\Data\TransactionInterface;
 use Magento\Sales\Model\Order;
 use Midtrans\Snap\Gateway\Utility\PaymentUtils;
 
+use Magento\Framework\App\CsrfAwareActionInterface;
+use Magento\Framework\App\RequestInterface;
+use Magento\Framework\App\Request\InvalidRequestException;
+
 /**
  * Class Notification
  * Handle notifications from midtrans http notifications
  */
-class Notification extends Action
+class Notification extends Action implements CsrfAwareActionInterface
 {
     /**
      * Main function
@@ -18,6 +22,17 @@ class Notification extends Action
      * @return \Magento\Framework\App\ResponseInterface|\Magento\Framework\Controller\ResultInterface
      * @throws \Exception
      */
+
+    public function createCsrfValidationException(RequestInterface $request): ?InvalidRequestException
+    {
+        return null;
+    }
+
+    public function validateForCsrf(RequestInterface $request): ?bool
+    {
+        return true;
+    }
+
     public function execute()
     {
         // 1. Get body from request
@@ -227,8 +242,8 @@ class Notification extends Action
             }
         }
         /**
-         Skip refund process if not qualified
-        */
+        Skip refund process if not qualified
+         */
         else {
             $this->getResponse()->setBody('OK');
         }
